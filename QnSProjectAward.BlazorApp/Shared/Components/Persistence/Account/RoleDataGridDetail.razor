@@ -1,0 +1,16 @@
+@*@QnSGeneratedCode*@
+@inherits DataGridDetailComponent
+@using Radzen;
+@using TModel = QnSProjectAward.BlazorApp.Models.Persistence.Account.Role;
+
+<RadzenCard Style="margin-bottom:20px">
+    <b>@TranslateFor("TitleDetails")</b>
+</RadzenCard>
+<RadzenPanel>
+    <HeaderTemplate>
+    </HeaderTemplate>
+    <ChildContent>
+        <DisplayModelComponent ParentComponent=@this Model="@ParentModel" />
+    </ChildContent>
+</RadzenPanel>
+

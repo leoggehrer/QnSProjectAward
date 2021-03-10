@@ -1,0 +1,48 @@
+//@QnSCodeCopy
+//MdStart
+using CommonBase.Extensions;
+using QnSProjectAward.BlazorApp.Models;
+using QnSProjectAward.BlazorApp.Models.Modules.Form;
+using QnSProjectAward.BlazorApp.Pages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+namespace QnSProjectAward.BlazorApp.Modules.Helpers
+{
+    public class SelectEditMember<T> : EditModelMember where T : Contracts.IIdentifiable
+    {
+        public SelectEditMember(ModelPage page, ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty, Func<T, string> toText, Func<T, bool> selector)
+            : base(page, model, propertyInfo, displayProperty)
+        {
+            SelectItems = new SelectItems<T>(page, toText, selector);
+
+            if (model is IdentityModel im)
+            {
+                if (SelectItems.Any(e => e.Selected) == false)
+                {
+                    EditValue = SelectItems.ElementAt(0).Value;
+                }
+            }
+            EditCtrlType = Common.ControlType.Select;
+        }
+        public SelectEditMember(ModelPage page, ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty, IEnumerable<T> items, Func<T, string> toText, Func<T, bool> selector)
+            : base(page, model, propertyInfo, displayProperty)
+        {
+            items.CheckArgument(nameof(items));
+
+            SelectItems = new SelectItems<T>(items, toText, selector);
+
+            if (model is IdentityModel im)
+            {
+                if (SelectItems.Any(e => e.Selected) == false)
+                {
+                    EditValue = SelectItems.ElementAt(0).Value;
+                }
+            }
+            EditCtrlType = Common.ControlType.Select;
+        }
+    }
+}
+//MdEnd
