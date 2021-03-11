@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace QnSProjectAward.Logic.Migrations
@@ -11,13 +11,10 @@ namespace QnSProjectAward.Logic.Migrations
                 name: "Account");
 
             migrationBuilder.EnsureSchema(
-                name: "MusicStoreApp");
+                name: "App");
 
             migrationBuilder.EnsureSchema(
                 name: "Data");
-
-            migrationBuilder.EnsureSchema(
-                name: "Test");
 
             migrationBuilder.EnsureSchema(
                 name: "Configuration");
@@ -26,19 +23,22 @@ namespace QnSProjectAward.Logic.Migrations
                 name: "Language");
 
             migrationBuilder.CreateTable(
-                name: "Artist",
-                schema: "MusicStoreApp",
+                name: "Award",
+                schema: "App",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    From = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    To = table.Column<DateTime>(type: "datetime2", nullable: true),
                     State = table.Column<int>(type: "int", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Artist", x => x.Id);
+                    table.PrimaryKey("PK_Award", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,55 +55,6 @@ namespace QnSProjectAward.Logic.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BinaryData", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EditForm",
-                schema: "Test",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TextBox = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    TextArea = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    TextBoxRequired = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    TextAreaReadonly = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EnumState = table.Column<int>(type: "int", nullable: false),
-                    CheckBox = table.Column<bool>(type: "bit", nullable: false),
-                    CheckBoxNullable = table.Column<bool>(type: "bit", nullable: true),
-                    ByteValue = table.Column<byte>(type: "tinyint", nullable: false),
-                    ByteNullable = table.Column<byte>(type: "tinyint", nullable: true),
-                    ShortValue = table.Column<short>(type: "smallint", nullable: false),
-                    ShortNullable = table.Column<short>(type: "smallint", nullable: true),
-                    IntegerValue = table.Column<int>(type: "int", nullable: false),
-                    IntegerNullable = table.Column<int>(type: "int", nullable: true),
-                    DoubleValue = table.Column<double>(type: "float", nullable: false),
-                    DoubleNullable = table.Column<double>(type: "float", nullable: true),
-                    DateTimeValue = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateTimeNullable = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TimeSpanValue = table.Column<TimeSpan>(type: "time", nullable: false),
-                    TimeSpanNullable = table.Column<TimeSpan>(type: "time", nullable: true),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EditForm", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Genre",
-                schema: "MusicStoreApp",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    State = table.Column<int>(type: "int", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Genre", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -127,27 +78,6 @@ namespace QnSProjectAward.Logic.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Identity", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Order",
-                schema: "Test",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    Count = table.Column<int>(type: "int", nullable: false),
-                    PiecePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Percentage = table.Column<double>(type: "float", nullable: false),
-                    PriceNet = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Order", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,45 +133,54 @@ namespace QnSProjectAward.Logic.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Album",
-                schema: "MusicStoreApp",
+                name: "Juror",
+                schema: "App",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
-                    ArtistId = table.Column<int>(type: "int", nullable: false),
-                    State = table.Column<int>(type: "int", nullable: false),
+                    AwardId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Institution = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Logo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Album", x => x.Id);
+                    table.PrimaryKey("PK_Juror", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Album_Artist_ArtistId",
-                        column: x => x.ArtistId,
-                        principalSchema: "MusicStoreApp",
-                        principalTable: "Artist",
+                        name: "FK_Juror_Award_AwardId",
+                        column: x => x.AwardId,
+                        principalSchema: "App",
+                        principalTable: "Award",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "GenreEx",
-                schema: "MusicStoreApp",
+                name: "Project",
+                schema: "App",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AwardId = table.Column<int>(type: "int", nullable: false),
+                    School = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
+                    Logo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GenreEx", x => x.Id);
+                    table.PrimaryKey("PK_Project", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GenreEx_Genre_Id",
-                        column: x => x.Id,
-                        principalSchema: "MusicStoreApp",
-                        principalTable: "Genre",
+                        name: "FK_Project_Award_AwardId",
+                        column: x => x.AwardId,
+                        principalSchema: "App",
+                        principalTable: "Award",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -354,37 +293,59 @@ namespace QnSProjectAward.Logic.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Track",
-                schema: "MusicStoreApp",
+                name: "Member",
+                schema: "App",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AlbumId = table.Column<int>(type: "int", nullable: false),
-                    GenreId = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
-                    Composer = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
-                    Milliseconds = table.Column<long>(type: "bigint", nullable: false),
-                    Bytes = table.Column<long>(type: "bigint", nullable: false),
-                    UnitPrice = table.Column<double>(type: "float", nullable: false),
-                    State = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Course = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
+                    Role = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Track", x => x.Id);
+                    table.PrimaryKey("PK_Member", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Track_Album_AlbumId",
-                        column: x => x.AlbumId,
-                        principalSchema: "MusicStoreApp",
-                        principalTable: "Album",
+                        name: "FK_Member_Project_ProjectId",
+                        column: x => x.ProjectId,
+                        principalSchema: "App",
+                        principalTable: "Project",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rating",
+                schema: "App",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    JurorId = table.Column<int>(type: "int", nullable: false),
+                    Rate = table.Column<int>(type: "int", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rating", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Rating_Juror_JurorId",
+                        column: x => x.JurorId,
+                        principalSchema: "App",
+                        principalTable: "Juror",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Track_Genre_GenreId",
-                        column: x => x.GenreId,
-                        principalSchema: "MusicStoreApp",
-                        principalTable: "Genre",
+                        name: "FK_Rating_Project_ProjectId",
+                        column: x => x.ProjectId,
+                        principalSchema: "App",
+                        principalTable: "Project",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -396,37 +357,10 @@ namespace QnSProjectAward.Logic.Migrations
                 column: "IdentityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Album_ArtistId",
-                schema: "MusicStoreApp",
-                table: "Album",
-                column: "ArtistId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Album_Title",
-                schema: "MusicStoreApp",
-                table: "Album",
-                column: "Title",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Artist_Name",
-                schema: "MusicStoreApp",
-                table: "Artist",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BinaryData_Guid",
                 schema: "Data",
                 table: "BinaryData",
                 column: "Guid",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Genre_Name",
-                schema: "MusicStoreApp",
-                table: "Genre",
-                column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -456,10 +390,40 @@ namespace QnSProjectAward.Logic.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Juror_AwardId",
+                schema: "App",
+                table: "Juror",
+                column: "AwardId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LoginSession_IdentityId",
                 schema: "Account",
                 table: "LoginSession",
                 column: "IdentityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Member_ProjectId",
+                schema: "App",
+                table: "Member",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Project_AwardId",
+                schema: "App",
+                table: "Project",
+                column: "AwardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rating_JurorId",
+                schema: "App",
+                table: "Rating",
+                column: "JurorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rating_ProjectId",
+                schema: "App",
+                table: "Rating",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Role_Designation",
@@ -474,24 +438,6 @@ namespace QnSProjectAward.Logic.Migrations
                 table: "Setting",
                 columns: new[] { "AppName", "Key" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Track_AlbumId",
-                schema: "MusicStoreApp",
-                table: "Track",
-                column: "AlbumId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Track_GenreId",
-                schema: "MusicStoreApp",
-                table: "Track",
-                column: "GenreId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Track_Title",
-                schema: "MusicStoreApp",
-                table: "Track",
-                column: "Title");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Translation_AppName_KeyLanguage_Key",
@@ -519,14 +465,6 @@ namespace QnSProjectAward.Logic.Migrations
                 schema: "Data");
 
             migrationBuilder.DropTable(
-                name: "EditForm",
-                schema: "Test");
-
-            migrationBuilder.DropTable(
-                name: "GenreEx",
-                schema: "MusicStoreApp");
-
-            migrationBuilder.DropTable(
                 name: "IdentityXRole",
                 schema: "Account");
 
@@ -535,16 +473,16 @@ namespace QnSProjectAward.Logic.Migrations
                 schema: "Account");
 
             migrationBuilder.DropTable(
-                name: "Order",
-                schema: "Test");
+                name: "Member",
+                schema: "App");
+
+            migrationBuilder.DropTable(
+                name: "Rating",
+                schema: "App");
 
             migrationBuilder.DropTable(
                 name: "Setting",
                 schema: "Configuration");
-
-            migrationBuilder.DropTable(
-                name: "Track",
-                schema: "MusicStoreApp");
 
             migrationBuilder.DropTable(
                 name: "Translation",
@@ -559,20 +497,20 @@ namespace QnSProjectAward.Logic.Migrations
                 schema: "Account");
 
             migrationBuilder.DropTable(
-                name: "Album",
-                schema: "MusicStoreApp");
+                name: "Juror",
+                schema: "App");
 
             migrationBuilder.DropTable(
-                name: "Genre",
-                schema: "MusicStoreApp");
+                name: "Project",
+                schema: "App");
 
             migrationBuilder.DropTable(
                 name: "Identity",
                 schema: "Account");
 
             migrationBuilder.DropTable(
-                name: "Artist",
-                schema: "MusicStoreApp");
+                name: "Award",
+                schema: "App");
         }
     }
 }

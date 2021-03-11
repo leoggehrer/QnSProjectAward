@@ -824,6 +824,527 @@ namespace QnSProjectAward.AspMvc.Models.Persistence.Account
         static partial void AfterCreate(Persistence.Account.ActionLog instance, QnSProjectAward.Contracts.Persistence.Account.IActionLog other);
     }
 }
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    partial class Rating : VersionModel
+    {
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    using System;
+    public partial class Rating : QnSProjectAward.Contracts.Persistence.App.IRating
+    {
+        static Rating()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Rating()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 ProjectId
+        {
+            get;
+            set;
+        }
+        public System.Int32 JurorId
+        {
+            get;
+            set;
+        }
+        public QnSProjectAward.Contracts.Modules.Common.Rate Rate
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IRating other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                ProjectId = other.ProjectId;
+                JurorId = other.JurorId;
+                Rate = other.Rate;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IRating other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IRating other);
+        public static Persistence.App.Rating Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Rating();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Rating Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Rating();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Rating Create(QnSProjectAward.Contracts.Persistence.App.IRating other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Rating();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Rating instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Rating instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IRating other);
+        static partial void AfterCreate(Persistence.App.Rating instance, QnSProjectAward.Contracts.Persistence.App.IRating other);
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    partial class Project : VersionModel
+    {
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    using System;
+    public partial class Project : QnSProjectAward.Contracts.Persistence.App.IProject
+    {
+        static Project()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Project()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 AwardId
+        {
+            get;
+            set;
+        }
+        public System.String School
+        {
+            get;
+            set;
+        }
+        public System.String Title
+        {
+            get;
+            set;
+        }
+        public System.String Description
+        {
+            get;
+            set;
+        }
+        public System.Byte[] Logo
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IProject other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                AwardId = other.AwardId;
+                School = other.School;
+                Title = other.Title;
+                Description = other.Description;
+                Logo = other.Logo;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IProject other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IProject other);
+        public static Persistence.App.Project Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Project();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Project Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Project();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Project Create(QnSProjectAward.Contracts.Persistence.App.IProject other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Project();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Project instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Project instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IProject other);
+        static partial void AfterCreate(Persistence.App.Project instance, QnSProjectAward.Contracts.Persistence.App.IProject other);
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    partial class Member : VersionModel
+    {
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    using System;
+    public partial class Member : QnSProjectAward.Contracts.Persistence.App.IMember
+    {
+        static Member()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Member()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 ProjectId
+        {
+            get;
+            set;
+        }
+        public System.String Name
+        {
+            get;
+            set;
+        }
+        public System.String Course
+        {
+            get;
+            set;
+        }
+        public System.String Email
+        {
+            get;
+            set;
+        }
+        public System.String Phone
+        {
+            get;
+            set;
+        }
+        public System.String Role
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IMember other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                ProjectId = other.ProjectId;
+                Name = other.Name;
+                Course = other.Course;
+                Email = other.Email;
+                Phone = other.Phone;
+                Role = other.Role;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IMember other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IMember other);
+        public static Persistence.App.Member Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Member();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Member Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Member();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Member Create(QnSProjectAward.Contracts.Persistence.App.IMember other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Member();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Member instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Member instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IMember other);
+        static partial void AfterCreate(Persistence.App.Member instance, QnSProjectAward.Contracts.Persistence.App.IMember other);
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    partial class Juror : VersionModel
+    {
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    using System;
+    public partial class Juror : QnSProjectAward.Contracts.Persistence.App.IJuror
+    {
+        static Juror()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Juror()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 AwardId
+        {
+            get;
+            set;
+        }
+        public System.String Name
+        {
+            get;
+            set;
+        }
+        public System.String Institution
+        {
+            get;
+            set;
+        }
+        public System.String Position
+        {
+            get;
+            set;
+        }
+        public System.String Email
+        {
+            get;
+            set;
+        }
+        public System.Byte[] Logo
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IJuror other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                AwardId = other.AwardId;
+                Name = other.Name;
+                Institution = other.Institution;
+                Position = other.Position;
+                Email = other.Email;
+                Logo = other.Logo;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IJuror other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IJuror other);
+        public static Persistence.App.Juror Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Juror();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Juror Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Juror();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Juror Create(QnSProjectAward.Contracts.Persistence.App.IJuror other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Juror();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Juror instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Juror instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IJuror other);
+        static partial void AfterCreate(Persistence.App.Juror instance, QnSProjectAward.Contracts.Persistence.App.IJuror other);
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    partial class Award : VersionModel
+    {
+    }
+}
+namespace QnSProjectAward.AspMvc.Models.Persistence.App
+{
+    using System;
+    public partial class Award : QnSProjectAward.Contracts.Persistence.App.IAward
+    {
+        static Award()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Award()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.String Title
+        {
+            get;
+            set;
+        }
+        public System.String Location
+        {
+            get;
+            set;
+        }
+        public System.DateTime From
+        {
+            get;
+            set;
+        }
+        public System.DateTime? To
+        {
+            get;
+            set;
+        }
+        public QnSProjectAward.Contracts.Modules.Common.AwardState State
+        {
+            get;
+            set;
+        }
+        = Contracts.Modules.Common.AwardState.RegistrationOpen;
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IAward other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                Title = other.Title;
+                Location = other.Location;
+                From = other.From;
+                To = other.To;
+                State = other.State;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IAward other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IAward other);
+        public static Persistence.App.Award Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Award();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Award Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Award();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Award Create(QnSProjectAward.Contracts.Persistence.App.IAward other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Award();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Award instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Award instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IAward other);
+        static partial void AfterCreate(Persistence.App.Award instance, QnSProjectAward.Contracts.Persistence.App.IAward other);
+    }
+}
 namespace QnSProjectAward.AspMvc.Models.Persistence.Configuration
 {
     partial class Setting : VersionModel

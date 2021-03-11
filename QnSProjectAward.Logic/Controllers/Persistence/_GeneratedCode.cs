@@ -153,6 +153,131 @@ namespace QnSProjectAward.Logic.Controllers.Persistence.Account
         }
     }
 }
+namespace QnSProjectAward.Logic.Controllers.Persistence.App
+{
+    sealed partial class RatingController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.App.IRating, Entities.Persistence.App.Rating>
+    {
+        static RatingController()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        internal RatingController(DataContext.IContext context):base(context)
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        internal RatingController(ControllerObject controller):base(controller)
+        {
+            Constructing();
+            Constructed();
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Controllers.Persistence.App
+{
+    sealed partial class ProjectController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.App.IProject, Entities.Persistence.App.Project>
+    {
+        static ProjectController()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        internal ProjectController(DataContext.IContext context):base(context)
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        internal ProjectController(ControllerObject controller):base(controller)
+        {
+            Constructing();
+            Constructed();
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Controllers.Persistence.App
+{
+    sealed partial class MemberController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.App.IMember, Entities.Persistence.App.Member>
+    {
+        static MemberController()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        internal MemberController(DataContext.IContext context):base(context)
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        internal MemberController(ControllerObject controller):base(controller)
+        {
+            Constructing();
+            Constructed();
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Controllers.Persistence.App
+{
+    sealed partial class JurorController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.App.IJuror, Entities.Persistence.App.Juror>
+    {
+        static JurorController()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        internal JurorController(DataContext.IContext context):base(context)
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        internal JurorController(ControllerObject controller):base(controller)
+        {
+            Constructing();
+            Constructed();
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Controllers.Persistence.App
+{
+    sealed partial class AwardController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.App.IAward, Entities.Persistence.App.Award>
+    {
+        static AwardController()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        internal AwardController(DataContext.IContext context):base(context)
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        internal AwardController(ControllerObject controller):base(controller)
+        {
+            Constructing();
+            Constructed();
+        }
+    }
+}
 namespace QnSProjectAward.Logic.Controllers.Persistence.Configuration
 {
     sealed partial class SettingController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.Configuration.ISetting, Entities.Persistence.Configuration.Setting>

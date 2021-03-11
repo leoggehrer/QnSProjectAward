@@ -87,6 +87,61 @@ namespace QnSProjectAward.WebApi.Controllers.Persistence.Account
     {
     }
 }
+namespace QnSProjectAward.WebApi.Controllers.Persistence.App
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.App.IRating;
+    using TModel = Transfer.Persistence.App.Rating;
+    [ApiController]
+    [Route("Controller")]
+    public partial class RatingsController : GenericController<TContract, TModel>
+    {
+    }
+}
+namespace QnSProjectAward.WebApi.Controllers.Persistence.App
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.App.IProject;
+    using TModel = Transfer.Persistence.App.Project;
+    [ApiController]
+    [Route("Controller")]
+    public partial class ProjectsController : GenericController<TContract, TModel>
+    {
+    }
+}
+namespace QnSProjectAward.WebApi.Controllers.Persistence.App
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.App.IMember;
+    using TModel = Transfer.Persistence.App.Member;
+    [ApiController]
+    [Route("Controller")]
+    public partial class MembersController : GenericController<TContract, TModel>
+    {
+    }
+}
+namespace QnSProjectAward.WebApi.Controllers.Persistence.App
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.App.IJuror;
+    using TModel = Transfer.Persistence.App.Juror;
+    [ApiController]
+    [Route("Controller")]
+    public partial class JurorsController : GenericController<TContract, TModel>
+    {
+    }
+}
+namespace QnSProjectAward.WebApi.Controllers.Persistence.App
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.App.IAward;
+    using TModel = Transfer.Persistence.App.Award;
+    [ApiController]
+    [Route("Controller")]
+    public partial class AwardsController : GenericController<TContract, TModel>
+    {
+    }
+}
 namespace QnSProjectAward.WebApi.Controllers.Persistence.Configuration
 {
     using Microsoft.AspNetCore.Mvc;

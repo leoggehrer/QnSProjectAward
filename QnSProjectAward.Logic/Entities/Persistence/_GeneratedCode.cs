@@ -1035,6 +1035,712 @@ namespace QnSProjectAward.Logic.Entities.Persistence.Account
         static partial void AfterCreate(Persistence.Account.ActionLog instance, QnSProjectAward.Contracts.Persistence.Account.IActionLog other);
     }
 }
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Rating
+    {
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("ProjectId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Project Project
+        {
+            get;
+            set;
+        }
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("JurorId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Juror Juror
+        {
+            get;
+            set;
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Rating : VersionEntity
+    {
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    using System;
+    partial class Rating : QnSProjectAward.Contracts.Persistence.App.IRating
+    {
+        static Rating()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Rating()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 ProjectId
+        {
+            get;
+            set;
+        }
+        public System.Int32 JurorId
+        {
+            get;
+            set;
+        }
+        public QnSProjectAward.Contracts.Modules.Common.Rate Rate
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IRating other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                ProjectId = other.ProjectId;
+                JurorId = other.JurorId;
+                Rate = other.Rate;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IRating other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IRating other);
+        public override bool Equals(object obj)
+        {
+            if (obj is not QnSProjectAward.Contracts.Persistence.App.IRating instance)
+            {
+                return false;
+            }
+            return base.Equals(instance) && Equals(instance);
+        }
+        protected bool Equals(QnSProjectAward.Contracts.Persistence.App.IRating other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return ProjectId == other.ProjectId && JurorId == other.JurorId && Rate == other.Rate;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ProjectId, JurorId, Rate);
+        }
+        public static Persistence.App.Rating Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Rating();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Rating Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Rating();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Rating Create(QnSProjectAward.Contracts.Persistence.App.IRating other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Rating();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Rating instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Rating instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IRating other);
+        static partial void AfterCreate(Persistence.App.Rating instance, QnSProjectAward.Contracts.Persistence.App.IRating other);
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Project
+    {
+        public System.Collections.Generic.ICollection<QnSProjectAward.Logic.Entities.Persistence.App.Member> Members
+        {
+            get;
+            set;
+        }
+        public System.Collections.Generic.ICollection<QnSProjectAward.Logic.Entities.Persistence.App.Rating> Ratings
+        {
+            get;
+            set;
+        }
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("AwardId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Award Award
+        {
+            get;
+            set;
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Project : VersionEntity
+    {
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    using System;
+    partial class Project : QnSProjectAward.Contracts.Persistence.App.IProject
+    {
+        static Project()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Project()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 AwardId
+        {
+            get;
+            set;
+        }
+        public System.String School
+        {
+            get;
+            set;
+        }
+        public System.String Title
+        {
+            get;
+            set;
+        }
+        public System.String Description
+        {
+            get;
+            set;
+        }
+        public System.Byte[] Logo
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IProject other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                AwardId = other.AwardId;
+                School = other.School;
+                Title = other.Title;
+                Description = other.Description;
+                Logo = other.Logo;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IProject other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IProject other);
+        public override bool Equals(object obj)
+        {
+            if (obj is not QnSProjectAward.Contracts.Persistence.App.IProject instance)
+            {
+                return false;
+            }
+            return base.Equals(instance) && Equals(instance);
+        }
+        protected bool Equals(QnSProjectAward.Contracts.Persistence.App.IProject other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return AwardId == other.AwardId && IsEqualsWith(School, other.School) && IsEqualsWith(Title, other.Title) && IsEqualsWith(Description, other.Description) && IsEqualsWith(Logo, other.Logo);
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(AwardId, School, Title, Description, Logo);
+        }
+        public static Persistence.App.Project Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Project();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Project Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Project();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Project Create(QnSProjectAward.Contracts.Persistence.App.IProject other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Project();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Project instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Project instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IProject other);
+        static partial void AfterCreate(Persistence.App.Project instance, QnSProjectAward.Contracts.Persistence.App.IProject other);
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Member
+    {
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("ProjectId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Project Project
+        {
+            get;
+            set;
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Member : VersionEntity
+    {
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    using System;
+    partial class Member : QnSProjectAward.Contracts.Persistence.App.IMember
+    {
+        static Member()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Member()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 ProjectId
+        {
+            get;
+            set;
+        }
+        public System.String Name
+        {
+            get;
+            set;
+        }
+        public System.String Course
+        {
+            get;
+            set;
+        }
+        public System.String Email
+        {
+            get;
+            set;
+        }
+        public System.String Phone
+        {
+            get;
+            set;
+        }
+        public System.String Role
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IMember other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                ProjectId = other.ProjectId;
+                Name = other.Name;
+                Course = other.Course;
+                Email = other.Email;
+                Phone = other.Phone;
+                Role = other.Role;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IMember other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IMember other);
+        public override bool Equals(object obj)
+        {
+            if (obj is not QnSProjectAward.Contracts.Persistence.App.IMember instance)
+            {
+                return false;
+            }
+            return base.Equals(instance) && Equals(instance);
+        }
+        protected bool Equals(QnSProjectAward.Contracts.Persistence.App.IMember other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return ProjectId == other.ProjectId && IsEqualsWith(Name, other.Name) && IsEqualsWith(Course, other.Course) && IsEqualsWith(Email, other.Email) && IsEqualsWith(Phone, other.Phone) && IsEqualsWith(Role, other.Role);
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ProjectId, Name, Course, Email, Phone, Role);
+        }
+        public static Persistence.App.Member Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Member();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Member Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Member();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Member Create(QnSProjectAward.Contracts.Persistence.App.IMember other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Member();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Member instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Member instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IMember other);
+        static partial void AfterCreate(Persistence.App.Member instance, QnSProjectAward.Contracts.Persistence.App.IMember other);
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Juror
+    {
+        public System.Collections.Generic.ICollection<QnSProjectAward.Logic.Entities.Persistence.App.Rating> Ratings
+        {
+            get;
+            set;
+        }
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("AwardId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Award Award
+        {
+            get;
+            set;
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Juror : VersionEntity
+    {
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    using System;
+    partial class Juror : QnSProjectAward.Contracts.Persistence.App.IJuror
+    {
+        static Juror()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Juror()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 AwardId
+        {
+            get;
+            set;
+        }
+        public System.String Name
+        {
+            get;
+            set;
+        }
+        public System.String Institution
+        {
+            get;
+            set;
+        }
+        public System.String Position
+        {
+            get;
+            set;
+        }
+        public System.String Email
+        {
+            get;
+            set;
+        }
+        public System.Byte[] Logo
+        {
+            get;
+            set;
+        }
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IJuror other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                AwardId = other.AwardId;
+                Name = other.Name;
+                Institution = other.Institution;
+                Position = other.Position;
+                Email = other.Email;
+                Logo = other.Logo;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IJuror other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IJuror other);
+        public override bool Equals(object obj)
+        {
+            if (obj is not QnSProjectAward.Contracts.Persistence.App.IJuror instance)
+            {
+                return false;
+            }
+            return base.Equals(instance) && Equals(instance);
+        }
+        protected bool Equals(QnSProjectAward.Contracts.Persistence.App.IJuror other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return AwardId == other.AwardId && IsEqualsWith(Name, other.Name) && IsEqualsWith(Institution, other.Institution) && IsEqualsWith(Position, other.Position) && IsEqualsWith(Email, other.Email) && IsEqualsWith(Logo, other.Logo);
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(AwardId, Name, Institution, Position, Email, Logo);
+        }
+        public static Persistence.App.Juror Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Juror();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Juror Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Juror();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Juror Create(QnSProjectAward.Contracts.Persistence.App.IJuror other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Juror();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Juror instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Juror instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IJuror other);
+        static partial void AfterCreate(Persistence.App.Juror instance, QnSProjectAward.Contracts.Persistence.App.IJuror other);
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Award
+    {
+        public System.Collections.Generic.ICollection<QnSProjectAward.Logic.Entities.Persistence.App.Juror> Jurors
+        {
+            get;
+            set;
+        }
+        public System.Collections.Generic.ICollection<QnSProjectAward.Logic.Entities.Persistence.App.Project> Projects
+        {
+            get;
+            set;
+        }
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    partial class Award : VersionEntity
+    {
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Persistence.App
+{
+    using System;
+    partial class Award : QnSProjectAward.Contracts.Persistence.App.IAward
+    {
+        static Award()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public Award()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.String Title
+        {
+            get;
+            set;
+        }
+        public System.String Location
+        {
+            get;
+            set;
+        }
+        public System.DateTime From
+        {
+            get;
+            set;
+        }
+        public System.DateTime? To
+        {
+            get;
+            set;
+        }
+        public QnSProjectAward.Contracts.Modules.Common.AwardState State
+        {
+            get;
+            set;
+        }
+        = Contracts.Modules.Common.AwardState.RegistrationOpen;
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.App.IAward other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                RowVersion = other.RowVersion;
+                Title = other.Title;
+                Location = other.Location;
+                From = other.From;
+                To = other.To;
+                State = other.State;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.App.IAward other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.App.IAward other);
+        public override bool Equals(object obj)
+        {
+            if (obj is not QnSProjectAward.Contracts.Persistence.App.IAward instance)
+            {
+                return false;
+            }
+            return base.Equals(instance) && Equals(instance);
+        }
+        protected bool Equals(QnSProjectAward.Contracts.Persistence.App.IAward other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return IsEqualsWith(Title, other.Title) && IsEqualsWith(Location, other.Location) && From == other.From && To == other.To && State == other.State;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Title, Location, From, To, State);
+        }
+        public static Persistence.App.Award Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.App.Award();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.App.Award Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.App.Award();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.App.Award Create(QnSProjectAward.Contracts.Persistence.App.IAward other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.App.Award();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.App.Award instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.App.Award instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.App.IAward other);
+        static partial void AfterCreate(Persistence.App.Award instance, QnSProjectAward.Contracts.Persistence.App.IAward other);
+    }
+}
 namespace QnSProjectAward.Logic.Entities.Persistence.Configuration
 {
     partial class Setting

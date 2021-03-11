@@ -1,0 +1,19 @@
+﻿using CommonBase.Attributes;
+using QnSProjectAward.Contracts.Modules.Common;
+using System;
+
+namespace QnSProjectAward.Contracts.Persistence.App
+{
+    [ContractInfo]
+    public partial interface IAward : IVersionable, ICopyable<IAward>
+    {
+        [ContractPropertyInfo(Required = true, MaxLength = 256)]
+        string Title { get; set; }
+        [ContractPropertyInfo(Required = true, MaxLength = 256)]
+        string Location { get; set; }
+        DateTime From { get; set; }
+        DateTime? To { get; set; }
+        [ContractPropertyInfo(DefaultValue = "Contracts.Modules.Common.AwardState.RegistrationOpen")]
+        AwardState State { get; set; }
+    }
+}

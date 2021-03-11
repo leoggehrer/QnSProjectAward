@@ -20,6 +20,31 @@ namespace QnSProjectAward.Logic.DataContext.Db
             get;
             set;
         }
+        protected DbSet<Entities.Persistence.App.Award> AwardSet
+        {
+            get;
+            set;
+        }
+        protected DbSet<Entities.Persistence.App.Juror> JurorSet
+        {
+            get;
+            set;
+        }
+        protected DbSet<Entities.Persistence.App.Member> MemberSet
+        {
+            get;
+            set;
+        }
+        protected DbSet<Entities.Persistence.App.Project> ProjectSet
+        {
+            get;
+            set;
+        }
+        protected DbSet<Entities.Persistence.App.Rating> RatingSet
+        {
+            get;
+            set;
+        }
         protected DbSet<Entities.Persistence.Account.ActionLog> ActionLogSet
         {
             get;
@@ -64,6 +89,26 @@ namespace QnSProjectAward.Logic.DataContext.Db
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.ISetting))
             {
                 result = SettingSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IAward))
+            {
+                result = AwardSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IJuror))
+            {
+                result = JurorSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IMember))
+            {
+                result = MemberSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IProject))
+            {
+                result = ProjectSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
+            {
+                result = RatingSet as DbSet<E>;
             }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
             {
@@ -124,6 +169,40 @@ namespace QnSProjectAward.Logic.DataContext.Db
             }
             ).IsUnique();
             ConfigureEntityType(settingBuilder);
+            var awardBuilder = modelBuilder.Entity<Entities.Persistence.App.Award>();
+            awardBuilder.ToTable("Award", "App").HasKey("Id");
+            modelBuilder.Entity<Entities.Persistence.App.Award>().Property(p => p.RowVersion).IsRowVersion();
+            awardBuilder.Property(p => p.Title).IsRequired().HasMaxLength(256);
+            awardBuilder.Property(p => p.Location).IsRequired().HasMaxLength(256);
+            ConfigureEntityType(awardBuilder);
+            var jurorBuilder = modelBuilder.Entity<Entities.Persistence.App.Juror>();
+            jurorBuilder.ToTable("Juror", "App").HasKey("Id");
+            modelBuilder.Entity<Entities.Persistence.App.Juror>().Property(p => p.RowVersion).IsRowVersion();
+            jurorBuilder.Property(p => p.Name).IsRequired().HasMaxLength(256);
+            jurorBuilder.Property(p => p.Institution).IsRequired().HasMaxLength(256);
+            jurorBuilder.Property(p => p.Position).HasMaxLength(128);
+            jurorBuilder.Property(p => p.Email).IsRequired().HasMaxLength(128);
+            ConfigureEntityType(jurorBuilder);
+            var memberBuilder = modelBuilder.Entity<Entities.Persistence.App.Member>();
+            memberBuilder.ToTable("Member", "App").HasKey("Id");
+            modelBuilder.Entity<Entities.Persistence.App.Member>().Property(p => p.RowVersion).IsRowVersion();
+            memberBuilder.Property(p => p.Name).IsRequired().HasMaxLength(256);
+            memberBuilder.Property(p => p.Course).IsRequired().HasMaxLength(20);
+            memberBuilder.Property(p => p.Email).IsRequired().HasMaxLength(128);
+            memberBuilder.Property(p => p.Phone).HasMaxLength(64);
+            memberBuilder.Property(p => p.Role).IsRequired().HasMaxLength(128);
+            ConfigureEntityType(memberBuilder);
+            var projectBuilder = modelBuilder.Entity<Entities.Persistence.App.Project>();
+            projectBuilder.ToTable("Project", "App").HasKey("Id");
+            modelBuilder.Entity<Entities.Persistence.App.Project>().Property(p => p.RowVersion).IsRowVersion();
+            projectBuilder.Property(p => p.School).IsRequired().HasMaxLength(128);
+            projectBuilder.Property(p => p.Title).IsRequired().HasMaxLength(256);
+            projectBuilder.Property(p => p.Description).IsRequired().HasMaxLength(1024);
+            ConfigureEntityType(projectBuilder);
+            var ratingBuilder = modelBuilder.Entity<Entities.Persistence.App.Rating>();
+            ratingBuilder.ToTable("Rating", "App").HasKey("Id");
+            modelBuilder.Entity<Entities.Persistence.App.Rating>().Property(p => p.RowVersion).IsRowVersion();
+            ConfigureEntityType(ratingBuilder);
             var actionLogBuilder = modelBuilder.Entity<Entities.Persistence.Account.ActionLog>();
             actionLogBuilder.ToTable("ActionLog", "Account").HasKey("Id");
             modelBuilder.Entity<Entities.Persistence.Account.ActionLog>().Property(p => p.RowVersion).IsRowVersion();
@@ -172,6 +251,11 @@ namespace QnSProjectAward.Logic.DataContext.Db
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Language.Translation> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Data.BinaryData> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Configuration.Setting> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Award> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Juror> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Member> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Project> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Rating> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.ActionLog> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.Identity> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.IdentityXRole> entityTypeBuilder);
