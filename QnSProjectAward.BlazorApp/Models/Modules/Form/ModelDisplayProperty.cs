@@ -11,8 +11,8 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
 	{
 		public DisplayProperty DisplayProperty { get; init; }
 		public string OriginName => DisplayProperty.OriginName;
-		public bool CanRead => Property.CanRead;
-		public bool CanWrite => Property.CanWrite;
+		public bool CanRead => PropertyInfo.CanRead;
+		public bool CanWrite => PropertyInfo.CanWrite;
 		public int Order => DisplayProperty.Order;
 		public ModelDisplayProperty(Type modelType, PropertyInfo propertyInfo, DisplayProperty displayProperty) 
 			: base(modelType, propertyInfo)

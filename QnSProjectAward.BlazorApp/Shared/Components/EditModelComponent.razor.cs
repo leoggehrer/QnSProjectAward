@@ -20,7 +20,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             set
             {
                 model = value;
-                LoadContainer();
+                LoadModelMembers();
             }
         }
 
@@ -44,7 +44,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         partial void Constructing();
         partial void Constructed();
 
-        protected virtual void LoadContainer()
+        protected virtual void LoadModelMembers()
         {
             bool handled = false;
             IEnumerable<TModelMember> CreateModelMembers(ModelObject model)
@@ -106,7 +106,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             if (modelMember != null)
             {
                 displayComponent?.CreatedEditModelMember(modelMember);
-                if (modelMember.Property.PropertyType.IsEnum)
+                if (modelMember.PropertyInfo.PropertyType.IsEnum)
                 {
                     modelMember.SelectItems.ToList().ForEach(i => i.Text = Translate(i.Text, i.Text));
                 }

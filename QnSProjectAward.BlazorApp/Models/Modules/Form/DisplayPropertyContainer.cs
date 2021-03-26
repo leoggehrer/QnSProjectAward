@@ -10,7 +10,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
 {
     public partial class DisplayPropertyContainer : IEnumerable<KeyValuePair<string, DisplayProperty>>
     {
-        private readonly Dictionary<string, DisplayProperty> displayProperties = new Dictionary<string, DisplayProperty>();
+        private readonly Dictionary<string, DisplayProperty> displayProperties = new();
         public DisplayProperty this[string key]
         {
             get
@@ -38,6 +38,23 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
                 Add(displayProperty);
             }
         }
+        public void AddOrSet(string key, Action<DisplayProperty> action)
+        {
+            key.CheckNotNullOrEmpty(nameof(key));
+
+            DisplayProperty displayProperty;
+
+            if (displayProperties.ContainsKey(key))
+            {
+                displayProperty = displayProperties[key];
+            }
+            else
+            {
+                displayProperty = new DisplayProperty(key);
+                displayProperties.Add(key, displayProperty);
+            }
+            action?.Invoke(displayProperty);
+        }
 
         public bool TryGetValue(string key, out DisplayProperty displayProperty)
         {
@@ -56,7 +73,6 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         {
             return displayProperties.GetEnumerator();
         }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return displayProperties.GetEnumerator();

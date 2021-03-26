@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.WebApi.Controllers
 {
-    public abstract class GenericController<I, M> : ApiControllerBase
+	public abstract class GenericController<I, M> : ApiControllerBase
         where I : Contracts.IIdentifiable
         where M : Transfer.IdentityModel, I, Contracts.ICopyable<I>, new()
     {
@@ -80,7 +80,7 @@ namespace QnSProjectAward.WebApi.Controllers
         }
 
         [HttpPost("/api/[controller]")]
-        public Task<M> PostAsync([FromBody] M model)
+        public Task<M> PostAsync([FromBody]M model)
         {
             return InsertModelAsync(model);
         }
@@ -91,7 +91,7 @@ namespace QnSProjectAward.WebApi.Controllers
         }
 
         [HttpPut("/api/[controller]")]
-        public Task<M> PutAsync(M model)
+        public Task<M> PutAsync([FromBody]M model)
         {
             return UpdateModelAsync(model);
         }

@@ -55,7 +55,7 @@ namespace CommonBase
         public static string QnSCSharpFileExtension => ".cs";
         public static IDictionary<string, string> QnSSourceFileHeaders { get; }
         public static string QnSIgnoreLabel => "@QnSIgnore";
-        public static string QnSBaseCodeLabel => "@QnSCodeCopy";
+        public static string QnSBaseCodeLabel => "@QnSBaseCode";
         public static string QnSCodeCopyLabel => "@QnSCodeCopy";
 
         public static string[] QnSCommonProjects { get; }

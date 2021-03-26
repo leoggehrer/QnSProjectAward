@@ -40,7 +40,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Business.Account
                 if (role != null)
                 {
                     model.AddManyItem(role);
-                    await AdapterAccess.UpdateAsync(model).ConfigureAwait(false);
+                    await DataAccess.UpdateAsync(model).ConfigureAwait(false);
                 }
             }
             else
@@ -50,7 +50,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Business.Account
                 if (item != null)
                 {
                     model.RemoveManyItem(item);
-                    await AdapterAccess.UpdateAsync(model).ConfigureAwait(false);
+                    await DataAccess.UpdateAsync(model).ConfigureAwait(false);
                 }
             }
             await LoadRolesAsync(model).ConfigureAwait(false);

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Radzen;
+using QnSProjectAward.BlazorApp.Modules.DataGrid;
 using QnSProjectAward.BlazorApp.Shared.Components.Persistence.Configuration;
 using TContract = QnSProjectAward.Contracts.Persistence.Configuration.ISetting;
 using TModel = QnSProjectAward.BlazorApp.Models.Persistence.Configuration.Setting;
@@ -27,9 +28,18 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Configuration
         }
         protected override Task OnFirstRenderAsync()
         {
-            DataGridHandler = new SettingDataGridHandler(this);
-            DataGridHandler.PageSize = Settings.GetValueTyped<int>($"{ComponentName}.{nameof(DataGridHandler.PageSize)}", DataGridHandler.PageSize);
+            bool handled = false;
+            BeforeFirstRender(ref handled);
+            if (handled == false)
+            {
+                AdapterAccess = ServiceAdapter.Create<TContract>();
+                DataGridHandler = new SettingDataGridHandler(this, new DataAdapterAccess<TContract>(AdapterAccess));
+                InitDataGridHandler(DataGridHandler);
+            }
+            AfterFirstRender();
             return base.OnFirstRenderAsync();
         }
+        partial void BeforeFirstRender(ref bool handled);
+        partial void AfterFirstRender();
     }
 }

@@ -56,7 +56,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
             where I : IIdentifiable
             where E : IdentityEntity, ICopyable<I>, I, new()
         {
-            return Task.Run(() => new E());
+            return Task.Factory.StartNew(() => new E());
         }
 
         public async Task<E> InsertAsync<I, E>(E entity)
@@ -71,7 +71,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
             where I : IIdentifiable
             where E : IdentityEntity, ICopyable<I>, I, new()
         {
-            return Task.Run(() =>
+            return Task.Factory.StartNew(() =>
             {
                 Set<I, E>().Update(entity);
                 return entity;
@@ -81,7 +81,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
             where I : IIdentifiable
             where E : IdentityEntity, I
         {
-            return Task.Run(() =>
+            return Task.Factory.StartNew(() =>
             {
                 E result = Set<E>().SingleOrDefault(i => i.Id == id);
 

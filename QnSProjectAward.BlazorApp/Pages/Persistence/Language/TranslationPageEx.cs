@@ -1,9 +1,13 @@
 //@QnSCodeCopy
 //MdStart
 
+using QnSProjectAward.BlazorApp.Pages.Persistence.Configuration;
+using QnSProjectAward.BlazorApp.Shared.Components.Persistence.Language;
 using QnSProjectAward.Contracts.Persistence.Language;
 using Radzen;
 using System.Threading.Tasks;
+using TContract = QnSProjectAward.Contracts.Persistence.Language.ITranslation;
+
 
 namespace QnSProjectAward.BlazorApp.Pages.Persistence.Language
 {
@@ -43,6 +47,15 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Language
                 await adapter.InsertAsync(entity).ConfigureAwait(false);
             }
         }
+        partial void BeforeFirstRender(ref bool handled)
+        {
+            handled = true;
+
+            AdapterAccess = ServiceAdapter.Create<TContract>();
+            DataGridHandler = new TranslationDataGridHandler(this, new TranslationAdapterAccess(AdapterAccess, Translator));
+            DataGridHandler.PageSize = Settings.GetValueTyped<int>($"{ComponentName}.{nameof(DataGridHandler.PageSize)}", DataGridHandler.PageSize);
+        }
+
     }
 }
 //MdEnd

@@ -63,7 +63,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
 		{
 			var menuItems = new Dictionary<string, MenuItem>();
 
-			foreach (var item in Settings.QueryStoredSettings(p => p.Key.Contains("NavMenu")))
+			foreach (var item in Settings.QueryStoredSettings(p => p.Key != null && p.Key.Contains("NavMenu")))
 			{
 				try
 				{

@@ -11,15 +11,15 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         private int order = -1;
 
         public ModelObject Model { get; init; }
-        public DisplayProperty Display { get; init; }
-        public bool ScaffoldItem => Display.ScaffoldItem;
+        public DisplayProperty DisplayInfo { get; init; }
+        public bool ScaffoldItem => DisplayInfo.ScaffoldItem;
 
         public int Order 
         {
-            get => order < 0 ? Display.Order : order; 
+            get => order < 0 ? DisplayInfo.Order : order; 
             set => order = value; 
         }
-        public virtual object Value => Property.GetValue(Model);
+        public virtual object Value => PropertyInfo.GetValue(Model);
 
         public ModelMember(ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty)
             : base(model?.GetType(), propertyInfo)
@@ -28,7 +28,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
             displayProperty.CheckArgument(nameof(displayProperty));
 
             Model = model;
-            Display = displayProperty;
+            DisplayInfo = displayProperty;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
         public override string ForPrefix => "IdentityXRole";
         protected override Task OnFirstRenderAsync()
         {
-            DataGridHandler.ModelItems = DataGridHandler.ModelItems.Union(GetAllDisplayProperties().Where(e => e.ScaffoldItem && e.Visible && e.IsModelItem).Select(e => e.PropertyName)).Distinct().ToArray();
+            DataGridHandler.ModelItems = DataGridHandler.ModelItems.Union(GetAllDisplayProperties().Where(e => e.ScaffoldItem && (e.VisibilityMode & Models.Modules.Common.VisibilityMode.ListView) > 0 && e.IsModelItem).Select(e => e.PropertyName)).Distinct().ToArray();
             return base.OnFirstRenderAsync();
         }
         protected override Type GetModelType()

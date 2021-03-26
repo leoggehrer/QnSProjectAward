@@ -5,8 +5,7 @@ using System;
 namespace QnSProjectAward.BlazorApp.Modules.Common
 {
     [Flags]
-    public enum ControlType
-
+    public enum ControlType : int
     {
         TextBox = 1,
         TextArea = 2,
@@ -16,12 +15,14 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
         FloatingPointNull = 32,
         Select = 64,
         SelectNull = 128,
-        DatePicker = 256,
-        DatePickerNull = 512,
-        TimePicker = 1024,
-        TimePickerNull = 2048,
-        CheckBox = 2 * 2048,
-        CheckBoxNull = 4 * 2048,
+        TimePicker = 256,
+        TimePickerNull = 512,
+        DatePicker = 1024,
+        DatePickerNull = 2048,
+        DateTimePicker = 2048 * 2,
+        DateTimePickerNull = 2048 * 4,
+        CheckBox = 2 * 2048 * 8,
+        CheckBoxNull = 4 * 2048 * 16,
 
         ValidateType = TextBox + TextArea + Numeric + FloatingPoint + DatePicker + TimePicker,
     }

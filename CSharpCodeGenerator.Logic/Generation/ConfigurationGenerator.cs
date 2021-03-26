@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace CSharpCodeGenerator.Logic.Generation
 {
-    internal partial class ConfigurationGenerator : GeneratorObject, Contracts.IConfigurationGenerator
+	internal partial class ConfigurationGenerator : GeneratorObject, Contracts.IConfigurationGenerator
     {
         protected ConfigurationGenerator(SolutionProperties solutionProperties)
             : base(solutionProperties)
@@ -142,17 +142,11 @@ namespace CSharpCodeGenerator.Logic.Generation
                         Width = "800px",
                         Height = string.Empty,
                     };
-                    var dataGridItem = new DataGridSetting()
-                    {
-                        HasDataGridProgress = true,
-                        HasEditDialogHeader = false,
-                        HasEditDialogFooter = true,
-                        HasDeleteDialogHeader = false,
-                        HasDeleteDialogFooter = true,
-                    };
+                    var dataGridSetting = new DataGridSetting();
+                    var dataGridPageSetting = new DataGridPageSetting();
 
-                    result.Add($"{categoryKey}{separator}PageSize{separator}{separator}50");
-                    result.Add($"{categoryKey}DataGrid{separator}Setting{separator}{separator}{JsonSerializer.Serialize<DataGridSetting>(dataGridItem)}");
+                    result.Add($"{categoryKey}DataGrid{separator}Setting{separator}{separator}{JsonSerializer.Serialize<DataGridSetting>(dataGridSetting)}");
+                    result.Add($"{categoryKey}DataGrid{separator}PageSetting{separator}{separator}{JsonSerializer.Serialize<DataGridPageSetting>(dataGridPageSetting)}");
                     result.Add($"{categoryKey}DataGrid{separator}EditOptions{separator}{separator}{JsonSerializer.Serialize<DialogOptions>(dialogOptions)}");
                     result.Add($"{categoryKey}DataGrid{separator}DeleteOptions{separator}{separator}{JsonSerializer.Serialize<DialogOptions>(dialogOptions)}");
                 }
@@ -167,18 +161,14 @@ namespace CSharpCodeGenerator.Logic.Generation
                         {
                             ScaffoldItem = true,
                             IsModelItem = false,
-                            Readonly = false,
-                            FormatValue = string.Empty,
-                            Visible = GetVisible(propertyHelper),
-                            DisplayVisible = true,
-                            EditVisible = true,
-                            ListVisible = true,
+                            ReadonlyMode = GetReadonlyMode(propertyHelper),
+                            VisibilityMode = GetVisibilityMode(propertyHelper),
                             ListSortable = true,
                             ListFilterable = true,
                             ListWidth = GetListWitdh(propertyHelper),
+                            FormatValue = GetFormatValue(propertyHelper),
                             Order = 10_000,
                         };
-
                         result.Add($"{fullKey}{separator}{JsonSerializer.Serialize<DisplaySetting>(displaySetting)}");
                     }
                 }
@@ -186,25 +176,37 @@ namespace CSharpCodeGenerator.Logic.Generation
             return result;
         }
 
-        private static bool GetVisible(Helpers.ContractPropertyHelper propertyHelper)
+        private static ReadonlyMode GetReadonlyMode(Helpers.ContractPropertyHelper propertyHelper)
         {
             propertyHelper.CheckArgument(nameof(propertyHelper));
 
-            var result = true;
+            var result = ReadonlyMode.None;
+
+            if (propertyHelper.Property.CanWrite == false)
+            {
+                result = ReadonlyMode.Readonly;
+            }
+            return result;
+        }
+        private static VisibilityMode GetVisibilityMode(Helpers.ContractPropertyHelper propertyHelper)
+        {
+            propertyHelper.CheckArgument(nameof(propertyHelper));
+
+            var result = VisibilityMode.Visible;
             var name = propertyHelper.PropertyName;
             var type = propertyHelper.PropertyType;
 
             if (name.Equals("Id"))
             {
-                result = false;
+                result = VisibilityMode.Hidden;
             }
             else if (name.Equals("RowVersion"))
             {
-                result = false;
+                result = VisibilityMode.Hidden;
             }
             else if (type == typeof(byte[]))
             {
-                result = false;
+                result = VisibilityMode.Hidden;
             }
             return result;
         }
@@ -227,6 +229,38 @@ namespace CSharpCodeGenerator.Logic.Generation
             else if (type == typeof(DateTime))
             {
                 result = "150px";
+            }
+            return result;
+        }
+        private static string GetFormatValue(Helpers.ContractPropertyHelper propertyHelper)
+        {
+            propertyHelper.CheckArgument(nameof(propertyHelper));
+
+            var result = string.Empty;
+            
+            if (propertyHelper.PropertyType.Equals(typeof(TimeSpan)))
+            {
+                result = "HH:mm";
+            }
+            else if (propertyHelper.PropertyType.Equals(typeof(TimeSpan?)))
+            {
+                result = "HH:mm";
+            }
+            else if (propertyHelper.PropertyType.Equals(typeof(DateTime)))
+            {
+                result = "dd.MM.yyyy";
+                if (propertyHelper.ContentType == CommonBase.Attributes.ContentType.DateTime)
+                {
+                    result += " HH:mm:ss";
+                }
+            }
+            else if (propertyHelper.PropertyType.Equals(typeof(DateTime?)))
+            {
+                result = "dd.MM.yyyy";
+                if (propertyHelper.ContentType == CommonBase.Attributes.ContentType.DateTime)
+                {
+                    result += " HH:mm:ss";
+                }
             }
             return result;
         }

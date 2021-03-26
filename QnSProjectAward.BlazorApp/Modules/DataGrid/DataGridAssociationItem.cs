@@ -60,12 +60,10 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         {
             if (e.ContainsKey($"{typeof(TModel).Name}{ItemRefIdName}") == false)
             {
-                e.Add(new DisplayProperty(typeof(TModel).Name, ItemRefIdName)
+                e.AddOrSet(new DisplayProperty(typeof(TModel).Name, ItemRefIdName)
                 {
                     Order = 1,
-                    ListVisible = false,
-                    DisplayVisible = false,
-                    EditVisible = true,
+                    VisibilityMode = Models.Modules.Common.VisibilityMode.CreateUpdateDeleteView,
                 });
             }
         }

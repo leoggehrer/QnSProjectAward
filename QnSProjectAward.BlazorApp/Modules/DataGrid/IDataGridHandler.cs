@@ -3,36 +3,25 @@
 using QnSProjectAward.BlazorApp.Models;
 using QnSProjectAward.BlazorApp.Pages;
 using QnSProjectAward.Contracts;
-using Radzen;
-using Radzen.Blazor;
 using System;
 using System.Threading.Tasks;
 
 namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 {
-    public interface IDataGridHandler<TModel>
+    public interface IDataGridHandler<TModel> : IDataGridBase
         where TModel : ModelObject, IIdentifiable, new()
     {
-        string AccessFilter { get; set; }
-        bool AllowAdd { get; set; }
-        bool AllowDelete { get; set; }
-        bool AllowEdit { get; set; }
-        bool AllowFiltering { get; set; }
-        bool AllowInlineEdit { get; set; }
-        bool AllowPaging { get; set; }
-        bool AllowSorting { get; set; }
-        bool HasRowDetail { get; set; }
+        ModelPage ModelPage { get; }
 
         int Count { get; }
-        int PageSize { get; set; }
+        string AccessFilter { get; set; }
+
         TModel[] Models { get; }
+        string[] ModelItems { get; set; }
         TModel DeleteModel { get; }
         TModel EditModel { get; }
         TModel ExpandModel { get; }
         TModel SelectedModel { get; }
-
-        string[] ModelItems { get; set; }
-        ModelPage ModelPage { get; }
 
         event EventHandler<TModel> AfterCreateModelHandler;
         event EventHandler<TModel> AfterDeleteModelHandler;

@@ -12,7 +12,7 @@ namespace QnSProjectAward.BlazorApp.Services.Modules.Authentication
 {
     public class AccountService : Adapters.Modules.Account.AccountManager, IAccountService, IDisposable
     {
-        private const int checkTimeoutDelay = 60000;
+        private const int checkTimeoutDelay = 10_000;
         private volatile bool checkForTimeoutRun = false;
         private AuthorizationSession currentAuthorizationSession;
 

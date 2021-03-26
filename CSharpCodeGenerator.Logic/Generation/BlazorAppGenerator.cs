@@ -254,6 +254,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("using System.Threading.Tasks;");
             result.Add("using Microsoft.AspNetCore.Components;");
             result.Add("using Radzen;");
+            result.Add($"using {ProjectName}.Modules.DataGrid;");
             result.Add($"using {CreateComponentsNameSpace(type)};");
             result.Add($"using TContract = {type.FullName};");
             result.Add($"using TModel = {entityFullName};");
@@ -279,10 +280,20 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.Add("protected override Task OnFirstRenderAsync()");
             result.Add("{");
-            result.Add($"DataGridHandler = new {entityName}DataGridHandler(this);");
-            result.Add("DataGridHandler.PageSize = Settings.GetValueTyped<int>($\"{ComponentName}.{nameof(DataGridHandler.PageSize)}\", DataGridHandler.PageSize);");
+            result.Add("bool handled = false;");
+            result.Add("BeforeFirstRender(ref handled);");
+            result.Add("if (handled == false)");
+            result.Add("{");
+            result.Add("AdapterAccess = ServiceAdapter.Create<TContract>();");
+            result.Add($"DataGridHandler = new {entityName}DataGridHandler(this, new DataAdapterAccess<TContract>(AdapterAccess));");
+            result.Add("InitDataGridHandler(DataGridHandler);");
+            result.Add("}");
+            result.Add("AfterFirstRender();");
             result.Add("return base.OnFirstRenderAsync();");
             result.Add("}");
+
+            result.Add("partial void BeforeFirstRender(ref bool handled);");
+            result.Add("partial void AfterFirstRender();");
 
             result.Add("}");
             result.Add("}");
@@ -428,6 +439,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameCode);
 
             StartCreateDataGridHandlerCode(type, result.Source);
+            result.Add($"using {ProjectName}.Modules.DataGrid;");
             result.Add($"using TContract = {type.FullName};");
             result.Add($"using TModel = {entityFullName};");
 
@@ -439,6 +451,11 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.Add($"public {entityName}DataGridHandler(Pages.ModelPage modelPage)");
             result.Add(" : base(modelPage)");
+            result.Add("{");
+            result.Add("}");
+
+            result.Add($"public {entityName}DataGridHandler(Pages.ModelPage modelPage, DataAccess<TContract> dataAccess)");
+            result.Add(" : base(modelPage, dataAccess)");
             result.Add("{");
             result.Add("}");
 
@@ -699,7 +716,7 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.Add("protected override Task OnFirstRenderAsync()");
             result.Add("{");
-            result.Add("DataGridHandler.ModelItems = DataGridHandler.ModelItems.Union(GetAllDisplayProperties().Where(e => e.ScaffoldItem && e.Visible && e.IsModelItem).Select(e => e.PropertyName)).Distinct().ToArray();");
+            result.Add("DataGridHandler.ModelItems = DataGridHandler.ModelItems.Union(GetAllDisplayProperties().Where(e => e.ScaffoldItem && (e.VisibilityMode & Models.Modules.Common.VisibilityMode.ListView) > 0 && e.IsModelItem).Select(e => e.PropertyName)).Distinct().ToArray();");
             result.Add("return base.OnFirstRenderAsync();");
             result.Add("}");
 

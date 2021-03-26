@@ -7,7 +7,7 @@
 
     foreach (var item in gridModelColumns.OrderBy(e => e.Order))
     {
-        EvaluateDisplayProperty(item.DisplayProperty);
+        EvaluateDisplayProperty(item.DisplayInfo);
 
         if (item.ScaffoldItem && item.ListVisible)
         {
@@ -18,7 +18,7 @@
                         <RadzenLabel Text="@TranslateFor(item.PropertyName)" />
                     </HeaderTemplate>
                     <Template Context="data">
-                        @item.ToDisplay(data, item.Property.GetValue(data))
+                        @item.ToDisplay(data, item.PropertyInfo.GetValue(data))
                     </Template>
                     <FooterTemplate>
                         @item.GetFooterText(item.PropertyName)
@@ -32,16 +32,16 @@
                         <RadzenLabel Text="@TranslateFor(item.PropertyName)" />
                     </HeaderTemplate>
                     <Template Context="data">
-                        @item.ToDisplay(data, item.Property.GetValue(data))
+                        @item.ToDisplay(data, item.PropertyInfo.GetValue(data))
                     </Template>
                     <EditTemplate Context="data">
-                        @if (item.Readonly)
+                        @if (item.ReadonlyMode == Models.Modules.Common.ReadonlyMode.Readonly)
                         {
-                            @item.ToDisplay(data, item.Property.GetValue(data))
+                            @item.ToDisplay(data, item.PropertyInfo.GetValue(data))
                         }
                         else
                         {
-                            <RadzenDropDown Name="@TranslateFor(item.OriginName)" TValue="string" @bind-Value="@(new Models.Modules.Form.ValueBinder(data, item.Property).StringValue)" Data="@item.CreateEnumSelectItems()" ValueProperty="Value" TextProperty="Text" Style="width: 100%;" />
+                            <RadzenDropDown Name="@TranslateFor(item.OriginName)" TValue="string" @bind-Value="@(new Models.Modules.Form.ValueBinder(data, item.PropertyInfo).StringValue)" Data="@item.CreateEnumSelectItems()" ValueProperty="Value" TextProperty="Text" Style="width: 100%;" />
                         }
                     </EditTemplate>
                     <FooterTemplate>
@@ -56,16 +56,16 @@
                         <RadzenLabel Text="@TranslateFor(item.PropertyName)" />
                     </HeaderTemplate>
                     <Template Context="data">
-                        @item.ToDisplay(data, item.Property.GetValue(data))
+                        @item.ToDisplay(data, item.PropertyInfo.GetValue(data))
                     </Template>
                     <EditTemplate Context="data">
-                        @if (item.Readonly)
+                        @if (item.ReadonlyMode == Models.Modules.Common.ReadonlyMode.Readonly)
                         {
-                            @item.ToDisplay(data, item.Property.GetValue(data))
+                            @item.ToDisplay(data, item.PropertyInfo.GetValue(data))
                         }
                         else
                         {
-                            <RadzenTextBox Name="@TranslateFor(item.OriginName)" @bind-Value="@(new Models.Modules.Form.ValueBinder(data, item.Property).StringValue)" Style="width: 100%; display: block;" />
+                            <RadzenTextBox Name="@TranslateFor(item.OriginName)" @bind-Value="@(new Models.Modules.Form.ValueBinder(data, item.PropertyInfo).StringValue)" Style="width: 100%; display: block;" />
                             @if (item.Required)
                             {
                                 <RadzenRequiredValidator Text="@TranslateFor(item.PropertyName + " is required")" Component="@TranslateFor(item.PropertyName)" Popup="true" />

@@ -121,7 +121,7 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<DivideInfo> Divide(this string text, string[] tags)
         {
-            List<DivideInfo> result = new List<DivideInfo>();
+            List<DivideInfo> result = new();
             int startIdx = 0;
             var tagInfos = text.GetAllTags(tags);
 
@@ -162,7 +162,7 @@ namespace CommonBase.Extensions
         {
             tags.CheckArgument(nameof(tags));
 
-            List<TagInfo> result = new List<TagInfo>();
+            List<TagInfo> result = new();
 
             for (int i = 0; i + 1 < tags.Length; i += 2)
             {
@@ -359,7 +359,7 @@ namespace CommonBase.Extensions
         /// <returns>Text mit Anzahl von Einzuegen.</returns>
         public static string SetIndent(this string text, int count)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             if (text != null)
             {
@@ -412,7 +412,7 @@ namespace CommonBase.Extensions
             if (lines == null)
                 throw new ArgumentNullException(nameof(lines));
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             foreach (var line in lines)
             {
@@ -432,7 +432,7 @@ namespace CommonBase.Extensions
             if (lines == null)
                 throw new ArgumentNullException(nameof(lines));
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             foreach (var line in lines)
             {
@@ -451,7 +451,7 @@ namespace CommonBase.Extensions
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
 
-            List<string> result = new List<string>();
+            List<string> result = new();
 
             foreach (var line in text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
             {
@@ -511,7 +511,7 @@ namespace CommonBase.Extensions
         /// <returns>The substring.</returns>
         public static string Partialstring(this string text, int from, int to)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             if (string.IsNullOrEmpty(text) == false)
             {
@@ -536,7 +536,7 @@ namespace CommonBase.Extensions
             startTag.CheckArgument(nameof(startTag));
             endTag.CheckArgument(nameof(endTag));
 
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
             int parseIndex = 0;
             int startTagIndex;
             int endTagIndex;
@@ -564,7 +564,7 @@ namespace CommonBase.Extensions
 
         public static string ReplaceUmlauts(this string text)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             if (text != null)
             {
@@ -611,7 +611,7 @@ namespace CommonBase.Extensions
             text.CheckArgument(nameof(text));
             tagInfo.CheckArgument(nameof(tagInfo));
 
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
             int parseIndex = 0;
             int startTagIndex;
             int endTagIndex;
@@ -657,7 +657,7 @@ namespace CommonBase.Extensions
             int parseIndex = 0;
             int startTagIndex;
             int endTagIndex;
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
 
             do
             {
@@ -755,7 +755,7 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<T> ToEnumerable<T>(this string source, string separator)
         {
-            List<T> result = new List<T>();
+            List<T> result = new();
 
             if (string.IsNullOrEmpty(source) == false)
             {
@@ -833,7 +833,7 @@ namespace CommonBase.Extensions
             string result;
             using var aesAlg = Aes.Create();
             using var decryptor = aesAlg.CreateDecryptor(key, iv);
-            using (MemoryStream msDecrypt = new MemoryStream(cipher))
+            using (MemoryStream msDecrypt = new(cipher))
             {
                 using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
                 using var srDecrypt = new StreamReader(csDecrypt);

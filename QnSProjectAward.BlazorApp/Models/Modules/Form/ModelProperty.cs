@@ -15,12 +15,12 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         protected ContractPropertyInfoAttribute PropertyAttribute { get; private set; }
 
         public Type ModelType { get; init; }
-        public PropertyInfo Property { get; init; }
-        public Type PropertyType => Property.PropertyType;
+        public PropertyInfo PropertyInfo { get; init; }
+        public Type PropertyType => PropertyInfo.PropertyType;
         public ContentType ContentType => PropertyAttribute != null ? PropertyAttribute.ContentType : ContentType.Undefined;
         public string ModelName => ModelType.Name;
         public string FullName => $"{ModelName}.{Name}";
-        public string Name => Property.Name;
+        public string Name => PropertyInfo.Name;
         public string FormatValue { get; set; }
 
         public bool Required => PropertyAttribute != null && PropertyAttribute.Required;
@@ -35,7 +35,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
             propertyInfo.CheckArgument(nameof(propertyInfo));
 
             ModelType = modelType;
-            Property = propertyInfo;
+            PropertyInfo = propertyInfo;
             InitMetaData();
         }
         private void InitMetaData()
@@ -45,7 +45,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
             if (ModelInterface != null)
             {
                 var pi = ModelInterface.GetAllInterfacePropertyInfos()
-                                       .FirstOrDefault(i => i.Name.Equals(Property.Name));
+                                       .FirstOrDefault(i => i.Name.Equals(PropertyInfo.Name));
 
                 if (pi != null)
                 {

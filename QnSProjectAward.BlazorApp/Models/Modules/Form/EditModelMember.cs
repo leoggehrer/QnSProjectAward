@@ -2,6 +2,7 @@
 //MdStart
 
 using CommonBase.Extensions;
+using QnSProjectAward.BlazorApp.Models.Modules.Common;
 using QnSProjectAward.BlazorApp.Modules.Common;
 using QnSProjectAward.BlazorApp.Shared.Components;
 using Radzen;
@@ -14,8 +15,38 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
     public partial class EditModelMember : ModelMember
     {
         public CommonComponent CommonComponent { get; init; }
-        public bool Visible => Display.EditVisible;
-        public bool Readonly => Display.Readonly || Property.CanWrite == false;
+        public ReadonlyMode ReadonlyMode => DisplayInfo.ReadonlyMode;
+        public VisibilityMode VisibilityMode => DisplayInfo.VisibilityMode;
+        public bool Visible
+        {
+            get
+            {
+                var result = (VisibilityMode & VisibilityMode.Visible) > 0;
+
+                if (Model is IdentityModel im)
+                {
+                    result = (im.Id > 0 && (VisibilityMode & VisibilityMode.UpdateView) > 0)
+                              ||
+                             (im.Id == 0 && (VisibilityMode & VisibilityMode.CreateView) > 0);
+                }
+                return result;
+            }
+        }
+        public bool Readonly
+        {
+            get
+            {
+                var result = (VisibilityMode & VisibilityMode.Visible) > 0;
+
+                if (Model is IdentityModel im)
+                {
+                    result = (im.Id > 0 && (ReadonlyMode & ReadonlyMode.Update) > 0)
+                              ||
+                             (im.Id == 0 && (ReadonlyMode & ReadonlyMode.Create) > 0);
+                }
+                return result;
+            }
+        }
         public string DefaultValue => PropertyAttribute != null ? PropertyAttribute.DefaultValue : string.Empty;
         public string HtmlCssClass { get; set; }
         public string HtmlAttributes { get; set; }
@@ -30,11 +61,11 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
             {
                 try
                 {
-                    var result = value.TryParse(Property.PropertyType, out object typeValue);
+                    var result = value.TryParse(PropertyInfo.PropertyType, out object typeValue);
 
                     if (result)
                     {
-                        Property.SetValue(Model, typeValue);
+                        PropertyInfo.SetValue(Model, typeValue);
                         LastError = null;
                     }
                     else
@@ -59,11 +90,11 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
             }
             set
             {
-                if (Property.PropertyType.Equals(typeof(string)))
+                if (PropertyInfo.PropertyType.Equals(typeof(string)))
                 {
                     EditValue = value;
                 }
-                else if (Property.PropertyType.IsNullableType() && string.IsNullOrEmpty(value))
+                else if (PropertyInfo.PropertyType.IsNullableType() && string.IsNullOrEmpty(value))
                 {
                     EditValue = null;
                 }
@@ -145,8 +176,18 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         }
         public virtual DateTime EditDateTimeValue
         {
-            get => TryParse<DateTime>(Value, DateTime.TryParse);
+            get => (DateTime)Value == default ? CreateDefaultDateTime() : TryParse<DateTime>(Value, DateTime.TryParse);
+            set => EditValue = (DateTime)value == CreateDefaultDateTime() ? default : value;
+        }
+        public virtual TimeSpan EditTimeSpanValue
+        {
+            get => TryParse<TimeSpan>(Value, TimeSpan.TryParse);
             set => EditValue = value;
+        }
+        public virtual DateTime EditTimeValue
+        {
+            get => CreateNowDate(EditTimeSpanValue);
+            set => EditTimeSpanValue = CreateTimeSpan(value);
         }
 
         public virtual char? EditCharNullValue
@@ -211,8 +252,18 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         }
         public virtual DateTime? EditDateTimeNullValue
         {
-            get => TryParse<DateTime>(Value, DateTime.TryParse);
+            get => Value == null ? CreateDefaultDateTime() : TryParse<DateTime>(Value, DateTime.TryParse);
+            set => EditValue = value == CreateDefaultDateTime() ? null : value;
+        }
+        public virtual TimeSpan? EditTimeSpanNullValue
+        {
+            get => TryParse<TimeSpan>(Value, TimeSpan.TryParse);
             set => EditValue = value;
+        }
+        public virtual DateTime? EditTimeNullValue
+        {
+            get => CreateNowDateNull(EditTimeSpanNullValue);
+            set => EditTimeSpanNullValue = CreateTimeSpanNull(value);
         }
 
         private string saveNumericValue;
@@ -248,51 +299,61 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
                 else
                     EditCtrlType = ControlType.TextBox;
             }
-            else if (Property.PropertyType.IsEnum)
+            else if (PropertyInfo.PropertyType.IsEnum)
             {
                 EditCtrlType = ControlType.Select;
-                SelectItems = Selector.LoadEnumLiterals(Property.PropertyType, Value, null);
+                SelectItems = Selector.LoadEnumLiterals(PropertyInfo.PropertyType, Value, null);
             }
-            else if (Property.PropertyType.Equals(typeof(TimeSpan)))
+            else if (PropertyInfo.PropertyType.Equals(typeof(TimeSpan)))
             {
                 EditCtrlType = ControlType.TimePicker;
                 FormatValue = "HH:mm";
             }
-            else if (Property.PropertyType.Equals(typeof(TimeSpan?)))
+            else if (PropertyInfo.PropertyType.Equals(typeof(TimeSpan?)))
             {
                 EditCtrlType = ControlType.TimePickerNull;
                 FormatValue = "HH:mm";
             }
-            else if (Property.PropertyType.Equals(typeof(DateTime)))
+            else if (PropertyInfo.PropertyType.Equals(typeof(DateTime)))
             {
                 EditCtrlType = ControlType.DatePicker;
-                FormatValue = "dd.MM.yyyy HH:mm";
+                FormatValue = "dd.MM.yyyy";
+                if (ContentType == CommonBase.Attributes.ContentType.DateTime)
+                {
+                    EditCtrlType = ControlType.DateTimePicker;
+                    FormatValue += " HH:mm:ss";
+                }
             }
-            else if (Property.PropertyType.Equals(typeof(DateTime?)))
+            else if (PropertyInfo.PropertyType.Equals(typeof(DateTime?)))
             {
                 EditCtrlType = ControlType.DatePickerNull;
-                FormatValue = "dd.MM.yyyy HH:mm";
+                FormatValue = "dd.MM.yyyy";
+                if (ContentType == CommonBase.Attributes.ContentType.DateTime)
+                {
+                    EditCtrlType = ControlType.DateTimePickerNull;
+                    FormatValue += " HH:mm:ss";
+                }
             }
-            else if (Property.PropertyType.Equals(typeof(bool)))
+            else if (PropertyInfo.PropertyType.Equals(typeof(bool)))
             {
                 EditCtrlType = ControlType.CheckBox;
             }
-            else if (Property.PropertyType.Equals(typeof(bool?)))
+            else if (PropertyInfo.PropertyType.Equals(typeof(bool?)))
             {
                 EditCtrlType = ControlType.CheckBoxNull;
             }
-            else if (Property.PropertyType.IsNumericType())
+            else if (PropertyInfo.PropertyType.IsNumericType())
             {
-                if (Property.PropertyType.IsNullableType())
+                if (PropertyInfo.PropertyType.IsNullableType())
                 {
                     EditCtrlType = ControlType.NumericNull;
-                    if (Property.PropertyType.IsFloatingPointType())
+                    if (PropertyInfo.PropertyType.IsFloatingPointType())
                         EditCtrlType = ControlType.FloatingPointNull;
                 }
                 else
                 {
                     EditCtrlType = ControlType.Numeric;
-                    if (Property.PropertyType.IsFloatingPointType())
+                    if (PropertyInfo.PropertyType.IsFloatingPointType())
                         EditCtrlType = ControlType.FloatingPoint;
                 }
             }
@@ -310,6 +371,42 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         }
 
         #region Helpers
+        public static DateTime CreateDefaultDateTime()
+        {
+            return new DateTime();// new DateTime(1, 1, 1, 1, 1, 1, 1);
+        }
+        public static DateTime CreateNowDate()
+        {
+            var result = DateTime.Now;
+
+            result = result.AddHours(-result.Hour);
+            result = result.AddMinutes(-result.Minute);
+            result = result.AddSeconds(-result.Second);
+            return result;
+        }
+        public static DateTime CreateNowDate(TimeSpan timeSpan)
+        {
+            var result = CreateNowDate();
+
+            result = result.AddHours(timeSpan.Hours);
+            result = result.AddMinutes(timeSpan.Minutes);
+            result = result.AddSeconds(timeSpan.Seconds);
+            return result;
+        }
+        public static TimeSpan CreateTimeSpan(DateTime dateTime)
+        {
+            return new TimeSpan(dateTime.Hour, dateTime.Minute, dateTime.Second);
+        }
+
+        public static DateTime? CreateNowDateNull(TimeSpan? timeSpan)
+        {
+            return timeSpan != null ? CreateNowDate(timeSpan.Value) : null;
+        }
+        public static TimeSpan? CreateTimeSpanNull(DateTime? dateTime)
+        {
+            return dateTime != null ? CreateTimeSpan(dateTime.Value) : null;
+        }
+
         private delegate bool TryParseHandler<T>(string value, out T result);
         private static T TryParse<T>(object value, TryParseHandler<T> tryParse)
         {

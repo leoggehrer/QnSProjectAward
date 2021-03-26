@@ -43,22 +43,33 @@ namespace QnSProjectAward.Logic.DataContext.Db
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            BeforeConfiguring(optionsBuilder);
-            optionsBuilder
-#if DEBUG        
+
+            var handled = false;
+
+            BeforeOnConfiguring(optionsBuilder, ref handled);
+            if (handled == false)
+            {
+                optionsBuilder
+#if DEBUG
                 .EnableSensitiveDataLogging()
-                .UseLoggerFactory(loggerFactory)
+                    .UseLoggerFactory(loggerFactory)
 #endif
                 .UseSqlServer(ConnectionString);
-            AfterConfiguring(optionsBuilder);
+            }
+            AfterOnConfiguring(optionsBuilder);
         }
-        partial void BeforeConfiguring(DbContextOptionsBuilder optionsBuilder);
-        partial void AfterConfiguring(DbContextOptionsBuilder optionsBuilder);
+        partial void BeforeOnConfiguring(DbContextOptionsBuilder optionsBuilder, ref bool handled);
+        partial void AfterOnConfiguring(DbContextOptionsBuilder optionsBuilder);
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            BeforeModelCreating(modelBuilder);
-            DoModelCreating(modelBuilder);
-            AfterModelCreating(modelBuilder);
+            var handled = false;
+
+            BeforeOnModelCreating(modelBuilder, ref handled);
+            if (handled == false)
+			{
+                DoModelCreating(modelBuilder);
+            }
+            AfterOnModelCreating(modelBuilder);
 
             var cascadeFKs = modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetForeignKeys())
@@ -69,9 +80,9 @@ namespace QnSProjectAward.Logic.DataContext.Db
 
             base.OnModelCreating(modelBuilder);
         }
-        static partial void BeforeModelCreating(ModelBuilder modelBuilder);
+        static partial void BeforeOnModelCreating(ModelBuilder modelBuilder, ref bool handled);
         static partial void DoModelCreating(ModelBuilder modelBuilder);
-        static partial void AfterModelCreating(ModelBuilder modelBuilder);
+        static partial void AfterOnModelCreating(ModelBuilder modelBuilder);
 
         static partial void ConfigureEntityType(EntityTypeBuilder<Identity> entityTypeBuilder)
         {

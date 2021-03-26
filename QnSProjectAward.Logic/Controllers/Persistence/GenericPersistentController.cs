@@ -249,14 +249,14 @@ namespace QnSProjectAward.Logic.Controllers.Persistence
         }
         internal virtual async Task<I> ExecuteCreateAsync()
         {
-            E entity = new E();
+            E entity = new();
 
             AfterCreate(entity);
             return await BeforeReturnAsync(entity).ConfigureAwait(false);
         }
         internal virtual async Task<E> ExecuteCreateEntityAsync()
         {
-            E entity = new E();
+            E entity = new();
 
             AfterCreate(entity);
             return await BeforeReturnAsync(entity).ConfigureAwait(false);

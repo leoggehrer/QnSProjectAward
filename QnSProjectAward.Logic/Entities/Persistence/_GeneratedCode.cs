@@ -1656,6 +1656,7 @@ namespace QnSProjectAward.Logic.Entities.Persistence.App
             get;
             set;
         }
+        = System.DateTime.Now;
         public System.DateTime? To
         {
             get;

@@ -1319,11 +1319,14 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
             get;
             set;
         }
+        [System.ComponentModel.DataAnnotations.DataType(System.ComponentModel.DataAnnotations.DataType.DateTime)]
         public System.DateTime From
         {
             get;
             set;
         }
+        = System.DateTime.Now;
+        [System.ComponentModel.DataAnnotations.DataType(System.ComponentModel.DataAnnotations.DataType.DateTime)]
         public System.DateTime? To
         {
             get;

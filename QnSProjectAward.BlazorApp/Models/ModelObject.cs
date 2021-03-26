@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace QnSProjectAward.BlazorApp.Models
 {
-    public partial class ModelObject
+    public abstract partial class ModelObject
     {
         private List<ModelObject> subObjects = null;
         protected List<ModelObject> SubObjects
@@ -26,36 +26,76 @@ namespace QnSProjectAward.BlazorApp.Models
 
         public virtual void BeforeDisplay()
         {
+            foreach (var item in SubObjects)
+            {
+                item.BeforeDisplay();
+            }
         }
 
         public virtual void BeforeEdit()
         {
+            foreach (var item in SubObjects)
+            {
+                item.BeforeEdit();
+            }
         }
         public virtual void BeforeSave()
         {
+            foreach (var item in SubObjects)
+            {
+                item.BeforeSave();
+            }
         }
         public virtual void AfterSave()
         {
+            foreach (var item in SubObjects)
+            {
+                item.AfterSave();
+            }
         }
         public virtual void CancelEdit()
         {
+            foreach (var item in SubObjects)
+            {
+                item.CancelEdit();
+            }
         }
 
         public virtual void BeforeDelete()
         {
+            foreach (var item in SubObjects)
+            {
+                item.BeforeDelete();
+            }
         }
         public virtual void ConfirmedDelete()
         {
+            foreach (var item in SubObjects)
+            {
+                item.ConfirmedDelete();
+            }
         }
         public virtual void AfterDelete()
         {
+            foreach (var item in SubObjects)
+            {
+                item.AfterDelete();
+            }
         }
         public virtual void CancelDelete()
         {
+            foreach (var item in SubObjects)
+            {
+                item.CancelDelete();
+            }
         }
 
         public virtual void EvaluateDisplayProperty(DisplayProperty displayProperty)
         {
+            foreach (var item in SubObjects)
+            {
+                item.EvaluateDisplayProperty(displayProperty);
+            }
         }
         protected static bool IsEqualsWith(object obj1, object obj2)
         {

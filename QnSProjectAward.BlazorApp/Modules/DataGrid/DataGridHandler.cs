@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using QnSProjectAward.BlazorApp.Models;
 using QnSProjectAward.BlazorApp.Pages;
 using QnSProjectAward.BlazorApp.Shared.Components;
-using QnSProjectAward.Contracts.Client;
 using Radzen;
 using Radzen.Blazor;
 using System;
@@ -17,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 {
-    public partial class DataGridHandler<TContract, TModel> : ComponentHandler, IDataGridHandler<TModel>
+	public partial class DataGridHandler<TContract, TModel> : ComponentHandler, IDataGridHandler<TModel>
         where TContract : Contracts.IIdentifiable, Contracts.ICopyable<TContract>
         where TModel : IdentityModel, TContract, new()
     {
@@ -52,7 +51,21 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public RadzenGrid<TModel> RadzenGrid { get; set; }
         public EditContext EditContext { get; protected set; }
         public ModelPage ModelPage { get; init; }
-        public IAdapterAccess<TContract> AdapterAccess { get; init; }
+        private DataAccess<TContract> dataAccess;
+        public DataAccess<TContract> DataAccess
+        {
+            get
+            {
+                if (ModelPage != null
+                    && ModelPage.AuthorizationSession != null
+                    && dataAccess != null)
+                {
+                    dataAccess.SessionToken = ModelPage.AuthorizationSession.Token;
+                }
+                return dataAccess;
+            }
+            init => dataAccess = value;
+        }
 
         public virtual string ForPrefix => typeof(TModel).Name;
         public Func<string, string> Translate { get; init; }
@@ -68,7 +81,18 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             modelPage.CheckArgument(nameof(modelPage));
 
             ModelPage = modelPage;
-            AdapterAccess = ModelPage.ServiceAdapter.Create<TContract>();
+            DataAccess = new DataAdapterAccess<TContract>(ModelPage.ServiceAdapter.Create<TContract>());
+            Translate = ModelPage.Translate;
+            Constructed();
+        }
+        public DataGridHandler(ModelPage modelPage, DataAccess<TContract> dataAccess)
+        {
+            Constructing();
+            modelPage.CheckArgument(nameof(modelPage));
+            dataAccess.CheckArgument(nameof(dataAccess));
+
+            ModelPage = modelPage;
+            DataAccess = dataAccess;
             Translate = ModelPage.Translate;
             Constructed();
         }
@@ -224,11 +248,11 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 
         public virtual async Task LoadDataAsync(LoadDataArgs args)
         {
-            if (loadDataActive == false)
+            if (DataAccess != null && loadDataActive == false)
             {
                 try
                 {
-                    var handled = default(bool);
+                    bool handled;
 
                     loadDataActive = true;
                     PrepareLoadDataArgs(args);
@@ -243,7 +267,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                         var modelFilter = default(string);
 
                         SelectedModel = null;
-                        AdapterAccess.SessionToken = ModelPage.AuthorizationSession.Token;
                         if (string.IsNullOrWhiteSpace(args.Filter) == false)
                         {
                             var gridAccessFilter = GetGridAccessFilter(args.Filter);
@@ -271,9 +294,9 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                           && modelFilter.HasContent() == false
                           && orderBy.HasContent() == false)
                         {
-                            Count = await AdapterAccess.CountAsync()
+                            Count = await DataAccess.CountAsync()
                                            .ConfigureAwait(false);
-                            var query = (await AdapterAccess.GetPageListAsync(pageIndex.GetValueOrDefault(), PageSize)
+                            var query = (await DataAccess.GetPageListAsync(pageIndex.GetValueOrDefault(), PageSize)
                                            .ConfigureAwait(false))
                                            .Select(e => ToModel(e))
                                            .ToArray();
@@ -288,9 +311,9 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && modelFilter.HasContent() == false
                              && orderBy.HasContent() == false)
                         {
-                            Count = await AdapterAccess.CountByAsync(accessFilter)
+                            Count = await DataAccess.CountByAsync(accessFilter)
                                            .ConfigureAwait(false);
-                            var query = (await AdapterAccess.QueryPageListAsync(accessFilter, pageIndex.GetValueOrDefault(), PageSize)
+                            var query = (await DataAccess.QueryPageListAsync(accessFilter, pageIndex.GetValueOrDefault(), PageSize)
                                            .ConfigureAwait(false))
                                            .Select(e => ToModel(e))
                                            .ToArray();
@@ -306,9 +329,9 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy) == false)
                         {
-                            Count = await AdapterAccess.CountByAsync(accessFilter)
+                            Count = await DataAccess.CountByAsync(accessFilter)
                                            .ConfigureAwait(false);
-                            var query = (await AdapterAccess.QueryPageListAsync(accessFilter, pageIndex.GetValueOrDefault(), PageSize)
+                            var query = (await DataAccess.QueryPageListAsync(accessFilter, pageIndex.GetValueOrDefault(), PageSize)
                                            .ConfigureAwait(false))
                                            .Select(e => ToModel(e))
                                            .ToArray();
@@ -326,9 +349,9 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy))
                         {
-                            Count = await AdapterAccess.CountByAsync(accessFilter)
+                            Count = await DataAccess.CountByAsync(accessFilter)
                                            .ConfigureAwait(false);
-                            var query = (await AdapterAccess.QueryPageListAsync(accessFilter, pageIndex.GetValueOrDefault(), PageSize)
+                            var query = (await DataAccess.QueryPageListAsync(accessFilter, pageIndex.GetValueOrDefault(), PageSize)
                                            .ConfigureAwait(false))
                                            .Select(e => ToModel(e))
                                            .ToArray();
@@ -345,7 +368,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && modelFilter.HasContent()
                              && orderBy.HasContent() == false)
                         {
-                            var query = (await AdapterAccess.QueryAllAsync(accessFilter)
+                            var query = (await DataAccess.QueryAllAsync(accessFilter)
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -362,7 +385,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy) == false)
                         {
-                            var query = (await AdapterAccess.QueryAllAsync(accessFilter)
+                            var query = (await DataAccess.QueryAllAsync(accessFilter)
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -380,7 +403,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy))
                         {
-                            var query = (await AdapterAccess.QueryAllAsync(accessFilter)
+                            var query = (await DataAccess.QueryAllAsync(accessFilter)
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -397,7 +420,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && modelFilter.HasContent()
                              && orderBy.HasContent() == false)
                         {
-                            var query = (await AdapterAccess.GetAllAsync()
+                            var query = (await DataAccess.GetAllAsync()
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -414,7 +437,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy) == false)
                         {
-                            var query = (await AdapterAccess.GetAllAsync()
+                            var query = (await DataAccess.GetAllAsync()
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -432,7 +455,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy))
                         {
-                            var query = (await AdapterAccess.GetAllAsync()
+                            var query = (await DataAccess.GetAllAsync()
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -450,7 +473,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy) == false)
                         {
-                            var query = (await AdapterAccess.GetAllAsync()
+                            var query = (await DataAccess.GetAllAsync()
                                              .ConfigureAwait(false))
                                              .Select(e => ToModel(e))
                                              .ToArray();
@@ -467,7 +490,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                              && orderBy.HasContent()
                              && IsModelOrder(orderBy))
                         {
-                            var query = (await AdapterAccess.GetAllAsync()
+                            var query = (await DataAccess.GetAllAsync()
                                             .ConfigureAwait(false))
                                             .Select(e => ToModel(e))
                                             .ToArray();
@@ -520,15 +543,15 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         }
         #endregion Model operations
 
-        public virtual void ValueChanged(TModel item)
+        public virtual void ValueChanged(object item)
         {
             var handled = false;
 
-            BeforeValueChanged(item, ref handled);
+            BeforeValueChanged(item as TModel, ref handled);
             if (handled == false)
             {
             }
-            AfterValueChanged(item);
+            AfterValueChanged(item as TModel);
         }
         partial void BeforeValueChanged(TModel item, ref bool handled);
         partial void AfterValueChanged(TModel item);
@@ -606,24 +629,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             BeforeRowDoubleClick(item, ref handled);
             if (handled == false && AllowEdit && EditModel == null)
             {
-                try
-                {
-                    var entity = default(TContract);
-
-                    if (item.Id > 0)
-                    {
-                        entity = await AdapterAccess.GetByIdAsync(item.Id).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        entity = await CreateModelAsync().ConfigureAwait(false);
-                    }
-                    await ShowEditModelAsync(entity).ConfigureAwait(false);
-                }
-                catch (System.Exception ex)
-                {
-                    ShowException("Error update", ex);
-                }
+                await LoadAndShowEditModelAsync(item).ConfigureAwait(false);
             }
             AfterRowDoubleClick(item);
         }
@@ -632,8 +638,9 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 
         #region Dialog operations
         private bool hasFieldChanged;
+
         public bool IsEditModal { get; private set; }
-        public bool HasFieldChanged 
+        public bool HasFieldChanged
         {
             get => hasFieldChanged;
             set
@@ -644,6 +651,73 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         }
         public bool HasQueryChanged { get; private set; }
         public bool InSubmitChanges { get; private set; }
+        public bool InCancelChanges { get; private set; }
+
+        protected virtual async Task CreateAndShowEditModelAsync()
+        {
+            try
+            {
+                EditModel = await CreateModelAsync().ConfigureAwait(false);
+
+                await ShowEditModelAsync(EditModel).ConfigureAwait(false);
+            }
+            catch (System.Exception ex)
+            {
+                ShowException(Translate("Error create and show"), ex);
+            }
+        }
+        protected virtual async Task CreateAndShowEditModelAsync(DialogService dialogService)
+        {
+            try
+            {
+                EditModel = await CreateModelAsync().ConfigureAwait(false);
+
+                dialogService?.Close();
+                await ShowEditModelAsync(EditModel).ConfigureAwait(false);
+            }
+            catch (System.Exception ex)
+            {
+                ShowException(Translate("Error create and show"), ex);
+            }
+        }
+        protected virtual async Task LoadAndShowEditModelAsync(DialogService dialogService, int id)
+        {
+            try
+            {
+                var entity = await DataAccess.GetByIdAsync(id).ConfigureAwait(false);
+
+                dialogService?.Close();
+                await ShowEditModelAsync(entity).ConfigureAwait(false);
+            }
+            catch (System.Exception ex)
+            {
+                ShowException(Translate("Error load and show"), ex);
+            }
+        }
+        protected virtual async Task LoadAndShowEditModelAsync(TModel item)
+        {
+            item.CheckArgument(nameof(item));
+
+            try
+            {
+                var entity = default(TContract);
+
+                if (item.Id > 0)
+                {
+                    entity = await DataAccess.GetByIdAsync(item.Id).ConfigureAwait(false);
+                }
+                else
+                {
+                    entity = await CreateModelAsync().ConfigureAwait(false);
+                    entity.CopyProperties(item);
+                }
+                await ShowEditModelAsync(entity).ConfigureAwait(false);
+            }
+            catch (System.Exception ex)
+            {
+                ShowException(Translate($"Error {(item.Id == 0 ? "create" : "update")}"), ex);
+            }
+        }
         protected virtual async Task ShowEditModelAsync(TContract entity)
         {
             entity.CheckArgument(nameof(entity));
@@ -664,21 +738,10 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 BeforeShowEditItem(editModel);
                 IsEditModal = true;
                 HasFieldChanged = false;
+                InSubmitChanges = false;
+                InCancelChanges = false;
                 EditContext = new EditContext(editModel);
                 await ShowEditItemDialogAsync().ConfigureAwait(false);
-            }
-        }
-        protected virtual async Task LoadAndShowEditModelAsync(int id)
-        {
-            try
-            {
-                var entity = await AdapterAccess.GetByIdAsync(id).ConfigureAwait(false);
-
-                await ShowEditModelAsync(entity).ConfigureAwait(false);
-            }
-            catch (System.Exception ex)
-            {
-                ShowException("Error load", ex);
             }
         }
 
@@ -689,8 +752,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             BeforeAddItem(ref handled);
             if (handled == false && AllowAdd && EditModel == null)
             {
-                EditModel = await CreateModelAsync();
-                await ShowEditModelAsync(EditModel).ConfigureAwait(false);
+                await CreateAndShowEditModelAsync().ConfigureAwait(false);
             }
             AfterEditModelHandler?.Invoke(this, EditModel);
             AfterAddItem(EditModel);
@@ -706,17 +768,18 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         {
         }
 
-        public virtual async Task SubmitChangesAsync(DialogService dialogService)
+        public virtual async Task SubmitDialogChangesAsync(DialogService dialogService)
         {
             if (InSubmitChanges == false)
             {
-                var result = false;
                 var handled = false;
+                var saveModel = EditModel;
 
                 InSubmitChanges = true;
                 BeforeSubmitChanges(EditModel, ref handled);
                 if (handled == false)
                 {
+                    var result = false;
                     try
                     {
                         var entity = default(TModel);
@@ -736,10 +799,10 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                         if (result)
                         {
                             dialogService.Close();
+                            AfterSubmitChanges(saveModel);
+
                             EditModel = new TModel();
                             EditModel.CopyFrom(entity);
-                            AfterSubmitChanges(EditModel);
-                            InSubmitChanges = false;
                             await ShowEditModelAsync(EditModel).ConfigureAwait(false);
                         }
                     }
@@ -754,34 +817,40 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 }
                 else
                 {
-                    AfterSubmitChanges(EditModel);
+                    AfterSubmitChanges(saveModel);
                     InSubmitChanges = false;
                 }
             }
         }
-        public virtual async Task SubmitChangesCloseAsync(DialogService dialogService)
+        public virtual async Task SubmitDialogChangesAndCloseAsync(DialogService dialogService)
         {
             var handled = false;
-            var saveEditModel = EditModel;
+            var saveModel = EditModel;
 
             BeforeSubmitChanges(EditModel, ref handled);
             if (handled == false)
             {
+                var result = false;
                 try
                 {
-                    var result = false;
+                    var entity = default(TModel);
 
-                    if (EditModel.Id == 0)
+                    if (EditModel.CloneData || EditModel.Id == 0)
                     {
-                        result = await InsertModelAsync(EditModel).ConfigureAwait(false);
+                        entity = await CreateModelAsync().ConfigureAwait(false);
+                        entity.CopyFrom(EditModel, p => p.Equals(nameof(EditModel.Id)) == false);
+                        result = await InsertModelAsync(entity).ConfigureAwait(false);
                     }
                     else
                     {
-                        result = await UpdateModelAsync(EditModel).ConfigureAwait(false);
+                        entity = new TModel();
+                        entity.CopyFrom(EditModel);
+                        result = await UpdateModelAsync(entity).ConfigureAwait(false);
                     }
                     if (result)
                     {
                         dialogService.Close();
+                        AfterSubmitChanges(saveModel);
                     }
                 }
                 catch (System.Exception ex)
@@ -789,7 +858,10 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                     ShowException(EditModel.Id == 0 ? "Error create" : "Error update", ex);
                 }
             }
-            AfterSubmitChanges(saveEditModel);
+            else
+            {
+                AfterSubmitChanges(saveModel);
+            }
         }
         protected virtual void BeforeSubmitChanges(TModel item, ref bool handled)
         {
@@ -800,61 +872,107 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             item?.AfterSave();
         }
 
-        public virtual void CancelChangesDialog(DialogService dialogService)
+        public virtual async Task CancelDialogChangesAsync(DialogService dialogService)
         {
-            if (HasFieldChanged && HasQueryChanged == false)
+            if (InCancelChanges == false)
             {
-                HasQueryChanged = true;
-                ShowWarning("Data changed", "Are you sure you want to discard the changes?");
-            }
-            else
-            {
-                dialogService.Close();
-                EditModel?.CancelEdit();
-                EditModel = null;
+                InCancelChanges = true;
+
+                try
+                {
+                    if (HasFieldChanged && HasQueryChanged == false)
+                    {
+                        HasQueryChanged = true;
+                        ShowWarning("Data changed", "If you want to discard the changes, activate the action again!");
+                    }
+                    else
+                    {
+                        var id = EditModel.Id;
+
+                        EditModel?.CancelEdit();
+                        EditModel = null;
+
+                        if (id > 0)
+                        {
+                            await LoadAndShowEditModelAsync(dialogService, id).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await CreateAndShowEditModelAsync(dialogService).ConfigureAwait(false);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    ShowException(Translate("Error cancel"), ex);
+                }
+                finally
+                {
+                    InCancelChanges = false;
+                }
             }
         }
+        public virtual Task CancelDialogChangesAndCloseAsync(DialogService dialogService)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                if (HasFieldChanged && HasQueryChanged == false)
+                {
+                    HasQueryChanged = true;
+                    ShowWarning("Data changed", "If you want to discard the changes, activate the action again!");
+                }
+                else
+                {
+                    dialogService.Close();
+                    EditModel?.CancelEdit();
+                    EditModel = null;
+                }
+            });
+        }
 
-        public virtual async Task ConfirmDeleteItemAsync(DialogService dialogService)
+        public virtual async Task ConfirmDialogDeleteAsync(DialogService dialogService)
         {
             var handled = false;
+            var saveModel = DeleteModel;
 
-            BeforeConfirmDeleteItem(DeleteModel, ref handled);
+            BeforeConfirmDelete(DeleteModel, ref handled);
             if (handled == false)
             {
                 try
                 {
                     await DeleteModelAsync(DeleteModel).ConfigureAwait(false);
+                    dialogService.Close();
+                    AfterConfirmDelete(saveModel);
                 }
                 catch (System.Exception ex)
                 {
                     ShowException("Error delete", ex);
                 }
-                finally
-                {
-                    dialogService.Close();
-                }
             }
-            AfterConfirmDeleteItem(DeleteModel);
-            DeleteModel = null;
+            else
+            {
+                AfterConfirmDelete(saveModel);
+            }
         }
-        protected virtual void BeforeConfirmDeleteItem(TModel item, ref bool handled)
+        protected virtual void BeforeConfirmDelete(TModel item, ref bool handled)
         {
             item?.ConfirmedDelete();
         }
-        protected virtual void AfterConfirmDeleteItem(TModel item)
+        protected virtual void AfterConfirmDelete(TModel item)
         {
             item?.AfterDelete();
         }
 
-        public void CancelDeleteDialog(DialogService dialogService)
+        public virtual void CancelDialogDelete(DialogService dialogService)
         {
             dialogService.Close();
             DeleteModel?.CancelDelete();
             DeleteModel = null;
         }
 
+#pragma warning disable IDE0060 // Remove unused parameter
         public void OnCloseDialog(dynamic result)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             EditModel?.CancelEdit();
             EditModel = null;
@@ -869,7 +987,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         protected virtual async Task<TModel> CreateModelAsync()
         {
             var result = new TModel();
-            var entity = await AdapterAccess.CreateAsync().ConfigureAwait(false);
+            var entity = await DataAccess.CreateAsync().ConfigureAwait(false);
 
             result.CopyProperties(entity);
             AfterCreateModelHandler?.Invoke(this, result);
@@ -886,7 +1004,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 if (handled == false)
                 {
                     BeforeInsertModelHandler?.Invoke(this, model);
-                    var curItem = await AdapterAccess.InsertAsync(model).ConfigureAwait(false);
+                    var curItem = await DataAccess.InsertAsync(model).ConfigureAwait(false);
 
                     model.CopyProperties(curItem);
                 }
@@ -914,7 +1032,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 if (handled == false)
                 {
                     BeforeUpdateModelHandler?.Invoke(this, model);
-                    var curItem = await AdapterAccess.UpdateAsync(model).ConfigureAwait(false);
+                    var curItem = await DataAccess.UpdateAsync(model).ConfigureAwait(false);
 
                     model.CopyProperties(curItem);
                     LoadModelDataHandler?.Invoke(this, new[] { model });
@@ -940,7 +1058,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             if (handeld == false)
             {
                 BeforeDeleteModelHandler?.Invoke(this, model);
-                await AdapterAccess.DeleteAsync(model.Id).ConfigureAwait(false);
+                await DataAccess.DeleteAsync(model.Id).ConfigureAwait(false);
             }
             AfterDeleteModelHandler?.Invoke(this, model);
             AfterDelteModel(model);

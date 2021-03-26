@@ -1,6 +1,7 @@
 //@QnSCodeCopy
 //MdStart
 
+using QnSProjectAward.BlazorApp.Models.Modules.Common;
 using System;
 
 namespace QnSProjectAward.BlazorApp.Models.Modules.Form
@@ -15,34 +16,13 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
 
         public bool ScaffoldItem { get; set; } = true;
         public bool IsModelItem { get; set; }
-        public bool Readonly { get; set; }
-        public string FormatValue { get; set; } = string.Empty;
-
-        public bool Visible { get; set; } = true;
-        private bool displayVisible = true;
-        public bool DisplayVisible
-        {
-            get { return Visible && displayVisible; }
-            set { displayVisible = value; }
-        }
-        private bool editVisible = true;
-        public bool EditVisible
-        {
-            get { return Visible && editVisible; }
-            set { editVisible = value; }
-        }
-
-
-        private bool listVisible = true;
-        public bool ListVisible
-        {
-            get { return Visible && listVisible; }
-            set { listVisible = value; }
-        }
+        public ReadonlyMode ReadonlyMode { get; set; } = ReadonlyMode.None;
+        public VisibilityMode VisibilityMode { get; set; } = VisibilityMode.Visible;
         public bool ListSortable { get; set; } = true;
         public bool ListFilterable { get; set; } = true;
         public string ListWidth { get; set; } = "100%";
 
+        public string FormatValue { get; set; } = string.Empty;
         public int Order { get; set; } = 10_000;
         public Func<object, object, string> ToDisplay { get; set; }
         public Func<string, string> GetFooterText { get; set; }

@@ -9,7 +9,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
         {
             base.InitDisplayProperties(displayProperties);
 
-            displayProperties.Add(new DisplayProperty("Assigned") { ScaffoldItem = false });
+            displayProperties.AddOrSet(new DisplayProperty("Assigned") { ScaffoldItem = false });
         }
     }
 }

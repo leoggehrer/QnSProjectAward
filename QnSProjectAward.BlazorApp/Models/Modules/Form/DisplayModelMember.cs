@@ -8,7 +8,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
 {
     public partial class DisplayModelMember : ModelMember
     {
-        public bool Visible => Display.DisplayVisible;
+        public bool Visible => (DisplayInfo.VisibilityMode & Common.VisibilityMode.ListDetailView) > 0;
         public Func<object, string> ToDisplayValue = v => v != null ? v.ToString() : string.Empty;
         public virtual string DisplayValue => ToDisplayValue?.Invoke(Value);
         public DisplayModelMember(ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty) 
