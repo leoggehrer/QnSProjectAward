@@ -1,0 +1,41 @@
+@*@QnSCodeCopy*@
+
+@*DefaultPage*@
+@{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href=@($"{PageRoot}")>@Translate(PageRoot)</a></li>
+            <li class="breadcrumb-item"><a href=@($"{NewRef}")>@Translate(nameof(NewRef))</a></li>
+            @if (Id > 0)
+            {
+                <li class="breadcrumb-item"><a href=@($"{ViewRef}")>@Translate(nameof(ViewRef))</a></li>
+                <li class="breadcrumb-item"><a href=@($"{EditRef}")>@Translate(nameof(EditRef))</a></li>
+                <li class="breadcrumb-item"><a href=@($"{DeleteRef}")>@Translate(nameof(DeleteRef))</a></li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Translate(Mode)</li>
+        </ol>
+    </nav>
+    if (MenuItems.Count > 0)
+    {
+        <RadzenMenu Click="@(args => OnMenuItemClick(args))">
+            <RadzenMenuItem Text="@Translate(ComponentName)" Icon="grid_on" Style="z-index: 1000;">
+                @foreach (var item in MenuItems)
+                {
+                    <RadzenMenuItem Text="@item.Text" Value="@item.Value" Path="@item.Path" Icon="@item.Icon"></RadzenMenuItem>
+                }
+            </RadzenMenuItem>
+        </RadzenMenu>
+    }
+}
+
+@if (CanRender)
+{
+    <TMasterComponent MasterDetailsPage=@this />
+    <hr />
+    <TDetailsComponent MasterDetailsPage=@this />
+}
+else
+{
+    <QnSProjectAward.BlazorApp.Shared.Components.LoadingIndicator />
+}
+@*DefaultPage*@

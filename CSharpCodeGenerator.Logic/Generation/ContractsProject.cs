@@ -23,7 +23,7 @@ namespace CSharpCodeGenerator.Logic.Generation
         {
             solutionProperties.CheckArgument(nameof(solutionProperties));
 
-            ContractsProject result = new ContractsProject
+            ContractsProject result = new()
             {
                 SolutionProperties = solutionProperties
             };

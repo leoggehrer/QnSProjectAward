@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.BlazorApp.Pages
 {
-	public partial class CommonPage : CommonComponent
+	public abstract partial class CommonPage : CommonComponent
 	{
 		public virtual string PageName => GetType().Name.Replace("Page", string.Empty);
 		protected bool HasLocationChanged { get; private set; }

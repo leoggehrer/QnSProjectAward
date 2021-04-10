@@ -12,8 +12,8 @@
     }
     foreach (var item in ModelMembers)
     {
-        EvaluateDisplayProperty(item.DisplayInfo);
-        Model.EvaluateDisplayProperty(item.DisplayInfo);
+        EvaluateDisplayInfo(item.DisplayInfo);
+        Model.EvaluateDisplayInfo(item.DisplayInfo);
 
         if (item.ScaffoldItem && item.Visible)
         {
@@ -29,6 +29,7 @@
                 Required = item.Required || item.PropertyType.IsNullableType() == false,
             };
 
+            ShowModelDisplayProperty(item);
             if (item.EditCtrlType == Modules.Common.ControlType.CheckBox)
             {
                 cssLabel = "form-check-label";

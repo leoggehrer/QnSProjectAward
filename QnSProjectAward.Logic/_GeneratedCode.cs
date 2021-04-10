@@ -14,6 +14,10 @@ namespace QnSProjectAward.Logic
             {
                 result = new Controllers.Persistence.Data.BinaryDataController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
             }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting))
+            {
+                result = new Controllers.Persistence.Configuration.IdentitySettingController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
+            }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.ISetting))
             {
                 result = new Controllers.Persistence.Configuration.SettingController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
@@ -37,6 +41,22 @@ namespace QnSProjectAward.Logic
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
             {
                 result = new Controllers.Persistence.App.RatingController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
+            {
+                result = new Controllers.Persistence.Account.ActionLogController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IIdentity))
+            {
+                result = new Controllers.Persistence.Account.IdentityController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IIdentityXRole))
+            {
+                result = new Controllers.Persistence.Account.IdentityXRoleController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.ILoginSession))
+            {
+                result = new Controllers.Persistence.Account.LoginSessionController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
             }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IRole))
             {
@@ -71,6 +91,10 @@ namespace QnSProjectAward.Logic
             {
                 result = new Controllers.Persistence.Data.BinaryDataController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
             }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting))
+            {
+                result = new Controllers.Persistence.Configuration.IdentitySettingController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
+            }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.ISetting))
             {
                 result = new Controllers.Persistence.Configuration.SettingController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
@@ -94,6 +118,22 @@ namespace QnSProjectAward.Logic
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
             {
                 result = new Controllers.Persistence.App.RatingController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
+            {
+                result = new Controllers.Persistence.Account.ActionLogController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IIdentity))
+            {
+                result = new Controllers.Persistence.Account.IdentityController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IIdentityXRole))
+            {
+                result = new Controllers.Persistence.Account.IdentityXRoleController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.ILoginSession))
+            {
+                result = new Controllers.Persistence.Account.LoginSessionController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
             }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IRole))
             {
@@ -131,6 +171,14 @@ namespace QnSProjectAward.Logic
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Data.IBinaryData))
             {
                 result = new Controllers.Persistence.Data.BinaryDataController(CreateContext())
+                {
+                    SessionToken = sessionToken
+                }
+                as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting))
+            {
+                result = new Controllers.Persistence.Configuration.IdentitySettingController(CreateContext())
                 {
                     SessionToken = sessionToken
                 }
@@ -179,6 +227,38 @@ namespace QnSProjectAward.Logic
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
             {
                 result = new Controllers.Persistence.App.RatingController(CreateContext())
+                {
+                    SessionToken = sessionToken
+                }
+                as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
+            {
+                result = new Controllers.Persistence.Account.ActionLogController(CreateContext())
+                {
+                    SessionToken = sessionToken
+                }
+                as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IIdentity))
+            {
+                result = new Controllers.Persistence.Account.IdentityController(CreateContext())
+                {
+                    SessionToken = sessionToken
+                }
+                as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IIdentityXRole))
+            {
+                result = new Controllers.Persistence.Account.IdentityXRoleController(CreateContext())
+                {
+                    SessionToken = sessionToken
+                }
+                as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.ILoginSession))
+            {
+                result = new Controllers.Persistence.Account.LoginSessionController(CreateContext())
                 {
                     SessionToken = sessionToken
                 }

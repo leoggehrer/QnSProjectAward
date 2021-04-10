@@ -7,16 +7,17 @@
 
 @{
 	var modelType = GetModelType();
-	var gridModelColumns = CreateGridModelColumns(modelType);
+	var modelMembers = CreateGridModelMembers(modelType);
 
-    foreach (var item in gridModelColumns.OrderBy(e => e.Order))
+    foreach (var item in modelMembers.OrderBy(e => e.Order))
     {
-        EvaluateDisplayProperty(item.DisplayInfo);
+        EvaluateDisplayInfo(item.DisplayInfo);
 
         if (item.ScaffoldItem && item.ListVisible)
         {
             if (item.IsIdColumn && item.CanRead)
             {
+                ShowModelDisplayProperty(item);
                 <RadzenGridColumn TItem="TModel" Property="@item.PropertyName" Visible="@item.ListVisible" Width="@item.ListWidth" Sortable="@item.ListSortable" Filterable="@item.ListFilterable">
                     <HeaderTemplate>
                         <RadzenLabel Text="@TranslateFor(item.PropertyName)" />
@@ -31,6 +32,7 @@
             }
             else if (item.IsEnumColumn && item.CanRead && item.CanWrite)
             {
+                ShowModelDisplayProperty(item);
                 <RadzenGridColumn TItem="TModel" Property="@item.PropertyName" Visible="@item.ListVisible" Width="@item.ListWidth" Sortable="@item.ListSortable" Filterable="@item.ListFilterable">
                     <HeaderTemplate>
                         <RadzenLabel Text="@TranslateFor(item.PropertyName)" />
@@ -55,6 +57,7 @@
             }
             else if (item.CanRead)
             {
+                ShowModelDisplayProperty(item);
                 <RadzenGridColumn TItem="TModel" Property="@item.PropertyName" Visible="@item.ListVisible" Width="@item.ListWidth" Sortable="@item.ListSortable" Filterable="@item.ListFilterable">
                     <HeaderTemplate>
                         <RadzenLabel Text="@TranslateFor(item.PropertyName)" />
@@ -85,6 +88,14 @@
     }
 }
 
+@if (HasNavigation)
+{
+    <RadzenGridColumn TItem="TModel" Bubble="false" Filterable="true" Sortable="false" TextAlign="TextAlign.Center" Width="45px">
+        <Template Context="item">
+            <RadzenButton Visible="AllowAdd" Icon="list" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="@(args => DataGridHandler.NavigateTo(item.Id))" />
+        </Template>
+    </RadzenGridColumn>
+}
 @if (AllowAdd || AllowEdit)
 {
     <RadzenGridColumn TItem="TModel" Bubble="false" Filterable="true" Sortable="false" TextAlign="TextAlign.Center" Width="45px">
@@ -118,14 +129,15 @@
     bool AllowEdit => DataGridHandler.AllowEdit;
     bool AllowDelete => DataGridHandler.AllowDelete;
     bool AllowInlineEdit => DataGridHandler.AllowInlineEdit;
+    bool HasNavigation => DataGridHandler.HasNavigation;
 
-    IEnumerable<Models.Modules.Form.GridModelColumn> CreateGridModelColumns(Type modelType)
+    IEnumerable<Models.Modules.Form.GridModelMember> CreateGridModelMembers(Type modelType)
     {
-        var result = new List<Models.Modules.Form.GridModelColumn>();
+        var result = new List<Models.Modules.Form.GridModelMember>();
 
         foreach (var item in modelType.GetAllPropertyInfos())
         {
-            result.Add(CreateGridModelColumn(modelType, item));
+            result.Add(CreateGridModelMember(modelType, item));
         }
         return result;
     }

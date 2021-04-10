@@ -90,11 +90,11 @@ namespace QnSProjectAward.BlazorApp.Models
             }
         }
 
-        public virtual void EvaluateDisplayProperty(DisplayProperty displayProperty)
+        public virtual void EvaluateDisplayInfo(DisplayInfo displayInfo)
         {
             foreach (var item in SubObjects)
             {
-                item.EvaluateDisplayProperty(displayProperty);
+                item.EvaluateDisplayInfo(displayInfo);
             }
         }
         protected static bool IsEqualsWith(object obj1, object obj2)

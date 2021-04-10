@@ -21,6 +21,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
         public string ModelName => ModelType.Name;
         public string FullName => $"{ModelName}.{Name}";
         public string Name => PropertyInfo.Name;
+        public bool IsNullable => PropertyType.IsNullableType();
         public string FormatValue { get; set; }
 
         public bool Required => PropertyAttribute != null && PropertyAttribute.Required;

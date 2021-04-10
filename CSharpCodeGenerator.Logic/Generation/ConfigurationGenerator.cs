@@ -2,6 +2,7 @@
 //MdStart
 using CommonBase.Extensions;
 using CSharpCodeGenerator.Logic.Contracts;
+using CSharpCodeGenerator.Logic.Helpers;
 using CSharpCodeGenerator.Logic.Models.Configuration;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Text.Json;
 
 namespace CSharpCodeGenerator.Logic.Generation
 {
-	internal partial class ConfigurationGenerator : GeneratorObject, Contracts.IConfigurationGenerator
+    internal partial class ConfigurationGenerator : GeneratorObject, Contracts.IConfigurationGenerator
     {
         protected ConfigurationGenerator(SolutionProperties solutionProperties)
             : base(solutionProperties)
@@ -54,10 +55,24 @@ namespace CSharpCodeGenerator.Logic.Generation
                                   .GroupBy(p => p.Name)
                                   .Select(g => g.FirstOrDefault());
 
+            translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}NewRef{separator}De{separator}New");
+            translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}ViewRef{separator}De{separator}View");
+            translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}EditRef{separator}De{separator}Edit");
+            translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}DeleteRef{separator}De{separator}Delete");
+
+            translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}Reload{separator}De{separator}Reload");
             translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}Cancel{separator}De{separator}Cancel");
             translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}Confirm{separator}De{separator}Confirm");
             translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}Submit{separator}De{separator}Submit");
             translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}SubmitClose{separator}De{separator}SubmitClose");
+            foreach (var item in types)
+            {
+                var entityName = CreateEntityNameFromInterface(item);
+
+                translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}{entityName}MasterComponent.{separator}De{separator}");
+                translations.Add($"{SolutionProperties.SolutionName}{separator}En{separator}{entityName}DetailsComponent.{separator}De{separator}");
+            }
+
             foreach (var item in properties.OrderBy(p => p.Name))
             {
                 key = $"{item.Name}";
@@ -143,12 +158,25 @@ namespace CSharpCodeGenerator.Logic.Generation
                         Height = string.Empty,
                     };
                     var dataGridSetting = new DataGridSetting();
-                    var dataGridPageSetting = new DataGridPageSetting();
+                    var dataGridHandlerSetting = new DataGridHandlerSetting();
 
                     result.Add($"{categoryKey}DataGrid{separator}Setting{separator}{separator}{JsonSerializer.Serialize<DataGridSetting>(dataGridSetting)}");
-                    result.Add($"{categoryKey}DataGrid{separator}PageSetting{separator}{separator}{JsonSerializer.Serialize<DataGridPageSetting>(dataGridPageSetting)}");
+                    result.Add($"{categoryKey}DataGrid{separator}HandlerSetting{separator}{separator}{JsonSerializer.Serialize<DataGridHandlerSetting>(dataGridHandlerSetting)}");
                     result.Add($"{categoryKey}DataGrid{separator}EditOptions{separator}{separator}{JsonSerializer.Serialize<DialogOptions>(dialogOptions)}");
                     result.Add($"{categoryKey}DataGrid{separator}DeleteOptions{separator}{separator}{JsonSerializer.Serialize<DialogOptions>(dialogOptions)}");
+
+                    var contractHelper = new ContractHelper(type);
+                    var relations = contractHelper.GetDetailTypes(types);
+
+                    if (relations.Any())
+                    {
+                        foreach (var relation in relations)
+                        {
+                            var detailEntityName = CreateEntityNameFromInterface(relation.To);
+
+                            //result.Add($"{categoryKey}{detailEntityName}DataGrid{separator}Setting{separator}{separator}{JsonSerializer.Serialize<DataGridSetting>(dataGridSetting)}");
+                        }
+                    }
                 }
                 foreach (var pi in type.GetAllPropertyInfos())
                 {
@@ -228,7 +256,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             }
             else if (type == typeof(DateTime))
             {
-                result = "150px";
+                result = "160px";
             }
             return result;
         }

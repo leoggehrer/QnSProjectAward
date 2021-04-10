@@ -4,14 +4,18 @@ using CommonBase.Extensions;
 using QnSProjectAward.BlazorApp.Modules.DataGrid;
 using System.Collections.Generic;
 using System.Text.Json;
-using TDataGridPageSetting = QnSProjectAward.BlazorApp.Models.Modules.Configuration.DataGridPageSetting;
+using TDataGridHandlerSetting = QnSProjectAward.BlazorApp.Models.Modules.Configuration.DataGridHandlerSetting;
 using TMenuItem = QnSProjectAward.BlazorApp.Models.Modules.Menu.MenuItem;
 
 namespace QnSProjectAward.BlazorApp.Pages
 {
-    public partial class DataGridPage : ModelPage
+	public abstract partial class DataGridPage : ModelPage
     {
-        private TDataGridPageSetting dataGridPageSetting;
+        private TDataGridHandlerSetting dataGridPageSetting;
+        protected abstract string PageRoot { get; }
+
+        public override string PageName => base.PageName.Replace("DataGrid", string.Empty);
+        protected virtual string NewRef => $"{PageRoot}/New/Tabs/0";
 
         protected List<TMenuItem> MenuItems { get; } = new ();
 
@@ -20,27 +24,30 @@ namespace QnSProjectAward.BlazorApp.Pages
             dataGridBase.CheckArgument(nameof(dataGridBase));
 
             var modelName = ComponentName.Replace("Page", string.Empty);
-            var jsonValue = Settings.GetValue($"{modelName}DataGrid.PageSetting", string.Empty);
+            var jsonValue = Settings.GetValue($"{modelName}.HandlerSetting", string.Empty);
 
             if (jsonValue.HasContent())
             {
-                DataGridPageSetting = JsonSerializer.Deserialize<TDataGridPageSetting>(jsonValue);
+                DataGridHandlerSetting = JsonSerializer.Deserialize<TDataGridHandlerSetting>(jsonValue);
             }
 
-            dataGridBase.PageSize = DataGridPageSetting.PageSize;
-            dataGridBase.AllowPaging = DataGridPageSetting.AllowPaging;
-            dataGridBase.AllowSorting = DataGridPageSetting.AllowSorting;
-            dataGridBase.AllowFiltering = DataGridPageSetting.AllowFiltering;
-            dataGridBase.AllowAdd = DataGridPageSetting.AllowAdd;
-            dataGridBase.AllowEdit = DataGridPageSetting.AllowEdit;
-            dataGridBase.AllowDelete = DataGridPageSetting.AllowDelete;
-            dataGridBase.AllowInlineEdit = DataGridPageSetting.AllowInlineEdit;
-            dataGridBase.HasRowDetail = DataGridPageSetting.HasRowDetail;
+            dataGridBase.PageSize = DataGridHandlerSetting.PageSize;
 
+            dataGridBase.Editable = DataGridHandlerSetting.Editable;
+            dataGridBase.AllowAdd = DataGridHandlerSetting.AllowAdd;
+            dataGridBase.AllowEdit = DataGridHandlerSetting.AllowEdit;
+            dataGridBase.AllowDelete = DataGridHandlerSetting.AllowDelete;
+            dataGridBase.AllowInlineEdit = DataGridHandlerSetting.AllowInlineEdit;
+
+            dataGridBase.AllowPaging = DataGridHandlerSetting.AllowPaging;
+            dataGridBase.AllowSorting = DataGridHandlerSetting.AllowSorting;
+            dataGridBase.AllowFiltering = DataGridHandlerSetting.AllowFiltering;
+            dataGridBase.HasRowDetail = DataGridHandlerSetting.HasRowDetail;
+            dataGridBase.HasNavigation = DataGridHandlerSetting.HasNavigation;
         }
-        protected TDataGridPageSetting DataGridPageSetting
+        protected TDataGridHandlerSetting DataGridHandlerSetting
         {
-            get => dataGridPageSetting ??= new TDataGridPageSetting();
+            get => dataGridPageSetting ??= new TDataGridHandlerSetting();
             private set => dataGridPageSetting = value;
         }
     }

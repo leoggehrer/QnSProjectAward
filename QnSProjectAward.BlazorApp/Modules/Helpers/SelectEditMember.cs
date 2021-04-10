@@ -13,34 +13,71 @@ namespace QnSProjectAward.BlazorApp.Modules.Helpers
 {
     public class SelectEditMember<T> : EditModelMember where T : Contracts.IIdentifiable
     {
-        public SelectEditMember(ModelPage page, ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty, Func<T, string> toText, Func<T, bool> selector)
-            : base(page, model, propertyInfo, displayProperty)
+        public SelectEditMember(ModelPage page, ModelObject model, PropertyInfo propertyInfo, DisplayInfo displayInfo, Func<T, string> toText, Func<T, bool> selector)
+            : base(page, model, propertyInfo, displayInfo)
         {
-            SelectItems = new SelectItems<T>(page, toText, selector);
+            var selectItems = new SelectItems<T>(page, toText, selector);
+
+            if (propertyInfo.PropertyType.IsNullableType())
+            {
+                selectItems.Insert(0, new SelectItem
+                {
+                    Value = string.Empty,
+                    Text = page.Translate("Select an entry..."),
+                    Selected = false
+                });
+            }
 
             if (model is IdentityModel im)
             {
-                if (SelectItems.Any(e => e.Selected) == false)
+                if (selectItems.Any(e => e.Selected) == false)
                 {
-                    EditValue = SelectItems.ElementAt(0).Value;
+                    if (propertyInfo.PropertyType.IsNullableType())
+                    {
+                        EditValue = null;
+                    }
+                    else
+                    {
+                        EditValue = selectItems.ElementAt(0).Value;
+                    }
                 }
             }
+
+            SelectItems = selectItems;
             EditCtrlType = Common.ControlType.Select;
         }
-        public SelectEditMember(ModelPage page, ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty, IEnumerable<T> items, Func<T, string> toText, Func<T, bool> selector)
-            : base(page, model, propertyInfo, displayProperty)
+        public SelectEditMember(ModelPage page, ModelObject model, PropertyInfo propertyInfo, DisplayInfo displayInfo, IEnumerable<T> items, Func<T, string> toText, Func<T, bool> selector)
+            : base(page, model, propertyInfo, displayInfo)
         {
             items.CheckArgument(nameof(items));
 
-            SelectItems = new SelectItems<T>(items, toText, selector);
+            var selectItems = new SelectItems<T>(items, toText, selector);
+
+            if (propertyInfo.PropertyType.IsNullableType())
+            {
+                selectItems.Insert(0, new SelectItem
+                {
+                    Value = string.Empty,
+                    Text = page.Translate("Select an entry..."),
+                    Selected = false
+                });
+            }
 
             if (model is IdentityModel im)
             {
-                if (SelectItems.Any(e => e.Selected) == false)
+                if (selectItems.Any(e => e.Selected) == false)
                 {
-                    EditValue = SelectItems.ElementAt(0).Value;
+                    if (propertyInfo.PropertyType.IsNullableType())
+                    {
+                        EditValue = null;
+                    }
+                    else
+                    {
+                        EditValue = selectItems.ElementAt(0).Value;
+                    }
                 }
             }
+            SelectItems = selectItems;
             EditCtrlType = Common.ControlType.Select;
         }
     }

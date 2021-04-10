@@ -1,0 +1,89 @@
+@*@QnSCodeCopy*@
+
+@*DefaultPage*@
+@if (Mode.AreEquals("new", System.StringComparison.CurrentCultureIgnoreCase))
+{
+    <div class="card">
+        <EditForm EditContext="@EditModelContext">
+            <DataAnnotationsValidator />
+
+            @{
+                HasFieldChanged = false;
+                EditModelContext.OnFieldChanged += FieldChangedHandler;
+            }
+            <div class="card-body">
+                <EditModelComponent ParentComponent=@this Model=@Model Cloneable=false />
+            </div>
+            <div class="card-footer" style="background-color: transparent; border-top-style: none; margin-left: 20px; margin-right: 20px;">
+                <div class="row justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" style="display: inline-block;" @onclick="() => ReloadPage()">@TranslateFor("Reload")</button>
+                    <button type="submit" class="btn btn-outline-primary" @onclick="() => SubmitChangesAsync()">@TranslateFor("Submit")</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (Mode.AreEquals("view", System.StringComparison.CurrentCultureIgnoreCase))
+{
+    <div class="card">
+        <div class="card-body">
+            <DisplayModelComponent ParentComponent="@this" Model="@Model" />
+        </div>
+        <div class="card-footer" style="background-color: transparent; border-top-style: none; margin-left: 20px; margin-right: 20px;">
+            <div class="row justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" style="display: inline-block;" @onclick="() => ReloadPage()">@TranslateFor("Reload")</button>
+            </div>
+        </div>
+    </div>
+}
+else if (Mode.AreEquals("edit", System.StringComparison.CurrentCultureIgnoreCase))
+{
+    <div class="card">
+        <EditForm EditContext="@EditModelContext">
+            <DataAnnotationsValidator />
+
+            @{
+                HasFieldChanged = false;
+                EditModelContext.OnFieldChanged += FieldChangedHandler;
+            }
+            <div class="card-body">
+                <EditModelComponent ParentComponent=@this Model=@Model Cloneable=false />
+            </div>
+            <div class="card-footer" style="background-color: transparent; border-top-style: none; margin-left: 20px; margin-right: 20px;">
+                <div class="row justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" style="display: inline-block;" @onclick="() => ReloadPage()">@TranslateFor("Reload")</button>
+                    <button type="submit" class="btn btn-outline-primary" @onclick="() => SubmitChangesAsync()">@TranslateFor("Submit")</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (Mode.AreEquals("delete", System.StringComparison.CurrentCultureIgnoreCase))
+{
+    <div class="card">
+        <div class="card-body">
+            <DisplayModelComponent ParentComponent="@this" Model="@Model" />
+        </div>
+        <div class="card-footer" style="background-color: transparent; border-top-style: none; margin-left: 20px; margin-right: 20px;">
+            <div class="row justify-content-between">
+                <button type="submit" class="btn btn-outline-danger" @onclick="() => ConfirmDeleteAsync()">@TranslateFor("Confirm")</button>
+                <button type="button" class="btn btn-outline-primary" style="display: inline-block;" @onclick="() => ReloadPage()">@TranslateFor("Reload")</button>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    EditContext editContext = null;
+    EditContext EditModelContext => editContext ??= new EditContext(Model);
+
+    void FieldChangedHandler(object sender, FieldChangedEventArgs args)
+    {
+        if (args.FieldIdentifier.FieldName.Equals(nameof(Model.CloneData)) == false)
+        {
+            HasFieldChanged = true;
+        }
+    }
+}
+@*DefaultPage*@

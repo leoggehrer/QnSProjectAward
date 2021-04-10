@@ -8,10 +8,10 @@ namespace QnSProjectAward.Contracts.Persistence.App
         int AwardId { get; set; }
         [ContractPropertyInfo(Required = true, MaxLength = 256)]
         string Name { get; set; }
-        [ContractPropertyInfo(Required = true, MaxLength = 256)]
-        string Institution { get; set; }
         [ContractPropertyInfo(Required = false, MaxLength = 128)]
         string Position { get; set; }
+        [ContractPropertyInfo(Required = false, MaxLength = 256)]
+        string Institution { get; set; }
         [ContractPropertyInfo(Required = true, MaxLength = 128)]
         string Email { get; set; }
         [ContractPropertyInfo(ContentType = ContentType.Upload)]

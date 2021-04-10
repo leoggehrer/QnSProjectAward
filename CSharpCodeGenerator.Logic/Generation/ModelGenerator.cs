@@ -33,7 +33,7 @@ namespace CSharpCodeGenerator.Logic.Generation
         public abstract string AppModelsNameSpace { get; }
         public abstract string ModelsFolder { get; }
 
-        public string CreateModelsNameSpace(Type type)
+        public string CreateModelsNamespace(Type type)
         {
             type.CheckArgument(nameof(type));
 
@@ -95,7 +95,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Source.Add($"partial class {CreateModelNameFromInterface(type)} : {GetBaseClassByContract(type)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNameSpace(type));
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -128,7 +128,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Source.Add($"partial class {CreateModelNameFromInterface(type)} : {GetBaseClassByContract(type)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNameSpace(type));
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -161,7 +161,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Source.Add($"partial class {CreateModelNameFromInterface(type)} : {GetBaseClassByContract(type)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNameSpace(type));
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -194,7 +194,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Source.Add($"partial class {CreateModelNameFromInterface(type)} : {GetBaseClassByContract(type)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNameSpace(type));
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -229,7 +229,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             }
             result.AddRange(CreateFactoryMethods(type, false));
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNameSpace(type), "using System;");
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }
@@ -271,7 +271,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 }
             }
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNameSpace(type), "using System;");
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }

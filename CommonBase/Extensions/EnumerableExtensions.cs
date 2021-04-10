@@ -10,7 +10,7 @@ namespace CommonBase.Extensions
     {
         public static IEnumerable<ST> ToEnumerable<T, ST>(this IEnumerable<T> source, Func<T, ST> expandSelector)
         {
-            List<ST> expandResult = new List<ST>();
+            List<ST> expandResult = new();
 
             if (source != null && expandSelector != null)
             {
@@ -28,7 +28,7 @@ namespace CommonBase.Extensions
         }
         public static IEnumerable<ST> Flatten<T, ST>(this IEnumerable<T> source, Func<T, IEnumerable<ST>> expandSelector)
         {
-            List<ST> expandResult = new List<ST>();
+            List<ST> expandResult = new();
 
             if (source != null && expandSelector != null)
             {
@@ -116,7 +116,9 @@ namespace CommonBase.Extensions
 
             foreach (var item in items)
             {
-                if (predicate(item)) return retVal;
+                if (predicate(item)) 
+                    return retVal;
+
                 retVal++;
             }
             return -1;

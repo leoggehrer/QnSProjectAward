@@ -20,7 +20,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             set
             {
                 model = value;
-                LoadModelMembers();
+                CreateModelMembers();
             }
         }
 
@@ -44,7 +44,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         partial void Constructing();
         partial void Constructed();
 
-        protected virtual void LoadModelMembers()
+        protected virtual void CreateModelMembers()
         {
             bool handled = false;
             IEnumerable<TModelMember> CreateModelMembers(ModelObject model)
@@ -99,9 +99,9 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             }
             if (createHandled == false && propertyInfo.CanRead)
             {
-                var displayProperty = GetOrCreateDisplayProperty(modelObject.GetType(), propertyInfo);
+                var displayInfo = GetOrCreateDisplayInfo(modelObject.GetType(), propertyInfo);
 
-                modelMember = new TModelMember(displayComponent, modelObject, propertyInfo, displayProperty);
+                modelMember = new TModelMember(displayComponent, modelObject, propertyInfo, displayInfo);
             }
             if (modelMember != null)
             {

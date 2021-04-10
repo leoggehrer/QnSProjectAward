@@ -127,51 +127,49 @@ else if (ModelMember.EditCtrlType == Modules.Common.ControlType.CheckBoxNull)
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.Select)
 {
-    <InputSelect TValue="string" id="@ModelMember.FullName" @bind-Value="@ModelMember.EditStringValue" class="@HtmlInfo.CssClass">
-        @foreach (var selectItem in ModelMember.SelectItems)
-        {
-            <option value="@selectItem.Value" selected="@selectItem.Selected">@selectItem.Text</option>
-        }
-    </InputSelect>
+    @*<InputSelect TValue="string" id="@ModelMember.FullName" @bind-Value="@ModelMember.EditStringValue" class="@HtmlInfo.CssClass">
+            @foreach (var selectItem in ModelMember.SelectItems)
+            {
+                <option value="@selectItem.Value" selected="@selectItem.Selected">@selectItem.Text</option>
+            }
+        </InputSelect>*@
+    <RadzenDropDown TValue="string" @bind-Value="@ModelMember.EditStringValue" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowFiltering="@ModelMember.AllowFiltering" AllowClear="@ModelMember.IsNullable"
+                    Data=@(ModelMember.SelectItems.AsQueryable())
+                    TextProperty="Text" ValueProperty="Value" class="@HtmlInfo.CssClass" />
+
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.TimePicker)
 {
-    @*<input type="time" id="@ModelMember.FullName" @bind="@ModelMember.EditTimeValue" class="@HtmlInfo.CssClass" style="@HtmlInfo.AttrStyle" required="@HtmlInfo.Required" readonly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />*@
     <div class="col-xl-6">
         <RadzenDatePicker TValue="DateTime" @bind-Value="@ModelMember.EditTimeValue" ShowTime="true" TimeOnly="true" HourFormat="24" DateFormat="@ModelMember.FormatValue" Syle="@HtmlInfo.AttrStyle" ReadOnly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />
     </div>
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.TimePickerNull)
 {
-    @*<input type="time" id="@ModelMember.FullName" @bind="@ModelMember.EditTimeNullValue" class="@HtmlInfo.CssClass" style="@HtmlInfo.AttrStyle" required="@HtmlInfo.Required" readonly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />*@
     <div class="col-xl-6">
         <RadzenDatePicker TValue="DateTime?" @bind-Value="@ModelMember.EditTimeNullValue" ShowTime="true" TimeOnly="true" HourFormat="24" DateFormat="@ModelMember.FormatValue" Syle="@HtmlInfo.AttrStyle" ReadOnly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />
     </div>
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.DatePicker)
 {
-    @*<input type="date" id="@ModelMember.FullName" @bind="@ModelMember.EditDateTimeValue" class="@HtmlInfo.CssClass" style="@HtmlInfo.AttrStyle" required="@HtmlInfo.Required" readonly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />*@
     <div class="col-xl-6">
         <RadzenDatePicker TValue="DateTime" @bind-Value="@ModelMember.EditDateTimeValue" DateFormat="@ModelMember.FormatValue" Syle="@HtmlInfo.AttrStyle" ReadOnly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />
     </div>
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.DatePickerNull)
 {
-    @*<input type="date" id="@ModelMember.FullName" @bind="@ModelMember.EditDateTimeNullValue" class="@HtmlInfo.CssClass" style="@HtmlInfo.AttrStyle" required="@HtmlInfo.Required" readonly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />*@
     <div class="col-xl-6">
         <RadzenDatePicker TValue="DateTime?" @bind-Value="@ModelMember.EditDateTimeNullValue" DateFormat="@ModelMember.FormatValue" Syle="@HtmlInfo.AttrStyle" ReadOnly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />
     </div>
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.DateTimePicker)
 {
-    @*<input type="datetime-local" id="@ModelMember.FullName" @bind="@ModelMember.EditDateTimeValue" class="@HtmlInfo.CssClass" style="@HtmlInfo.AttrStyle" required="@HtmlInfo.Required" readonly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />*@
     <div class="col-xl-6">
         <RadzenDatePicker TValue="DateTime" @bind-Value="@ModelMember.EditDateTimeValue" ShowTime="true" HourFormat="24" DateFormat="@ModelMember.FormatValue" Syle="@HtmlInfo.AttrStyle" ReadOnly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />
     </div>
 }
 else if (ModelMember.EditCtrlType == Modules.Common.ControlType.DateTimePickerNull)
 {
-    @*<input type="datetime-local" id="@ModelMember.FullName" @bind="@ModelMember.EditDateTimeNullValue" class="@HtmlInfo.CssClass" style="@HtmlInfo.AttrStyle" required="@HtmlInfo.Required" readonly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />*@
     <div class="col-xl-6">
         <RadzenDatePicker TValue="DateTime?" @bind-Value="@ModelMember.EditDateTimeNullValue" ShowTime="true" HourFormat="24" DateFormat="@ModelMember.FormatValue" Syle="@HtmlInfo.AttrStyle" ReadOnly="@HtmlInfo.Readonly" placeholder="@HtmlInfo.Placeholder" />
     </div>

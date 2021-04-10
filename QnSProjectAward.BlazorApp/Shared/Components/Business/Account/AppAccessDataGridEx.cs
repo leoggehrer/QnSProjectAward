@@ -6,12 +6,12 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Business.Account
 {
     public partial class AppAccessDataGrid
     {
-        protected override void InitDisplayProperties(DisplayPropertyContainer displayProperties)
+        protected override void InitDisplayInfoContainer(DisplayInfoContainer displayProperties)
         {
-            base.InitDisplayProperties(displayProperties);
+            base.InitDisplayInfoContainer(displayProperties);
 
-            displayProperties.AddOrSet(new DisplayProperty(nameof(Identity), nameof(Identity.Guid)) { VisibilityMode = Models.Modules.Common.VisibilityMode.DetailCreateUpdateDeleteView });
-            displayProperties.AddOrSet(new DisplayProperty(nameof(Identity), nameof(Identity.Password)) { VisibilityMode = Models.Modules.Common.VisibilityMode.DetailCreateUpdateDeleteView });
+            displayProperties.AddOrSet(new DisplayInfo(nameof(Identity), nameof(Identity.Guid)) { VisibilityMode = Models.Modules.Common.VisibilityMode.DetailCreateUpdateDeleteView });
+            displayProperties.AddOrSet(new DisplayInfo(nameof(Identity), nameof(Identity.Password)) { VisibilityMode = Models.Modules.Common.VisibilityMode.DetailCreateUpdateDeleteView });
         }
     }
 }

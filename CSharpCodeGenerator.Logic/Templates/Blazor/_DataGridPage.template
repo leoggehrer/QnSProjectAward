@@ -1,19 +1,24 @@
 @*@QnSCodeCopy*@
 
 @*DefaultPage*@
-@if (MenuItems.Count > 0)
-{
-    <RadzenMenu Click="@(args => OnMenuItemClick(args))">
-        <RadzenMenuItem Text="@Translate(ComponentName)" Icon="grid_on" Style="z-index: 1000;">
-            @foreach (var item in MenuItems)
-            {
-                <RadzenMenuItem Text="@item.Text" Value="@item.Value" Path="@item.Path" Icon="@item.Icon"></RadzenMenuItem>
-            }
-        </RadzenMenuItem>
-    </RadzenMenu>
-}
-else
-{
-    <h2>@Translate(ComponentName)</h2>
+@{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href=@($"{PageRoot}")>@Translate(PageRoot)</a></li>
+            <li class="breadcrumb-item"><a href=@($"{NewRef}")>@Translate(nameof(NewRef))</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Translate(PageRoot)</li>
+        </ol>
+    </nav>
+    if (MenuItems.Count > 0)
+    {
+        <RadzenMenu Click="@(args => OnMenuItemClick(args))">
+            <RadzenMenuItem Text="@Translate(ComponentName)" Icon="grid_on" Style="z-index: 1000;">
+                @foreach (var item in MenuItems)
+                {
+                    <RadzenMenuItem Text="@item.Text" Value="@item.Value" Path="@item.Path" Icon="@item.Icon"></RadzenMenuItem>
+                }
+            </RadzenMenuItem>
+        </RadzenMenu>
+    }
 }
 @*DefaultPage*@

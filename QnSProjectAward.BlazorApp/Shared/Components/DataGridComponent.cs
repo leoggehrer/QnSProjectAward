@@ -3,15 +3,13 @@
 
 using CommonBase.Extensions;
 using Microsoft.AspNetCore.Components;
-using QnSProjectAward.BlazorApp.Models;
-using QnSProjectAward.BlazorApp.Models.Modules.Form;
 using Radzen;
 using System.Text.Json;
 using DataGridSetting = QnSProjectAward.BlazorApp.Models.Modules.Configuration.DataGridSetting;
 
 namespace QnSProjectAward.BlazorApp.Shared.Components
 {
-	public partial class DataGridComponent : DataGridCommonComponent
+    public partial class DataGridComponent : DataGridCommonComponent
     {
         private DialogOptions editOptions;
         private DialogOptions deleteOptions;
@@ -20,27 +18,6 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         [Inject]
         protected DialogService DialogService { get; init; }
 
-        protected override void InitDisplayProperties(DisplayPropertyContainer displayProperties)
-        {
-            base.InitDisplayProperties(displayProperties);
-
-            displayProperties.AddOrSet(nameof(IdentityModel.Id), dp => 
-            {
-                dp.ReadonlyMode = Models.Modules.Common.ReadonlyMode.Readonly;
-                dp.VisibilityMode = Models.Modules.Common.VisibilityMode.Hidden;
-                dp.IsModelItem = false;
-                dp.ListWidth = "100px";
-                dp.Order = 100;
-            });
-            displayProperties.AddOrSet(nameof(IdentityModel.Cloneable), dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet(nameof(IdentityModel.CloneData), dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet(nameof(VersionModel.RowVersion), dp => { dp.ScaffoldItem = false; });
-
-            displayProperties.AddOrSet("OneItem", dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet("OneModel", dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet("ManyItems", dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet("ManyModels", dp => { dp.ScaffoldItem = false; });
-        }
         protected override void OnAfterRender(bool firstRender)
         {
             if (firstRender)

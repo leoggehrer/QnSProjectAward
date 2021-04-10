@@ -46,7 +46,7 @@ namespace QnSProjectAward.AspMvc
         {
             BeginConfigure(app, env);
             // Transfer the application settings to the logic.
-            Logic.Modules.Configuration.Settings.SetConfiguration(Configuration);
+            Logic.Modules.Configuration.AppSettings.SetConfiguration(Configuration);
 
             if (env.IsDevelopment())
             {

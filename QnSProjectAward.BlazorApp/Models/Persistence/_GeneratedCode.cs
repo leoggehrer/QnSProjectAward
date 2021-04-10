@@ -962,6 +962,16 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
             get;
             set;
         }
+        public System.TimeSpan? From
+        {
+            get;
+            set;
+        }
+        public System.TimeSpan? To
+        {
+            get;
+            set;
+        }
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(128)]
         public System.String School
@@ -977,7 +987,7 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
             set;
         }
         [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(1024)]
+        [System.ComponentModel.DataAnnotations.StringLength(2048)]
         public System.String Description
         {
             get;
@@ -1002,6 +1012,8 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
                 Id = other.Id;
                 RowVersion = other.RowVersion;
                 AwardId = other.AwardId;
+                From = other.From;
+                To = other.To;
                 School = other.School;
                 Title = other.Title;
                 Description = other.Description;
@@ -1199,15 +1211,14 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
             get;
             set;
         }
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public System.String Institution
+        [System.ComponentModel.DataAnnotations.StringLength(128)]
+        public System.String Position
         {
             get;
             set;
         }
-        [System.ComponentModel.DataAnnotations.StringLength(128)]
-        public System.String Position
+        [System.ComponentModel.DataAnnotations.StringLength(256)]
+        public System.String Institution
         {
             get;
             set;
@@ -1239,8 +1250,8 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
                 RowVersion = other.RowVersion;
                 AwardId = other.AwardId;
                 Name = other.Name;
-                Institution = other.Institution;
                 Position = other.Position;
+                Institution = other.Institution;
                 Email = other.Email;
                 Logo = other.Logo;
             }
@@ -1489,6 +1500,112 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
         static partial void AfterCreate(Persistence.Configuration.Setting instance, object other);
         static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.Configuration.ISetting other);
         static partial void AfterCreate(Persistence.Configuration.Setting instance, QnSProjectAward.Contracts.Persistence.Configuration.ISetting other);
+    }
+}
+namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
+{
+    partial class IdentitySetting : VersionModel
+    {
+    }
+}
+namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
+{
+    using System;
+    public partial class IdentitySetting : QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting
+    {
+        static IdentitySetting()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public IdentitySetting()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Int32 IdentityId
+        {
+            get;
+            set;
+        }
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(128)]
+        public System.String AppName
+        {
+            get;
+            set;
+        }
+        = nameof(QnSProjectAward);
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(512)]
+        public System.String Key
+        {
+            get;
+            set;
+        }
+        [System.ComponentModel.DataAnnotations.StringLength(4096)]
+        public System.String Value
+        {
+            get;
+            set;
+        }
+        = string.Empty;
+        public void CopyProperties(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                RowVersion = other.RowVersion;
+                Id = other.Id;
+                IdentityId = other.IdentityId;
+                AppName = other.AppName;
+                Key = other.Key;
+                Value = other.Value;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting other);
+        public static Persistence.Configuration.IdentitySetting Create()
+        {
+            BeforeCreate();
+            var result = new Persistence.Configuration.IdentitySetting();
+            AfterCreate(result);
+            return result;
+        }
+        public static Persistence.Configuration.IdentitySetting Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Persistence.Configuration.IdentitySetting();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Persistence.Configuration.IdentitySetting Create(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting other)
+        {
+            BeforeCreate(other);
+            var result = new Persistence.Configuration.IdentitySetting();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Persistence.Configuration.IdentitySetting instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Persistence.Configuration.IdentitySetting instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting other);
+        static partial void AfterCreate(Persistence.Configuration.IdentitySetting instance, QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting other);
     }
 }
 namespace QnSProjectAward.BlazorApp.Models.Persistence.Data

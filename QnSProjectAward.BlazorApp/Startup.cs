@@ -15,7 +15,7 @@ using Radzen;
 
 namespace QnSProjectAward.BlazorApp
 {
-    public class Startup
+	public class Startup
     {
         public Startup(IConfiguration configuration)
         {
@@ -36,11 +36,8 @@ namespace QnSProjectAward.BlazorApp
             services.AddScoped<IServiceAdapter, ServiceAdapter>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ISettingService, SettingService>();
+            services.AddScoped<IIdentitySettingService, IdentitySettingService>();
             services.AddScoped<ITranslatorService, TranslatorService>();
-
-            services.AddScoped<AuthenticationStateProviderService>();
-            services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<AuthenticationStateProviderService>());
-            services.AddScoped<Modules.App.AppState>();
 
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();

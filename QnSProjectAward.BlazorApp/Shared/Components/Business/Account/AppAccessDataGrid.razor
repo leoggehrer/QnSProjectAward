@@ -112,20 +112,30 @@
             {
                 <div class="card-header" style="background-color: transparent; border-bottom-style: none;">
                     <div class="row justify-content-between">
-						<div>
-							<button type="button" class="btn btn-outline-dark" @onclick="() => DataGridHandler.CancelDialogChangesAndCloseAsync(ds)">@TranslateFor("CancelClose")</button>
-							@if (DataGridSetting.HasRefreshButton)
-							{
-								<button type="button" class="btn btn-outline-secondary" style="display: inline-block; margin-left: 10px;" @onclick="() => DataGridHandler.CancelDialogChangesAsync(ds)">@TranslateFor("Reload")</button>
-							}
-						</div>
-						<div>
-							@if (DataGridSetting.HasApplyButton)
-							{
-								<button type="submit" class="btn btn-outline-info" style="display: inline-block; margin-right: 10px;" @onclick="() => DataGridHandler.SubmitDialogChangesAsync(ds)">@TranslateFor("Submit")</button>
-							}
-							<button type="submit" class="btn btn-outline-primary" @onclick="() => DataGridHandler.SubmitDialogChangesAndCloseAsync(ds)">@TranslateFor("SubmitClose")</button>
-						</div>
+                        <div>
+                            <button type="button" class="btn btn-outline-dark" @onclick="() => DataGridHandler.CancelDialogChangesAndCloseAsync(ds)">@TranslateFor("CancelClose")</button>
+                            @if (DataGridSetting.HasReloadButton)
+                            {
+                                <button type="button" class="btn btn-outline-secondary" style="display: inline-block; margin-left: 10px;" @onclick="() => DataGridHandler.ReloadDialogModelAsync(ds)">@TranslateFor("Reload")</button>
+                            }
+                        </div>
+                        @if (DataGridSetting.HasNavigationBar)
+                        {
+                            string leftSign = "<", middleSign = "...", rightSign = ">";
+
+                            <div class="btn-group" role="group" aria-label="Navigation">
+                                <button type="button" class="btn btn-outline-primary" title=@TranslateFor("MovePrevoius") @onclick="() => DataGridHandler.MovePrevDialogModelAsync(ds)">@leftSign</button>
+                                <button type="button" class="btn btn-outline-primary" title=@TranslateFor("Reload") @onclick="() => DataGridHandler.ReloadDialogModelAsync(ds)">@middleSign</button>
+                                <button type="button" class="btn btn-outline-primary" title=@TranslateFor("MoveNext") @onclick="() => DataGridHandler.MoveNextDialogModelAsync(ds)">@rightSign</button>
+                            </div>
+                        }
+                        <div>
+                            @if (DataGridSetting.HasApplyButton)
+                            {
+                                <button type="submit" class="btn btn-outline-info" style="display: inline-block; margin-right: 10px;" @onclick="() => DataGridHandler.SubmitDialogChangesAsync(ds)">@TranslateFor("Submit")</button>
+                            }
+                            <button type="submit" class="btn btn-outline-primary" @onclick="() => DataGridHandler.SubmitDialogChangesAndCloseAsync(ds)">@TranslateFor("SubmitClose")</button>
+                        </div>
                     </div>
                 </div>
             }
@@ -135,22 +145,32 @@
             @if (DataGridSetting.HasEditDialogFooter)
             {
                 <div class="card-footer" style="background-color: transparent; border-top-style: none;">
-					<div class="row justify-content-between">
-						<div>
-							<button type="button" class="btn btn-outline-dark" @onclick="() => DataGridHandler.CancelDialogChangesAndCloseAsync(ds)">@TranslateFor("CancelClose")</button>
-							@if (DataGridSetting.HasRefreshButton)
-							{
-								<button type="button" class="btn btn-outline-secondary" style="display: inline-block; margin-left: 10px;" @onclick="() => DataGridHandler.CancelDialogChangesAsync(ds)">@TranslateFor("Reload")</button>
-							}
-						</div>
-						<div>
-							@if (DataGridSetting.HasApplyButton)
-							{
-								<button type="submit" class="btn btn-outline-info" style="display: inline-block; margin-right: 10px;" @onclick="() => DataGridHandler.SubmitDialogChangesAsync(ds)">@TranslateFor("Submit")</button>
-							}
-							<button type="submit" class="btn btn-outline-primary" @onclick="() => DataGridHandler.SubmitDialogChangesAndCloseAsync(ds)">@TranslateFor("SubmitClose")</button>
-						</div>
-					</div>
+                    <div class="row justify-content-between">
+                        <div>
+                            <button type="button" class="btn btn-outline-dark" @onclick="() => DataGridHandler.CancelDialogChangesAndCloseAsync(ds)">@TranslateFor("CancelClose")</button>
+                            @if (DataGridSetting.HasReloadButton)
+                            {
+                                <button type="button" class="btn btn-outline-secondary" style="display: inline-block; margin-left: 10px;" @onclick="() => DataGridHandler.ReloadDialogModelAsync(ds)">@TranslateFor("Reload")</button>
+                            }
+                        </div>
+                        @if (DataGridSetting.HasNavigationBar)
+                        {
+                            string leftSign = "<", middleSign = "...", rightSign = ">";
+
+                            <div class="btn-group" role="group" aria-label="Navigation">
+                                <button type="button" class="btn btn-outline-primary" title=@TranslateFor("MovePrevoius") @onclick="() => DataGridHandler.MovePrevDialogModelAsync(ds)">@leftSign</button>
+                                <button type="button" class="btn btn-outline-primary" title=@TranslateFor("Reload") @onclick="() => DataGridHandler.ReloadDialogModelAsync(ds)">@middleSign</button>
+                                <button type="button" class="btn btn-outline-primary" title=@TranslateFor("MoveNext") @onclick="() => DataGridHandler.MoveNextDialogModelAsync(ds)">@rightSign</button>
+                            </div>
+                        }
+                        <div>
+                            @if (DataGridSetting.HasApplyButton)
+                            {
+                                <button type="submit" class="btn btn-outline-info" style="display: inline-block; margin-right: 10px;" @onclick="() => DataGridHandler.SubmitDialogChangesAsync(ds)">@TranslateFor("Submit")</button>
+                            }
+                            <button type="submit" class="btn btn-outline-primary" @onclick="() => DataGridHandler.SubmitDialogChangesAndCloseAsync(ds)">@TranslateFor("SubmitClose")</button>
+                        </div>
+                    </div>
                 </div>
             }
         </EditForm>

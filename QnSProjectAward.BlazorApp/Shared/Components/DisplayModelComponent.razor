@@ -3,15 +3,16 @@
 
 @foreach (var item in ModelMembers)
 {
-    EvaluateDisplayProperty(item.DisplayInfo);
+    EvaluateDisplayInfo(item.DisplayInfo);
 
     if (item.ScaffoldItem && item.Visible)
     {
         var displayValue = item.DisplayValue;
-        var isTextArea = displayValue.Length > 100 || displayValue.Contains(Environment.NewLine);
         var description = item.Description ?? string.Empty;
 
-        @if (item.PropertyType.Equals(typeof(bool)))
+        ShowModelDisplayProperty(item);
+
+        if (item.PropertyType.Equals(typeof(bool)))
         {
             var value = (bool)item.Value;
 
@@ -20,7 +21,7 @@
                 <label class="form-check-label" for="@item.FullName">@TranslateFor(item.Name)</label>
             </div>
         }
-        else if (isTextArea)
+        else if (item.IsTextArea)
         {
             <div class="mb-3">
                 <label class="form-label" for="@item.FullName">@TranslateFor(item.Name)</label>
@@ -34,7 +35,7 @@
             <div class="mb-3">
                 <label class="form-label" for="@item.FullName">@TranslateFor(item.Name)</label>
                 <label id="@item.FullName" class="form-control" style="border-color: lightgray; background-color: whitesmoke; font-weight: bold;" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@description">
-                    @item.DisplayValue
+                    @displayValue
                 </label>
             </div>
         }

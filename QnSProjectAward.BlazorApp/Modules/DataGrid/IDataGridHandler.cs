@@ -1,20 +1,14 @@
 //@QnSCodeCopy
 //MdStart
 using QnSProjectAward.BlazorApp.Models;
-using QnSProjectAward.BlazorApp.Pages;
 using QnSProjectAward.Contracts;
 using System;
-using System.Threading.Tasks;
 
 namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 {
     public interface IDataGridHandler<TModel> : IDataGridBase
         where TModel : ModelObject, IIdentifiable, new()
     {
-        ModelPage ModelPage { get; }
-
-        int Count { get; }
-        string AccessFilter { get; set; }
 
         TModel[] Models { get; }
         string[] ModelItems { get; set; }
@@ -40,7 +34,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         event EventHandler<TModel> BeforeUpdateModelHandler;
         event EventHandler<TModel[]> LoadModelDataHandler;
 
-        Task ReloadDataAsync();
         void ReloadModel(TModel model);
     }
 }

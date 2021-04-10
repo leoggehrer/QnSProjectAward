@@ -29,7 +29,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 {
                     Text = TranslateFor("Access-Authorization"),
                     Value = "accessauth",
-                    Path = "appaccess",
+                    Path = "appaccesses",
                     Icon = "line_weight",
                 }
             );
@@ -38,7 +38,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 {
                     Text = TranslateFor("Identity-User"),
                     Value = "identityuser",
-                    Path = "user",
+                    Path = "users",
                     Icon = "line_weight",
                 }
             );
@@ -47,7 +47,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 {
                     Text = TranslateFor("Role-Management"),
                     Value = "rolemanagement",
-                    Path = "role",
+                    Path = "roles",
                     Icon = "line_weight",
                 }
             );
@@ -72,9 +72,9 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             MenuItems.Add(
                 new MenuItem
                 {
-                    Text = TranslateFor("Translation"),
-                    Value = "translation",
-                    Path = "translation",
+                    Text = TranslateFor("Translations"),
+                    Value = "translations",
+                    Path = "translations",
                     Icon = "line_weight",
                 }
             );
@@ -82,8 +82,8 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 new MenuItem
                 {
                     Text = TranslateFor("Settings"),
-                    Value = "setting",
-                    Path = "setting",
+                    Value = "settings",
+                    Path = "settings",
                     Icon = "line_weight",
                 }
             );

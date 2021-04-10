@@ -43,22 +43,22 @@ namespace QnSProjectAward.AspMvc.Modules.Language
             Task.Run(async () =>
             {
                 var handled = false;
-                var settingValue = Logic.Modules.Configuration.Settings.Get("Translator:BaseUri");
+                var settingValue = Logic.Modules.Configuration.AppSettings.Get("Translator:BaseUri");
                 if (settingValue.HasContent())
                 {
                     BaseUri = settingValue;
                 }
-                settingValue = Logic.Modules.Configuration.Settings.Get("Translator:IdentityUri");
+                settingValue = Logic.Modules.Configuration.AppSettings.Get("Translator:IdentityUri");
                 if (settingValue.HasContent())
                 {
                     IdentityUri = settingValue;
                 }
-                settingValue = Logic.Modules.Configuration.Settings.Get("Translator:Email");
+                settingValue = Logic.Modules.Configuration.AppSettings.Get("Translator:Email");
                 if (settingValue.HasContent())
                 {
                     Email = settingValue;
                 }
-                settingValue = Logic.Modules.Configuration.Settings.Get("Translator:Password");
+                settingValue = Logic.Modules.Configuration.AppSettings.Get("Translator:Password");
                 if (settingValue.HasContent())
                 {
                     Password = settingValue;

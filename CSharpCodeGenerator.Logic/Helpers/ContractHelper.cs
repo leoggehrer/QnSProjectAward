@@ -262,6 +262,64 @@ namespace CSharpCodeGenerator.Logic.Helpers
                              .Select(e => e.Property);
         }
 
+        public IEnumerable<Type> GetMasterTypes(IEnumerable<Type> types)
+        {
+            types.CheckArgument(nameof(types));
+
+            var result = new List<Type>();
+
+            foreach (var pi in GetAllProperties())
+            {
+                int idx;
+
+                if (pi.Name.EndsWith("Id"))
+                {
+                    var masterName = pi.Name[0..^2];
+                    var masterReference = types.FirstOrDefault(e => new ContractHelper(e).EntityName.Equals(masterName));
+
+                    if (masterReference != null)
+                    {
+                        result.Add(masterReference);
+                    }
+                }
+                else if ((idx = pi.Name.IndexOf("Id_")) > -1)
+                {
+                    var masterName = pi.Name.Substring(0, idx);
+                    var masterReference = types.FirstOrDefault(e => new ContractHelper(e).EntityName.Equals(masterName));
+
+                    if (masterReference != null)
+                    {
+                        result.Add(masterReference);
+                    }
+                }
+            }
+            return result;
+        }
+        public IEnumerable<Models.Relation> GetDetailTypes(IEnumerable<Type> types)
+        {
+            types.CheckArgument(nameof(types));
+
+            var result = new List<Models.Relation>();
+
+            foreach (var other in types)
+            {
+                var otherHelper = new ContractHelper(other);
+
+                foreach (var pi in otherHelper.GetAllProperties())
+                {
+                    if (pi.Name.Equals($"{EntityName}Id"))
+                    {
+                        result.Add(new Models.Relation(Type, other, pi));
+                    }
+                    else if (pi.Name.StartsWith($"{EntityName}Id_"))
+                    {
+                        result.Add(new Models.Relation(Type, other, pi));
+                    }
+                }
+            }
+            return result;
+        }
+
         public static bool HasCopyable(Type type)
         {
             type.CheckArgument(nameof(type));

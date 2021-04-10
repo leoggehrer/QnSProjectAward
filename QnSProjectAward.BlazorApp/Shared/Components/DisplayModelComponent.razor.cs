@@ -20,7 +20,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             set
             {
                 model = value;
-                LoadContainer();
+                CreateModelMembers();
             }
         }
 
@@ -42,7 +42,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         partial void Constructing();
         partial void Constructed();
 
-        private void LoadContainer()
+        private void CreateModelMembers()
         {
             bool handled = false;
 
@@ -74,19 +74,19 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         }
         private TModelMember CreateModelMember(DisplayComponent displayComponent, ModelObject modelObject, PropertyInfo propertyInfo)
         {
-            var createHandled = false;
+            var handled = false;
             var modelMember = default(TModelMember);
 
-            displayComponent?.CreateDisplayModelMember(modelObject, propertyInfo, ref modelMember, ref createHandled);
-            if (createHandled == false)
+            displayComponent?.CreateDisplayModelMember(modelObject, propertyInfo, ref modelMember, ref handled);
+            if (handled == false)
             {
-                CreateModelMember(Model, propertyInfo, ref modelMember, ref createHandled);
+                CreateModelMember(Model, propertyInfo, ref modelMember, ref handled);
             }
-            if (createHandled == false && propertyInfo.CanRead)
+            if (handled == false && propertyInfo.CanRead)
             {
-                var displayProperty = GetOrCreateDisplayProperty(modelObject.GetType(), propertyInfo);
+                var displayInfo = GetOrCreateDisplayInfo(modelObject.GetType(), propertyInfo);
 
-                modelMember = new TModelMember(modelObject, propertyInfo, displayProperty);
+                modelMember = new TModelMember(modelObject, propertyInfo, displayInfo);
             }
             if (modelMember != null)
             {

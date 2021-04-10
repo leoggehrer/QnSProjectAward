@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 {
-	public partial class DataGridHandler<TContract, TModel> : ComponentHandler, IDataGridHandler<TModel>
+	public partial class DataGridHandler<TContract, TModel> : ComponentHandler, IDisposable, IDataGridHandler<TModel>
         where TContract : Contracts.IIdentifiable, Contracts.ICopyable<TContract>
         where TModel : IdentityModel, TContract, new()
     {
@@ -48,6 +48,13 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public event EventHandler<TModel> BeforeEditModelHandler;
         public event EventHandler<TModel> AfterEditModelHandler;
         #endregion EventHandler
+
+        #region Fields
+        private bool allowAdd = true;
+        private bool allowEdit = true;
+        private bool allowDelete = true;
+        private bool allowInlineEdit = true;
+        #endregion Fields
         public RadzenGrid<TModel> RadzenGrid { get; set; }
         public EditContext EditContext { get; protected set; }
         public ModelPage ModelPage { get; init; }
@@ -103,18 +110,40 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         {
         }
 
+        public int Count { get; protected set; }
+        public string AccessFilter { get; set; }
+
+        public int PageSize { get; set; } = 50;
+        public bool Editable { get; set; } = true;
+        public bool AllowAdd 
+        {
+            get => Editable && allowAdd;
+            set => allowAdd = value; 
+        }
+        public bool AllowEdit
+        {
+            get => Editable && allowEdit;
+            set => allowEdit = value;
+        }
+        public bool AllowDelete
+        {
+            get => Editable && allowDelete;
+            set => allowDelete = value;
+        }
+        public bool AllowInlineEdit
+        {
+            get => Editable && allowInlineEdit;
+            set => allowInlineEdit = value;
+        }
+
         public bool AllowPaging { get; set; } = true;
         public bool AllowSorting { get; set; } = true;
         public bool AllowFiltering { get; set; } = true;
-        public bool AllowAdd { get; set; } = true;
-        public bool AllowEdit { get; set; } = true;
-        public bool AllowDelete { get; set; } = true;
-        public bool AllowInlineEdit { get; set; } = true;
+        public bool HasRowDetail { get; set; } = true;
+        public bool HasNavigation { get; set; } = true;
 
-        public int Count { get; protected set; }
         public int From { get; protected set; }
         public int To { get; protected set; }
-        public int PageSize { get; set; } = 50;
 
         private string[] modelItems = null;
         public string[] ModelItems
@@ -129,8 +158,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public TModel EditModel { get; protected set; }
         public TModel DeleteModel { get; protected set; }
 
-        public bool HasRowDetail { get; set; } = true;
-        public string AccessFilter { get; set; }
         protected virtual bool IsModelOrder(string orderBy)
         {
             return orderBy.HasContent() && ModelItems.Any(e => orderBy.Contains(e));
@@ -217,7 +244,18 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 
         public Task ReloadDataAsync()
         {
-            return RadzenGrid.Reload();
+            Task result;
+
+            Models = Array.Empty<TModel>();
+            if (RadzenGrid != null)
+            {
+                result = RadzenGrid.Reload();
+            }
+            else
+            {
+                result = Task.FromResult(0);
+            }
+            return result;
         }
         public async Task ReloadDataAsync(TModel model)
         {
@@ -245,7 +283,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         }
 
         private volatile bool loadDataActive = false;
-
+        public bool IsLoadDataActive => loadDataActive;
         public virtual async Task LoadDataAsync(LoadDataArgs args)
         {
             if (DataAccess != null && loadDataActive == false)
@@ -638,6 +676,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 
         #region Dialog operations
         private bool hasFieldChanged;
+        private bool disposedValue;
 
         public bool IsEditModal { get; private set; }
         public bool HasFieldChanged
@@ -652,6 +691,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public bool HasQueryChanged { get; private set; }
         public bool InSubmitChanges { get; private set; }
         public bool InCancelChanges { get; private set; }
+        public bool InReloadModel { get; private set; }
 
         protected virtual async Task CreateAndShowEditModelAsync()
         {
@@ -670,9 +710,8 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         {
             try
             {
-                EditModel = await CreateModelAsync().ConfigureAwait(false);
-
                 dialogService?.Close();
+                EditModel = await CreateModelAsync().ConfigureAwait(false);
                 await ShowEditModelAsync(EditModel).ConfigureAwait(false);
             }
             catch (System.Exception ex)
@@ -740,10 +779,38 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 HasFieldChanged = false;
                 InSubmitChanges = false;
                 InCancelChanges = false;
+                InReloadModel = false;
                 EditContext = new EditContext(editModel);
                 await ShowEditItemDialogAsync().ConfigureAwait(false);
             }
         }
+
+        private static string CreatePluralWord(string wordInSingular)
+        {
+            string result;
+
+            if (wordInSingular.EndsWith("y"))
+            {
+                result = $"{wordInSingular[0..^1]}ies";
+            }
+            else if (wordInSingular.EndsWith("s"))
+            {
+                result = $"{wordInSingular}es";
+            }
+            else
+            {
+                result = $"{wordInSingular}s";
+            }
+            return result;
+        }
+        public virtual void NavigateTo(int id)
+		{
+            var modelName = typeof(TModel).Name;
+            var pageRoot = $"{CreatePluralWord(modelName)}";
+            var navigateUri = $"{pageRoot}/View/{id}/Tabs/0";
+
+            ModelPage.NavigationManager.NavigateTo(navigateUri);
+		}
 
         public virtual async Task AddItemAsync()
         {
@@ -872,11 +939,57 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             item?.AfterSave();
         }
 
-        public virtual async Task CancelDialogChangesAsync(DialogService dialogService)
+        public virtual async Task MovePrevDialogModelAsync(DialogService dialogService)
         {
-            if (InCancelChanges == false)
+            if (InReloadModel == false)
             {
-                InCancelChanges = true;
+                InReloadModel = true;
+
+                try
+                {
+                    if (HasFieldChanged && HasQueryChanged == false)
+                    {
+                        HasQueryChanged = true;
+                        ShowWarning("Data changed", "If you want to discard the changes, activate the action again!");
+                    }
+                    else
+                    {
+                        var id = EditModel.Id;
+                        var idx = Models.FindIndex(e => e.Id == id);
+
+                        if (idx > 0)
+                        {
+                            id = Models[idx - 1].Id;
+                            await RadzenGrid.SelectRow(Models[idx - 1]).ConfigureAwait(false);
+                        }
+                        EditModel?.CancelEdit();
+                        EditModel = null;
+
+                        if (id > 0)
+                        {
+                            await LoadAndShowEditModelAsync(dialogService, id).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await CreateAndShowEditModelAsync(dialogService).ConfigureAwait(false);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    ShowException(Translate("Error reload"), ex);
+                }
+                finally
+                {
+                    InReloadModel = false;
+                }
+            }
+        }
+        public virtual async Task ReloadDialogModelAsync(DialogService dialogService)
+        {
+            if (InReloadModel == false)
+            {
+                InReloadModel = true;
 
                 try
                 {
@@ -904,14 +1017,61 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 }
                 catch (System.Exception ex)
                 {
-                    ShowException(Translate("Error cancel"), ex);
+                    ShowException(Translate("Error reload dialog"), ex);
                 }
                 finally
                 {
-                    InCancelChanges = false;
+                    InReloadModel = false;
                 }
             }
         }
+        public virtual async Task MoveNextDialogModelAsync(DialogService dialogService)
+        {
+            if (InReloadModel == false)
+            {
+                InReloadModel = true;
+
+                try
+                {
+                    if (HasFieldChanged && HasQueryChanged == false)
+                    {
+                        HasQueryChanged = true;
+                        ShowWarning("Data changed", "If you want to discard the changes, activate the action again!");
+                    }
+                    else
+                    {
+                        var id = EditModel.Id;
+                        var idx = Models.FindIndex(e => e.Id == id);
+
+                        if (idx < Models.Length - 1)
+                        {
+                            id = Models[idx + 1].Id;
+                            await RadzenGrid.SelectRow(Models[idx + 1]).ConfigureAwait(false);
+                        }
+                        EditModel?.CancelEdit();
+                        EditModel = null;
+
+                        if (id > 0)
+                        {
+                            await LoadAndShowEditModelAsync(dialogService, id).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await CreateAndShowEditModelAsync(dialogService).ConfigureAwait(false);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    ShowException(Translate("Error move next"), ex);
+                }
+                finally
+                {
+                    InReloadModel = false;
+                }
+            }
+        }
+
         public virtual Task CancelDialogChangesAndCloseAsync(DialogService dialogService)
         {
             return Task.Factory.StartNew(() =>
@@ -1245,6 +1405,42 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             });
             return result;
         }
+
+        #region Dispose pattern
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    if (dataAccess != null)
+                    {
+                        dataAccess.Dispose();
+                    }
+                    dataAccess = null;
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~DataGridHandler()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion Dispose pattern
     }
 }
 //MdEnd

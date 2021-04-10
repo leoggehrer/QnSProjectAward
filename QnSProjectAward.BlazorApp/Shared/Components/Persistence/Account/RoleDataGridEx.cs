@@ -5,11 +5,11 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
 {
     partial class RoleDataGrid
     {
-        protected override void InitDisplayProperties(DisplayPropertyContainer displayProperties)
+        protected override void InitDisplayInfoContainer(DisplayInfoContainer displayProperties)
         {
-            base.InitDisplayProperties(displayProperties);
+            base.InitDisplayInfoContainer(displayProperties);
 
-            displayProperties.AddOrSet(new DisplayProperty("Assigned") { ScaffoldItem = false });
+            displayProperties.AddOrSet(new DisplayInfo("Assigned") { ScaffoldItem = false });
         }
     }
 }

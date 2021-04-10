@@ -26,36 +26,47 @@ namespace CSharpCodeGenerator.Logic.Common
         BusinessModel = 1024,
         ModuleModel = 2048,
         PersistenceModel = 4096,
-        ShadowModel = 8192,
+        ShadowModel = (long)8192,
         Model = BusinessModel + ModuleModel + PersistenceModel + ShadowModel,
 
-        IndexRazorPage = 8192 * 2,
-        IndexRazorPageCode = 8192 * 4,
-        DataGridHandlerCode = 8192 * 8,
-        DataGridComponentRazor = 8192 * 16,
-        DataGridComponentCode = 8192 * 32,
-        DataGridComponentCommonCode = 8192 * 64,
-        DataGridColumnsComponentRazor = 8192 * 128,
-        DataGridColumnsComponentCode = 8192 * 256,
-        DataGridDetailComponentRazor = 8192 * 512,
-        DataGridDetailComponentCode = 8192 * 1024,
+        DataGridRazorPage = (long)8192 * 2,
+        DataGridRazorPageCode = (long)8192 * 4,
 
-        FieldSetHandlerCode = 8192 * 2048,
-        FieldSetComponentRazor = 8192 * 4096,
-        FieldSetComponentCode = 8192 * 8192,
-        FieldSetDetailComponentRazor = 8192 * 8192 * 2,
-        FieldSetDetailComponentCode = 8192 * 8192 * 4,
+        DataGridHandlerCode = (long)8192 * 8,
+        DataGridComponentRazor = (long)8192 * 16,
+        DataGridComponentCode = (long)8192 * 32,
+        DataGridComponentCommonCode = (long)8192 * 64,
+        DataGridColumnsComponentRazor = (long)8192 * 128,
+        DataGridColumnsComponentCode = (long)8192 * 256,
+        DataGridDetailComponentRazor = (long)8192 * 512,
+        DataGridDetailComponentCode = (long)8192 * 1024,
 
-        EditFormComponentRazor = 8192 * 8192 * 8,
-        EditFormComponentCode = 8192 * 8192 * 16,
+        FieldSetHandlerCode = (long)8192 * 2048,
+        FieldSetComponentRazor = (long)8192 * 4096,
+        FieldSetComponentCode = (long)8192 * 8192,
+        FieldSetDetailComponentRazor = (long)8192 * 8192 * 2,
+        FieldSetDetailComponentCode = (long)8192 * 8192 * 4,
 
-        TypeScriptEnum = (long)8192 * 8192 * 32,
-        TypeScriptContract = (long)8192 * 8192 * 64,
+        MasterComponentRazor = (long)8192 * 8192 * 8,
+        MasterComponentCode = (long)8192 * 8192 * 16,
 
-        Translations = (long)8192 * 8192 * 128,
-        Properties = (long)8192 * 8192 * 256,
+        MasterDetailsRazorPage = (long)8192 * 8192 * 32,
+        MasterDetailsRazorPageCode = (long)8192 * 8192 * 64,
 
-        IndexRazorPageAll = IndexRazorPage + IndexRazorPageCode,
+        DetailsComponentRazor = (long)8192 * 8192 * 128,
+        DetailsComponentCode = (long)8192 * 8192 * 256,
+
+        TypeScriptEnum = (long)8192 * 8192 * 512,
+        TypeScriptContract = (long)8192 * 8192 * 1024,
+
+        Translations = (long)8192 * 8192 * 2048,
+        Properties = (long)8192 * 8192 * 4096,
+
+        IndexRazorPageAll = DataGridRazorPage 
+                          + DataGridRazorPageCode 
+                          + MasterDetailsRazorPage 
+                          + MasterDetailsRazorPageCode,
+
         DataGridAll = DataGridHandlerCode 
                     + DataGridComponentRazor 
                     + DataGridComponentCode
@@ -64,9 +75,17 @@ namespace CSharpCodeGenerator.Logic.Common
                     + DataGridDetailComponentCode
                     + DataGridColumnsComponentRazor 
                     + DataGridColumnsComponentCode,
-        FieldSetAll = FieldSetHandlerCode + FieldSetComponentRazor + FieldSetComponentCode
-                    + FieldSetDetailComponentRazor + FieldSetDetailComponentCode,
-        EditFormAll = EditFormComponentRazor + EditFormComponentCode,
+
+        FieldSetAll = FieldSetHandlerCode 
+                    + FieldSetComponentRazor 
+                    + FieldSetComponentCode
+                    + FieldSetDetailComponentRazor 
+                    + FieldSetDetailComponentCode,
+
+        ComponentAll = MasterComponentRazor 
+                     + MasterComponentCode
+                     + DetailsComponentRazor
+                     + DetailsComponentCode,
     }
 }
 //MdEnd

@@ -8,6 +8,7 @@ using QnSProjectAward.BlazorApp.Shared.Components;
 using Radzen;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace QnSProjectAward.BlazorApp.Models.Modules.Form
@@ -15,8 +16,6 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
     public partial class EditModelMember : ModelMember
     {
         public CommonComponent CommonComponent { get; init; }
-        public ReadonlyMode ReadonlyMode => DisplayInfo.ReadonlyMode;
-        public VisibilityMode VisibilityMode => DisplayInfo.VisibilityMode;
         public bool Visible
         {
             get
@@ -47,6 +46,7 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
                 return result;
             }
         }
+        public bool AllowFiltering => SelectItems != null && SelectItems.Count() > 10;
         public string DefaultValue => PropertyAttribute != null ? PropertyAttribute.DefaultValue : string.Empty;
         public string HtmlCssClass { get; set; }
         public string HtmlAttributes { get; set; }
@@ -286,8 +286,8 @@ namespace QnSProjectAward.BlazorApp.Models.Modules.Form
             }
         }
 
-        public EditModelMember(CommonComponent commonComponent, ModelObject model, PropertyInfo propertyInfo, DisplayProperty displayProperty)
-            : base(model, propertyInfo, displayProperty)
+        public EditModelMember(CommonComponent commonComponent, ModelObject model, PropertyInfo propertyInfo, DisplayInfo displayInfo)
+            : base(model, propertyInfo, displayInfo)
         {
             commonComponent.CheckArgument(nameof(commonComponent));
 

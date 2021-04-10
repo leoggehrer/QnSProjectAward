@@ -37,6 +37,21 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 return items.Items;
             }
         }
+        public DataGridAssociationItem(DisplayComponent displayComponent, IDataGridHandler<TModel> dataGridHandler, string itemRefIdName, Func<TItem, string> itemToText)
+        {
+            displayComponent.CheckArgument(nameof(displayComponent));
+            dataGridHandler.CheckArgument(nameof(dataGridHandler));
+            itemToText.CheckArgument(nameof(itemToText));
+
+            DisplayComponent = displayComponent;
+            DataGridHandler = dataGridHandler;
+            ItemRefIdName = itemRefIdName;
+            ItemToText = itemToText;
+
+            DisplayComponent.CreatedDisplayModelMemberHandler += CreatedDisplayModelMemberHandler;
+            DisplayComponent.CreateEditModelMemberHandler += CreateEditModelMemberHandler;
+            DisplayComponent.ShowModelDisplayPropertyHandler += ShowModelDisplayPropertyhandler;
+        }
         public DataGridAssociationItem(DisplayComponent displayComponent, IDataGridHandler<TModel> dataGridHandler, string itemRefIdName, Func<TItem, string> itemToText, Action<TModel, TItem> modelAssignment)
         {
             displayComponent.CheckArgument(nameof(displayComponent));
@@ -56,14 +71,14 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             DataGridHandler.LoadModelDataHandler += LoadModelDataHandler;
         }
 
-        private void InitDisplayPropertiesHandler(object sender, DisplayPropertyContainer e)
+        protected virtual void InitDisplayPropertiesHandler(object sender, DisplayInfoContainer e)
         {
             if (e.ContainsKey($"{typeof(TModel).Name}{ItemRefIdName}") == false)
             {
-                e.AddOrSet(new DisplayProperty(typeof(TModel).Name, ItemRefIdName)
+                e.AddOrSet(new DisplayInfo(typeof(TModel).Name, ItemRefIdName)
                 {
-                    Order = 1,
                     VisibilityMode = Models.Modules.Common.VisibilityMode.CreateUpdateDeleteView,
+                    Order = 1,
                 });
             }
         }
@@ -111,13 +126,33 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             if (memberInfo.Property.Name.Equals(ItemRefIdName))
             {
                 var refId = (int?)memberInfo.Property.GetValue(memberInfo.Model);
-                var displayProperty = DisplayComponent.GetOrCreateDisplayProperty(memberInfo.Model.GetType(), memberInfo.Property);
+                var displayInfo = DisplayComponent.GetOrCreateDisplayInfo(memberInfo.Model.GetType(), memberInfo.Property);
 
                 memberInfo.Created = true;
-                memberInfo.ModelMember = new SelectEditMember<TItem>(ModelPage, memberInfo.Model, memberInfo.Property, displayProperty, Items, a => ItemToText(a), a => a.Id == refId.GetValueOrDefault());
+                memberInfo.ModelMember = new SelectEditMember<TItem>(ModelPage, memberInfo.Model, memberInfo.Property, displayInfo, Items, a => ItemToText(a), a => a.Id == refId.GetValueOrDefault());
             }
         }
+        protected void ShowModelDisplayPropertyhandler(object sender, ModelDisplayProperty modelDisplayProperty)
+        {
+            if (modelDisplayProperty.DisplayInfo.OriginName.Equals(ItemRefIdName))
+            {
+                modelDisplayProperty.DisplayInfo.ToDisplay = (m, v) =>
+                {
+                    var result = default(string);
 
+                    if (v is int refId)
+                    {
+                        var refItem = Items.FirstOrDefault(i => i.Id == refId);
+
+                        if (refItem != null)
+                        {
+                            result = ItemToText(refItem);
+                        }
+                    }
+                    return result;
+                };
+            }
+        }
         #region Dispose-pattern
         private bool disposedValue;
 

@@ -6,7 +6,7 @@ using Radzen;
 
 namespace QnSProjectAward.BlazorApp.Pages
 {
-    public partial class ModelPage : CommonPage
+    public abstract partial class ModelPage : CommonPage
     {
         [Inject]
         public IServiceAdapter ServiceAdapter { get; private set; }

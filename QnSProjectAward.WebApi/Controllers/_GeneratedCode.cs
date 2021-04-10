@@ -153,6 +153,17 @@ namespace QnSProjectAward.WebApi.Controllers.Persistence.Configuration
     {
     }
 }
+namespace QnSProjectAward.WebApi.Controllers.Persistence.Configuration
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.Configuration.IIdentitySetting;
+    using TModel = Transfer.Persistence.Configuration.IdentitySetting;
+    [ApiController]
+    [Route("Controller")]
+    public partial class IdentitySettingsController : GenericController<TContract, TModel>
+    {
+    }
+}
 namespace QnSProjectAward.WebApi.Controllers.Persistence.Data
 {
     using Microsoft.AspNetCore.Mvc;

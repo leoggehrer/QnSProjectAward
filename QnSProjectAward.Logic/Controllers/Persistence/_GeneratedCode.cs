@@ -303,6 +303,31 @@ namespace QnSProjectAward.Logic.Controllers.Persistence.Configuration
         }
     }
 }
+namespace QnSProjectAward.Logic.Controllers.Persistence.Configuration
+{
+    sealed partial class IdentitySettingController : GenericPersistenceController<QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting, Entities.Persistence.Configuration.IdentitySetting>
+    {
+        static IdentitySettingController()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        internal IdentitySettingController(DataContext.IContext context):base(context)
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        internal IdentitySettingController(ControllerObject controller):base(controller)
+        {
+            Constructing();
+            Constructed();
+        }
+    }
+}
 namespace QnSProjectAward.Logic.Controllers.Persistence.Data
 {
     sealed partial class BinaryDataController : GenericPersistenceControllerWithRun<QnSProjectAward.Contracts.Persistence.Data.IBinaryData, Entities.Persistence.Data.BinaryData>

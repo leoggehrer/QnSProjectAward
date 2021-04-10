@@ -15,16 +15,16 @@ namespace QnSProjectAward.Logic.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.2");
+                .HasAnnotation("ProductVersion", "5.0.4")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("QnSProjectAward.Logic.Entities.Persistence.Account.ActionLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Action")
                         .HasColumnType("nvarchar(max)");
@@ -58,7 +58,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -118,7 +118,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("IdentityId")
                         .HasColumnType("int");
@@ -145,7 +145,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("IdentityId")
                         .HasColumnType("int");
@@ -185,7 +185,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(256)
@@ -214,7 +214,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Firstname")
                         .HasMaxLength(64)
@@ -245,7 +245,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("From")
                         .HasColumnType("datetime2");
@@ -281,7 +281,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AwardId")
                         .HasColumnType("int");
@@ -292,7 +292,6 @@ namespace QnSProjectAward.Logic.Migrations
                         .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Institution")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -325,7 +324,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Course")
                         .IsRequired()
@@ -371,15 +370,18 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AwardId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<TimeSpan?>("From")
+                        .HasColumnType("time");
 
                     b.Property<byte[]>("Logo")
                         .HasColumnType("varbinary(max)");
@@ -399,6 +401,9 @@ namespace QnSProjectAward.Logic.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<TimeSpan?>("To")
+                        .HasColumnType("time");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AwardId");
@@ -411,7 +416,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("JurorId")
                         .HasColumnType("int");
@@ -436,12 +441,49 @@ namespace QnSProjectAward.Logic.Migrations
                     b.ToTable("Rating", "App");
                 });
 
+            modelBuilder.Entity("QnSProjectAward.Logic.Entities.Persistence.Configuration.IdentitySetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AppName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("IdentityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Value")
+                        .HasMaxLength(4096)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityId", "AppName", "Key")
+                        .IsUnique();
+
+                    b.ToTable("IdentitySetting", "Configuration");
+                });
+
             modelBuilder.Entity("QnSProjectAward.Logic.Entities.Persistence.Configuration.Setting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AppName")
                         .IsRequired()
@@ -475,7 +517,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<byte[]>("Data")
                         .IsRequired()
@@ -502,7 +544,7 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AppName")
                         .IsRequired()
@@ -639,6 +681,17 @@ namespace QnSProjectAward.Logic.Migrations
                     b.Navigation("Juror");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("QnSProjectAward.Logic.Entities.Persistence.Configuration.IdentitySetting", b =>
+                {
+                    b.HasOne("QnSProjectAward.Logic.Entities.Persistence.Account.Identity", "Identity")
+                        .WithMany()
+                        .HasForeignKey("IdentityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Identity");
                 });
 
             modelBuilder.Entity("QnSProjectAward.Logic.Entities.Persistence.Account.Identity", b =>

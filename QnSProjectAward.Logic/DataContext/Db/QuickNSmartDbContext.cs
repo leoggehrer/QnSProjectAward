@@ -13,7 +13,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
         static QnSProjectAwardDbContext()
         {
             ClassConstructing();
-            ConnectionString = Modules.Configuration.Settings.Get(CommonBase.StaticLiterals.ConnectionString);
+            ConnectionString = Modules.Configuration.AppSettings.Get(CommonBase.StaticLiterals.ConnectionString);
             ClassConstructed();
         }
         static partial void ClassConstructing();

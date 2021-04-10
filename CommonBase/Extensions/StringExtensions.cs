@@ -298,6 +298,17 @@ namespace CommonBase.Extensions
         {
             return source == null && value == null || value != null && source != null && source.Equals(value);
         }
+        /// <summary>
+        /// Determines if two string objects have equal values.
+        /// </summary>
+        /// <param name="source">The string to compare to the value.</param>
+        /// <param name="value">The string to compare to the source.</param>
+        /// <param name="stringComparison">One of the enumeration values that specifies how the strings will be compared.</param>
+        /// <returns>True if the values are equals, false else.</returns>
+        public static bool AreEquals(this string source, string value, StringComparison stringComparison)
+        {
+            return source == null && value == null || value != null && source != null && source.Equals(value, stringComparison);
+        }
 
         /// <summary>
         /// Indicates whether a specified string is null, empty, or consists only of white-space characters.

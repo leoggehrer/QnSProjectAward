@@ -42,15 +42,15 @@ namespace QnSProjectAward.BlazorApp.Services.Modules.Authentication
                 hasInitialized = true;
                 try
                 {
-                    var checkSession = await ProtectedBrowserStorage.GetAsync<AuthorizationSession>(StaticLiterals.AuthorizationSessionKey).ConfigureAwait(false);
+                    var authSession = await ProtectedBrowserStorage.GetAsync<AuthorizationSession>(StaticLiterals.AuthorizationSessionKey).ConfigureAwait(false);
 
-                    if (checkSession != null)
+                    if (authSession != null)
                     {
-                        var alive = await IsSessionAliveAsync(checkSession.Token).ConfigureAwait(false);
+                        var alive = await IsSessionAliveAsync(authSession.Token).ConfigureAwait(false);
 
                         if (alive)
                         {
-                            CurrentAuthorizationSession = checkSession;
+                            CurrentAuthorizationSession = authSession;
                         }
                         else
                         {

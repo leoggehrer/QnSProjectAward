@@ -342,11 +342,12 @@ namespace CSharpCodeGenerator.Logic
             return result;
         }
 
-        public static void DeleteGeneratedCodeFiles(string path)
+        public static void DeleteGenerationFiles(string path)
         {
+            Console.WriteLine("Delete all generation files...");
             foreach (var searchPattern in Logic.StaticLiterals.SourceFileExtensions.Split("|"))
             {
-                var deleteFiles = GetGeneratedCodeFiles(path, searchPattern, new[] { StaticLiterals.GeneratedCodeLabel });
+                var deleteFiles = GetGenerationFiles(path, searchPattern, new[] { StaticLiterals.GeneratedCodeLabel });
 
                 foreach (var item in deleteFiles)
                 {
@@ -354,7 +355,7 @@ namespace CSharpCodeGenerator.Logic
                 }
             }
         }
-        private static IEnumerable<string> GetGeneratedCodeFiles(string path, string searchPattern, string[] labels)
+        private static IEnumerable<string> GetGenerationFiles(string path, string searchPattern, string[] labels)
         {
             var result = new List<string>();
 

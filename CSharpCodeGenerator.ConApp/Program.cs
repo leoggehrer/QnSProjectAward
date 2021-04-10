@@ -7,7 +7,7 @@ using CommonStaticLiterals = CommonBase.StaticLiterals;
 
 namespace CSharpCodeGenerator.ConApp
 {
-	internal class Program
+    internal class Program
     {
         private static string GetCurrentSolutionPath()
         {
@@ -73,8 +73,7 @@ namespace CSharpCodeGenerator.ConApp
             var solutionProperties = Logic.Factory.GetSolutionProperties(solutionName, contractsFilePath);
             var appGenerationUnits = Logic.Common.UnitType.AllApps;
 
-            //Logic.Generator.DeleteGeneratedCodeFiles(solutionPath);
-            //return;
+            Logic.Generator.DeleteGenerationFiles(solutionPath);
             var generatedItems = Logic.Generator.Generate(solutionName, contractsFilePath, appGenerationUnits);
 
             Writer.WriteAll(solutionPath, solutionProperties, generatedItems);
@@ -82,8 +81,6 @@ namespace CSharpCodeGenerator.ConApp
             Console.WriteLine("Excluding Files from Git...");
             Logic.Git.GitIgnoreManager.Run($"{nameof(CSharpCodeGenerator)}.{nameof(ConApp)}");
         }
-
-
     }
 }
 //MdEnd

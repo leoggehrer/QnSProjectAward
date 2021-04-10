@@ -21,6 +21,9 @@ namespace CSharpCodeGenerator.Logic.Generation
         public static string UsingsLabel => "Usings";
         public static string NamespaceCodeLabel => "NamespaceCode";
         public static string ClassCodeLabel => "ClassCode";
+        public static string DataGridPagePostfix => "DataGridPage";
+        public static string PagePostfix => "Page";
+        public static string ComponentePostfix => "Component";
 
         public static string PagesFolder => "Pages";
         public static string SharedFolder => "Shared";
@@ -64,6 +67,14 @@ namespace CSharpCodeGenerator.Logic.Generation
             return create;
         }
         partial void CanCreateIndexPage(Type type, ref bool create);
+        private bool CanCreateMasterPage(Type type)
+        {
+            bool create = true;
+
+            CanCreateMasterPage(type, ref create);
+            return create;
+        }
+        partial void CanCreateMasterPage(Type type, ref bool create);
 
         protected override void CreateModelPropertyAttributes(Type type, PropertyInfo propertyInfo, List<string> codeLines)
         {
@@ -108,7 +119,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 if (CanCreateIndexPage(type))
                 {
                     result.AddRange(CreateDataGridPage(type, StaticLiterals.BusinessLabel));
-                    result.AddRange(CreateDisplayComponent(type, StaticLiterals.BusinessLabel));
+                    result.AddRange(CreateDisplayComponents(type, StaticLiterals.BusinessLabel));
                 }
             }
             return result;
@@ -123,7 +134,17 @@ namespace CSharpCodeGenerator.Logic.Generation
                 if (CanCreateIndexPage(type))
                 {
                     result.AddRange(CreateDataGridPage(type, StaticLiterals.PersistenceLabel));
-                    result.AddRange(CreateDisplayComponent(type, StaticLiterals.PersistenceLabel));
+                    result.AddRange(CreateDisplayComponents(type, StaticLiterals.PersistenceLabel));
+                }
+                if (CanCreateMasterPage(type))
+                {
+                    var contractHelper = new ContractHelper(type);
+                    var persistenceAndBusinessTypes = contractsProject.PersistenceTypes
+                                                                      .Union(contractsProject.BusinessTypes);
+                    var relations = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
+
+                    result.Add(CreateMasterDetailsPageRazor(type, relations));
+                    result.Add(CreateMasterDetailsPageCode(type, relations));
                 }
             }
             return result;
@@ -138,7 +159,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 if (CanCreateIndexPage(type))
                 {
                     result.AddRange(CreateDataGridPage(type, StaticLiterals.ShadowLabel));
-                    result.AddRange(CreateDisplayComponent(type, StaticLiterals.ShadowLabel));
+                    result.AddRange(CreateDisplayComponents(type, StaticLiterals.ShadowLabel));
                 }
             }
             return result;
@@ -168,9 +189,10 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
-            var fileNameRazor = $"{entityName}Page{PageExtension}";
-            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.IndexRazorPage)
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var pluralPageName = CreatePluralWord(entityName);
+            var fileNameRazor = $"{entityName}{DataGridPagePostfix}{PageExtension}";
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridRazorPage)
             {
                 FullName = CreateEntityFullNameFromInterface(type),
                 FileExtension = PageExtension,
@@ -178,10 +200,11 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazor);
             StartCreateDataGridPageRazor(type, result.Source);
 
-            result.Add($"@page \"/{entityName}\"");
-            result.Add("@inherits Pages.DataGridPage");
-            result.Add("@using Radzen;");
+            result.Add($"@page \"/{pluralPageName}\"");
+            result.Add($"@using TContract = {type.FullName};");
             result.Add($"@using TModel = {entityFullName};");
+            result.Add("@using Radzen;");
+            result.Add("@inherits Pages.DataGridPage");
             result.Add(string.Empty);
 
             result.Add("@*EmbeddedBegin:File=_DataGridPage.template:Label=DefaultPage*@");
@@ -218,11 +241,12 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
-            var fileNameRazor = $"{entityName}Page{PageExtension}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var pluralPageName = CreatePluralWord(entityName);
+            var fileNameRazor = $"{entityName}{DataGridPagePostfix}{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
-            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.IndexRazorPageCode)
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridRazorPageCode)
             {
                 FullName = CreateEntityFullNameFromInterface(type),
                 FileExtension = CodeExtension,
@@ -251,13 +275,13 @@ namespace CSharpCodeGenerator.Logic.Generation
                 }
             }
 
+            result.Add($"using TContract = {type.FullName};");
+            result.Add($"using TModel = {entityFullName};");
             result.Add("using System.Threading.Tasks;");
             result.Add("using Microsoft.AspNetCore.Components;");
             result.Add("using Radzen;");
             result.Add($"using {ProjectName}.Modules.DataGrid;");
             result.Add($"using {CreateComponentsNameSpace(type)};");
-            result.Add($"using TContract = {type.FullName};");
-            result.Add($"using TModel = {entityFullName};");
 
             result.AddRange(customUsings);
 
@@ -266,7 +290,7 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.AddRange(customNamespaceCode);
 
-            result.Add($"partial class {entityName}Page");
+            result.Add($"partial class {entityName}{DataGridPagePostfix}");
             result.Add("{");
 
             result.AddRange(customClassCode);
@@ -275,8 +299,8 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("protected DialogService DialogService { get; private set; }");
 
             result.Add(string.Empty);
+            result.Add($"protected override string PageRoot => \"{pluralPageName}\";");
             result.Add($"protected {entityName}DataGridHandler DataGridHandler" + " { get; private set; }");
-            result.Add("protected Contracts.Client.IAdapterAccess<TContract> AdapterAccess { get; private set; }");
 
             result.Add("protected override Task OnFirstRenderAsync()");
             result.Add("{");
@@ -284,8 +308,8 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("BeforeFirstRender(ref handled);");
             result.Add("if (handled == false)");
             result.Add("{");
-            result.Add("AdapterAccess = ServiceAdapter.Create<TContract>();");
-            result.Add($"DataGridHandler = new {entityName}DataGridHandler(this, new DataAdapterAccess<TContract>(AdapterAccess));");
+            result.Add("var adapterAccess = ServiceAdapter.Create<TContract>();");
+            result.Add($"DataGridHandler = new {entityName}DataGridHandler(this, new DataAdapterAccess<TContract>(adapterAccess));");
             result.Add("InitDataGridHandler(DataGridHandler);");
             result.Add("}");
             result.Add("AfterFirstRender();");
@@ -294,6 +318,16 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.Add("partial void BeforeFirstRender(ref bool handled);");
             result.Add("partial void AfterFirstRender();");
+
+            result.Add("protected override void Dispose(bool disposing)");
+            result.Add("{");
+            result.Add("if (disposing && DataGridHandler != null)");
+            result.Add("{");
+            result.Add("DataGridHandler.Dispose();");
+            result.Add("}");
+            result.Add("DataGridHandler = null;");
+            result.Add("base.Dispose(disposing);");
+            result.Add("}");
 
             result.Add("}");
             result.Add("}");
@@ -305,12 +339,13 @@ namespace CSharpCodeGenerator.Logic.Generation
         partial void StartCreateDataGridPageCode(Type type, List<string> lines);
         partial void FinishCreateDataGridPageCode(Type type, List<string> lines);
 
-        public IEnumerable<Contracts.IGeneratedItem> CreateDisplayComponent(Type type, string typeLabel)
+        public IEnumerable<Contracts.IGeneratedItem> CreateDisplayComponents(Type type, string typeLabel)
         {
             type.CheckArgument(nameof(type));
             typeLabel.CheckArgument(nameof(typeLabel));
 
             var result = new List<Contracts.IGeneratedItem>();
+            var contractsProject = ContractsProject.Create(SolutionProperties);
 
             StartCreateDisplayComponent(type, typeLabel);
 
@@ -332,94 +367,22 @@ namespace CSharpCodeGenerator.Logic.Generation
             //result.Add(CreateEditFieldSetDetailComponentRazor(type));
             //result.Add(CreateEditFieldSetDetailComponentCode(type));
 
-            result.Add(CreateEditFormComponentRazor(type));
-            result.Add(CreateEditFormComponentCode(type));
+            result.Add(CreateMasterComponentRazor(type));
+            result.Add(CreateMasterComponentCode(type));
+
+            var contractHelper = new ContractHelper(type);
+            var persistenceAndBusinessTypes = contractsProject.PersistenceTypes
+                                                              .Union(contractsProject.BusinessTypes);
+            var relations = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
+
+            result.Add(CreateDetailsComponentRazor(type, relations));
+            result.Add(CreateDetailsComponentCode(type, relations));
 
             FinishCreateDisplayComponent(type, typeLabel);
             return result;
         }
         partial void StartCreateDisplayComponent(Type type, string typeLabel);
         partial void FinishCreateDisplayComponent(Type type, string typeLabel);
-
-        #region Edit form component generation
-        private Contracts.IGeneratedItem CreateEditFormComponentRazor(Type type)
-        {
-            type.CheckArgument(nameof(type));
-
-            var subPath = CreateSubPathFromType(type);
-            var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
-            var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
-            var fileNameRazor = $"{entityName}EditForm{PageExtension}";
-            var filePathRazor = Path.Combine(projectSharedComponentsPath, subPath, fileNameRazor);
-            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridComponentRazor)
-            {
-                FullName = CreateEntityFullNameFromInterface(type),
-                FileExtension = PageExtension,
-            };
-            result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazor);
-
-            StartCreateEditFormComponentRazor(type, result.Source);
-            result.Add($"@using TContract = {type.FullName};");
-            result.Add($"@using TModel = {entityFullName};");
-            result.Add("@inherits EditFormComponent<TContract, TModel>");
-            result.Add(string.Empty);
-
-            result.Add("@*EmbeddedBegin:File=_EditFormComponent.template:Label=DefaultPage*@");
-            result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
-
-            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
-            FinishCreateEditFormComponentRazor(type, result.Source);
-            return result;
-        }
-        partial void StartCreateEditFormComponentRazor(Type type, List<string> lines);
-        partial void FinishCreateEditFormComponentRazor(Type type, List<string> lines);
-
-        private Contracts.IGeneratedItem CreateEditFormComponentCode(Type type)
-        {
-            type.CheckArgument(nameof(type));
-
-            var subPath = CreateSubPathFromType(type);
-            var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
-            var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
-            var fileNameRazor = $"{entityName}EditForm{PageExtension}";
-            var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
-            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.EditFormComponentCode)
-            {
-                FullName = CreateEntityFullNameFromInterface(type),
-                FileExtension = PageExtension,
-            };
-            result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazorCode);
-
-            StartCreateEditFormComponentCode(type, result.Source);
-            result.Add("using Microsoft.AspNetCore.Components;");
-            result.Add("using Radzen;");
-            result.Add("using System.Linq;");
-            result.Add("using System.Threading.Tasks;");
-            result.Add($"using TContract = {type.FullName};");
-            result.Add($"using TModel = {entityFullName};");
-
-            result.Add($"namespace {CreateComponentsNameSpace(type)}");
-            result.Add("{");
-            result.Add($"partial class {entityName}EditForm");
-            result.Add("{");
-
-            result.Add("@*EmbeddedBegin:File=_EditFormComponent.code:Label=DefaultPage*@");
-            result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
-
-            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
-
-            result.Add("}");
-            result.Add("}");
-
-            FinishCreateEditFormComponentCode(type, result.Source);
-            result.FormatCSharpCode();
-            return result;
-        }
-        partial void StartCreateEditFormComponentCode(Type type, List<string> lines);
-        partial void FinishCreateEditFormComponentCode(Type type, List<string> lines);
-        #endregion Edit form component generation
 
         #region DataGrid component generation
         private Contracts.IGeneratedItem CreateDataGridHandlerCode(Type type)
@@ -429,7 +392,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameCode = $"{entityName}DataGridHandler{CodeExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridHandlerCode)
             {
@@ -476,7 +439,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameRazor = $"{entityName}DataGrid{PageExtension}";
             var filePathRazor = Path.Combine(projectSharedComponentsPath, subPath, fileNameRazor);
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridComponentRazor)
@@ -516,7 +479,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameRazor = $"{entityName}DataGrid{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridComponentCode)
@@ -560,7 +523,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameRazor = $"{entityName}DataGridDetail{PageExtension}";
             var filePathRazor = Path.Combine(projectSharedComponentsPath, subPath, fileNameRazor);
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridDetailComponentRazor)
@@ -596,7 +559,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameRazor = $"{entityName}DataGridDetail{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridDetailComponentCode)
@@ -650,7 +613,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameRazor = $"{entityName}DataGridColumns{PageExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridColumnsComponentRazor)
             {
@@ -685,7 +648,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
-            var entityFullName = $"{CreateModelsNameSpace(type)}.{entityName}";
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
             var fileNameRazor = $"{entityName}DataGridColumns{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridColumnsComponentCode)
@@ -952,7 +915,445 @@ namespace CSharpCodeGenerator.Logic.Generation
         //}
         //partial void StartCreateEditFieldSetDetailComponentCode(Type type, List<string> lines);
         //partial void FinishCreateEditFieldSetDetailComponentCode(Type type, List<string> lines);
-		#endregion FieldSet component generation
-	}
+        #endregion FieldSet component generation
+
+        #region Master details generation
+        private static string CreatePluralWord(string wordInSingular)
+        {
+            string result;
+
+            if (wordInSingular.EndsWith("y"))
+            {
+                result = $"{wordInSingular[0..^1]}ies";
+            }
+            else if (wordInSingular.EndsWith("s"))
+            {
+                result = $"{wordInSingular}es";
+            }
+            else
+            {
+                result = $"{wordInSingular}s";
+            }
+            return result;
+        }
+        private Contracts.IGeneratedItem CreateMasterDetailsPageRazor(Type type, IEnumerable<Models.Relation> relations)
+        {
+            type.CheckArgument(nameof(type));
+            relations.CheckArgument(nameof(relations));
+
+            var subPath = CreateSubPathFromType(type);
+            var subNamespace = CreateSubNamespaceFromType(type);
+            var componentNamespace = $"{SolutionProperties.BlazorAppProjectName}.Shared.Components.{subNamespace}";
+            var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
+            var entityName = CreateEntityNameFromInterface(type);
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var pluralPageName = CreatePluralWord(entityName);
+            var fileNameRazor = $"{entityName}{PagePostfix}{PageExtension}";
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.MasterDetailsRazorPage)
+            {
+                FullName = CreateEntityFullNameFromInterface(type),
+                FileExtension = PageExtension,
+            };
+            result.SubFilePath = Path.Combine(projectPagePath, fileNameRazor);
+            StartCreateMasterPageRazor(type, relations, result.Source);
+
+            result.Add($"@page \"/{pluralPageName}" + "/{Mode}\"");
+            result.Add($"@page \"/{pluralPageName}" + "/{Mode}/{Detail}/{Index:int}\"");
+            result.Add($"@page \"/{pluralPageName}" + "/{Mode}" + "/{Id:int}\"");
+            result.Add($"@page \"/{pluralPageName}" + "/{Mode}" + "/{Id:int}" + "/{Detail}/{Index:int}\"");
+            result.Add($"@using {componentNamespace};");
+            result.Add($"@using TMasterContract = {type.FullName};");
+            result.Add($"@using TMaster = {entityFullName};");
+            result.Add("@inherits Pages.MasterDetailsPage<TMasterContract, TMaster>");
+            result.Add(string.Empty);
+
+            result.Add("@*EmbeddedBegin:File=_MasterDetailsPage.template:Label=DefaultPage*@");
+            result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
+
+            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p))
+                                            .Select(l => l.Replace("TMasterComponent", $"{entityName}Master{ComponentePostfix}"))
+                                            .Select(l => l.Replace("TDetailsComponent", $"{componentNamespace}.{entityName}DetailsComponent")));
+            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
+
+            FinishCreateMasterPageRazor(type, relations, result.Source);
+            return result;
+        }
+        partial void StartCreateMasterPageRazor(Type type, IEnumerable<Models.Relation> detailTypes, List<string> lines);
+        partial void FinishCreateMasterPageRazor(Type type, IEnumerable<Models.Relation> detailTypes, List<string> lines);
+
+        private Contracts.IGeneratedItem CreateMasterDetailsPageCode(Type type, IEnumerable<Models.Relation> relations)
+        {
+            type.CheckArgument(nameof(type));
+            relations.CheckArgument(nameof(relations));
+
+            var customUsings = new List<string>();
+            var customNamespaceCode = new List<string>();
+            var customClassCode = new List<string>();
+            var subPath = CreateSubPathFromType(type);
+            var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
+            var entityName = CreateEntityNameFromInterface(type);
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var pluralPageName = CreatePluralWord(entityName);
+            var fileNameRazor = $"{entityName}{PagePostfix}{PageExtension}";
+            var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
+            var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.MasterDetailsRazorPageCode)
+            {
+                FullName = CreateEntityFullNameFromInterface(type),
+                FileExtension = CodeExtension,
+            };
+            result.SubFilePath = Path.Combine(projectPagePath, fileNameRazorCode);
+
+            StartCreateMasterPageCode(type, relations, result.Source);
+            if (File.Exists(filePathRazorCode))
+            {
+                var fileCode = File.ReadAllText(filePathRazorCode, Encoding.Default);
+
+                foreach (var item in fileCode.GetAllTags(new string[] { $"/*{UsingsLabel}Begin*/", $"/*{UsingsLabel}nd*/" })
+                                             .OrderBy(e => e.StartTagIndex))
+                {
+                    customUsings.Add(item.FullText);
+                }
+                foreach (var item in fileCode.GetAllTags(new string[] { $"/*{NamespaceCodeLabel}Begin*/", $"/*{NamespaceCodeLabel}End*/" })
+                                             .OrderBy(e => e.StartTagIndex))
+                {
+                    customNamespaceCode.Add(item.FullText);
+                }
+                foreach (var item in fileCode.GetAllTags(new string[] { $"/*{ClassCodeLabel}Begin*/", $"/*{ClassCodeLabel}End*/" })
+                                             .OrderBy(e => e.StartTagIndex))
+                {
+                    customClassCode.Add(item.FullText);
+                }
+            }
+
+            result.Add("using System.Threading.Tasks;");
+            result.Add("using Microsoft.AspNetCore.Components;");
+            result.Add("using Radzen;");
+            result.Add($"using {CreateComponentsNameSpace(type)};");
+            result.Add($"using TMasterContract = {type.FullName};");
+            result.Add($"using TMaster = {entityFullName};");
+
+            result.AddRange(customUsings);
+
+            result.Add($"namespace {CreatePagesNameSpace(type)}");
+            result.Add("{");
+
+            result.AddRange(customNamespaceCode);
+
+            result.Add($"partial class {entityName}{PagePostfix}");
+            result.Add("{");
+
+            result.AddRange(customClassCode);
+
+            result.Add("[Inject]");
+            result.Add("protected DialogService DialogService { get; private set; }");
+            result.Add(string.Empty);
+            result.Add($"protected override string PageRoot => \"{pluralPageName}\";");
+
+            result.Add("}");
+            result.Add("}");
+
+            FinishCreateMasterPageCode(type, relations, result.Source);
+            result.FormatCSharpCode();
+            return result;
+        }
+        partial void StartCreateMasterPageCode(Type type, IEnumerable<Models.Relation> relations, List<string> lines);
+        partial void FinishCreateMasterPageCode(Type type, IEnumerable<Models.Relation> relations, List<string> lines);
+
+        private Contracts.IGeneratedItem CreateMasterComponentRazor(Type type)
+        {
+            type.CheckArgument(nameof(type));
+
+            var subPath = CreateSubPathFromType(type);
+            var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
+            var entityName = CreateEntityNameFromInterface(type);
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var fileNameRazor = $"{entityName}Master{ComponentePostfix}{PageExtension}";
+            var filePathRazor = Path.Combine(projectSharedComponentsPath, subPath, fileNameRazor);
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.MasterComponentRazor)
+            {
+                FullName = CreateEntityFullNameFromInterface(type),
+                FileExtension = PageExtension,
+            };
+            result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazor);
+
+            StartCreateMasterComponentRazor(type, result.Source);
+            result.Add($"@using TMasterContract = {type.FullName};");
+            result.Add($"@using TMaster = {entityFullName};");
+            result.Add("@using CommonBase.Extensions;");
+            result.Add("@inherits MasterComponent<TMasterContract, TMaster>");
+            result.Add(string.Empty);
+
+            result.Add("@*EmbeddedBegin:File=_MasterComponent.template:Label=DefaultPage*@");
+            result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
+
+            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
+            FinishCreateMasterComponentRazor(type, result.Source);
+            return result;
+        }
+        partial void StartCreateMasterComponentRazor(Type type, List<string> lines);
+        partial void FinishCreateMasterComponentRazor(Type type, List<string> lines);
+
+        private Contracts.IGeneratedItem CreateMasterComponentCode(Type type)
+        {
+            type.CheckArgument(nameof(type));
+
+            var subPath = CreateSubPathFromType(type);
+            var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
+            var entityName = CreateEntityNameFromInterface(type);
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var fileNameRazor = $"{entityName}Master{ComponentePostfix}{PageExtension}";
+            var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.MasterComponentCode)
+            {
+                FullName = CreateEntityFullNameFromInterface(type),
+                FileExtension = PageExtension,
+            };
+            result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazorCode);
+
+            StartCreateMasterComponentCode(type, result.Source);
+            result.Add("using Microsoft.AspNetCore.Components;");
+            result.Add("using Radzen;");
+            result.Add("using System.Linq;");
+            result.Add("using System.Threading.Tasks;");
+            result.Add($"using TMasterContract = {type.FullName};");
+            result.Add($"using TMaster = {entityFullName};");
+
+            result.Add($"namespace {CreateComponentsNameSpace(type)}");
+            result.Add("{");
+            result.Add($"partial class {entityName}MasterComponent");
+            result.Add("{");
+
+            result.Add("@*EmbeddedBegin:File=_MasterComponent.code:Label=DefaultPage*@");
+            result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
+
+            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
+
+            result.Add("}");
+            result.Add("}");
+
+            FinishCreateMasterComponentCode(type, result.Source);
+            result.FormatCSharpCode();
+            return result;
+        }
+        partial void StartCreateMasterComponentCode(Type type, List<string> lines);
+        partial void FinishCreateMasterComponentCode(Type type, List<string> lines);
+
+        private Contracts.IGeneratedItem CreateDetailsComponentRazor(Type type, IEnumerable<Models.Relation> relations)
+        {
+            type.CheckArgument(nameof(type));
+            relations.CheckArgument(nameof(relations));
+
+            var listRelations = new List<Models.Relation>(relations);
+            var subPath = CreateSubPathFromType(type);
+            var subNamespace = CreateSubNamespaceFromType(type);
+            var projectPagePath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
+            var entityName = CreateEntityNameFromInterface(type);
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var fileNameRazor = $"{entityName}Details{ComponentePostfix}{PageExtension}";
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DetailsComponentRazor)
+            {
+                FullName = CreateEntityFullNameFromInterface(type),
+                FileExtension = PageExtension,
+            };
+            result.SubFilePath = Path.Combine(projectPagePath, fileNameRazor);
+            StartCreateDetailsComponentRazor(type, listRelations, result.Source);
+
+            result.Add($"@using {SolutionProperties.BlazorAppProjectName}.Shared.Components;");
+            result.Add($"@using TMasterContract = {type.FullName};");
+            result.Add($"@using TMaster = {entityFullName};");
+            result.Add("@inherits DetailsComponent<TMasterContract, TMaster>");
+            result.Add(string.Empty);
+
+            result.Add("@*EmbeddedBegin:File=_DetailsComponent.template:Label=DefaultPage*@");
+            result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
+
+            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p))
+                                            .Select(l => l.Replace("TDetailsComponent", $"{entityName}Component")));
+            result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
+
+            if (listRelations.Any())
+            {
+                var namespaceComponents = $"{SolutionProperties.BlazorAppProjectName}.Shared.Components";
+
+                result.Add("<RadzenTabs SelectedIndex=@SelectedIndex @ref=@RadzenTabs >");
+                result.Add("  <Tabs>");
+                foreach (var item in listRelations)
+                {
+                    var namespaceSub = CreateSubNamespaceFromType(item.To);
+                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+
+                    result.Add($"    <RadzenTabsItem Text=\"@TranslateFor(\"{detailEntityName}_{item.Name}\")\">");
+                    result.Add($"      <{namespaceComponents}.{namespaceSub}.{detailEntityName}DataGrid DataGridHandler={detailEntityName}DataGridHandler{item.Name} ParentComponent=@this />");
+                    result.Add("    </RadzenTabsItem>");
+                }
+                result.Add("  </Tabs>");
+                result.Add("</RadzenTabs>");
+            }
+
+            FinishCreateDetailsComponentRazor(type, listRelations, result.Source);
+            return result;
+        }
+        partial void StartCreateDetailsComponentRazor(Type type, List<Models.Relation> relations, List<string> lines);
+        partial void FinishCreateDetailsComponentRazor(Type type, List<Models.Relation> relations, List<string> lines);
+
+        private Contracts.IGeneratedItem CreateDetailsComponentCode(Type type, IEnumerable<Models.Relation> relations)
+        {
+            type.CheckArgument(nameof(type));
+            relations.CheckArgument(nameof(relations));
+
+            var listRelations = new List<Models.Relation>(relations);
+            var customUsings = new List<string>();
+            var customNamespaceCode = new List<string>();
+            var customClassCode = new List<string>();
+            var subPath = CreateSubPathFromType(type);
+            var projectPagePath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
+            var entityName = CreateEntityNameFromInterface(type);
+            var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
+            var fileNameRazor = $"{entityName}Details{ComponentePostfix}{PageExtension}";
+            var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
+            var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
+            var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DetailsComponentCode)
+            {
+                FullName = CreateEntityFullNameFromInterface(type),
+                FileExtension = CodeExtension,
+            };
+            result.SubFilePath = Path.Combine(projectPagePath, fileNameRazorCode);
+
+            StartCreateDetailsComponentCode(type, listRelations, result.Source);
+            if (File.Exists(filePathRazorCode))
+            {
+                var fileCode = File.ReadAllText(filePathRazorCode, Encoding.Default);
+
+                foreach (var item in fileCode.GetAllTags(new string[] { $"/*{UsingsLabel}Begin*/", $"/*{UsingsLabel}nd*/" })
+                                             .OrderBy(e => e.StartTagIndex))
+                {
+                    customUsings.Add(item.FullText);
+                }
+                foreach (var item in fileCode.GetAllTags(new string[] { $"/*{NamespaceCodeLabel}Begin*/", $"/*{NamespaceCodeLabel}End*/" })
+                                             .OrderBy(e => e.StartTagIndex))
+                {
+                    customNamespaceCode.Add(item.FullText);
+                }
+                foreach (var item in fileCode.GetAllTags(new string[] { $"/*{ClassCodeLabel}Begin*/", $"/*{ClassCodeLabel}End*/" })
+                                             .OrderBy(e => e.StartTagIndex))
+                {
+                    customClassCode.Add(item.FullText);
+                }
+            }
+
+            result.Add("using System.Threading.Tasks;");
+            result.Add("using Microsoft.AspNetCore.Components;");
+            result.Add("using Radzen;");
+            result.Add($"using {CreateComponentsNameSpace(type)};");
+
+            result.AddRange(customUsings);
+
+            result.Add($"namespace {CreateComponentsNameSpace(type)}");
+            result.Add("{");
+
+            result.AddRange(customNamespaceCode);
+
+            result.Add($"partial class {entityName}Details{ComponentePostfix}");
+            result.Add("{");
+
+            result.AddRange(customClassCode);
+
+            result.Add("[Inject]");
+            result.Add("protected DialogService DialogService { get; private set; }");
+
+            result.Add(string.Empty);
+
+            if (listRelations.Any())
+            {
+                foreach (var item in listRelations)
+                {
+                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+
+                    result.Add($"protected {CreateComponentsNameSpace(item.To)}.{detailEntityName}DataGridHandler {detailEntityName}DataGridHandler{item.Name}" + "{ get; private set; }");
+                }
+
+                result.Add("protected override Task InitializeParametersAsync()");
+                result.Add("{");
+                foreach (var item in listRelations)
+                {
+                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+                    var dataGridHandler = $"{detailEntityName}DataGridHandler{item.Name}";
+
+                    result.Add($"{dataGridHandler}.Editable = MasterDetailsPage.Id != 0;");
+                    result.Add($"{dataGridHandler}.AccessFilter = $\"{item.Name}=" + "{MasterDetailsPage.Id}\";");
+                }
+                result.Add("return base.InitializeParametersAsync();");
+                result.Add("}");
+
+                result.Add("protected override void BeforeInitialized()");
+                result.Add("{");
+                result.Add("base.BeforeInitialized();");
+
+                foreach (var item in listRelations)
+                {
+                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+
+                    result.Add($"{detailEntityName}DataGridHandler{item.Name} = new {CreateComponentsNameSpace(item.To)}.{detailEntityName}DataGridHandler(MasterDetailsPage);");
+                    result.Add($"InitDataGridHandler({detailEntityName}DataGridHandler{item.Name}, \"{detailEntityName}\");");
+                    result.Add(string.Empty);
+                    result.Add($"{detailEntityName}DataGridHandler{item.Name}.BeforeLoadDataHandler += {detailEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler;");
+                    result.Add($"{detailEntityName}DataGridHandler{item.Name}.AfterCreateModelHandler += {detailEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler;");
+                }
+                result.Add("}");
+                result.Add(string.Empty);
+
+                foreach (var item in listRelations)
+                {
+                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+                    var namespaceModel = CreateModelsNamespace(item.To);
+
+                    result.Add($"private void {detailEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler(object sender, LoadDataArgs e)");
+                    result.Add("{");
+                    result.Add("if (sender is Modules.DataGrid.IDataGridBase dataGridHandler)");
+                    result.Add("{");
+                    result.Add($"dataGridHandler.AccessFilter = $\"{item.Name}=" + "{MasterDetailsPage.Id}\";");
+                    result.Add("}");
+                    result.Add("}");
+                }
+
+                foreach (var item in listRelations)
+                {
+                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+                    var namespaceModel = CreateModelsNamespace(item.To);
+
+                    result.Add($"private void {detailEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler(object sender, {namespaceModel}.{detailEntityName} model)");
+                    result.Add("{");
+                    result.Add("if (sender is Modules.DataGrid.IDataGridBase)");
+                    result.Add("{");
+                    result.Add($"model.{item.Name}=MasterDetailsPage.Id;");
+                    result.Add("}");
+                    result.Add("}");
+                }
+                result.Add("protected override void InitDisplayInfoContainer(Models.Modules.Form.DisplayInfoContainer displayInfos)");
+                result.Add("{");
+                result.Add("base.InitDisplayInfoContainer(displayInfos);");
+                result.Add("var handled = false;");
+                result.Add("BeforeInitDisplayInfoContainer(displayInfos, ref handled);");
+                result.Add("if (handled == false)");
+                result.Add("{");
+                result.Add($"displayInfos.AddOrSet(\"{CreateEntityNameFromInterface(type)}Id\", " + "dp => { dp.VisibilityMode = Models.Modules.Common.VisibilityMode.Hidden; });");
+                result.Add("}");
+                result.Add("AfterInitDisplayInfoContainer(displayInfos);");
+                result.Add("}");
+                result.Add("partial void BeforeInitDisplayInfoContainer(Models.Modules.Form.DisplayInfoContainer displayInfos, ref bool handled);");
+                result.Add("partial void AfterInitDisplayInfoContainer(Models.Modules.Form.DisplayInfoContainer displayInfos);");
+            }
+            result.Add("}");
+            result.Add("}");
+
+            FinishCreateDetailsComponentCode(type, listRelations, result.Source);
+            result.FormatCSharpCode();
+            return result;
+        }
+        partial void StartCreateDetailsComponentCode(Type type, List<Models.Relation> relations, List<string> lines);
+        partial void FinishCreateDetailsComponentCode(Type type, List<Models.Relation> relations, List<string> lines);
+        #endregion Master details generation
+    }
 }
 //MdEnd

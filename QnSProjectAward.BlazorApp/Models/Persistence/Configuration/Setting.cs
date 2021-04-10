@@ -33,9 +33,9 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 				{
 					SubObjects.Add(JsonSerializer.Deserialize<DataGridSetting>(Value));
 				}
-				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DataGridPageSetting)}\""))
+				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DataGridHandlerSetting)}\""))
 				{
-					SubObjects.Add(JsonSerializer.Deserialize<DataGridPageSetting>(Value));
+					SubObjects.Add(JsonSerializer.Deserialize<DataGridHandlerSetting>(Value));
 				}
 			}
 			catch (System.Exception ex)
@@ -69,49 +69,49 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 				{
 					Value = JsonSerializer.Serialize(dgsm, serializerOptions);
 				}
-				else if (SubObjects[0] is DataGridPageSetting dgpsm)
+				else if (SubObjects[0] is DataGridHandlerSetting dghsm)
 				{
-					Value = JsonSerializer.Serialize(dgpsm, serializerOptions);
+					Value = JsonSerializer.Serialize(dghsm, serializerOptions);
 				}
 			}
 		}
-		public override void EvaluateDisplayProperty(DisplayProperty displayProperty)
+		public override void EvaluateDisplayInfo(DisplayInfo displayInfo)
 		{
-			base.EvaluateDisplayProperty(displayProperty);
+			base.EvaluateDisplayInfo(displayInfo);
 
-			if (displayProperty.OriginName.Equals(nameof(State)))
+			if (displayInfo.OriginName.Equals(nameof(State)))
 			{
-				displayProperty.VisibilityMode = VisibilityMode.ListDetailView;
+				displayInfo.VisibilityMode = VisibilityMode.ListDetailView;
 			}
-			else if (displayProperty.OriginName.Equals(nameof(Value)))
+			else if (displayInfo.OriginName.Equals(nameof(Value)))
 			{
 				if (SubObjects.Count == 1)
 				{
-					displayProperty.VisibilityMode = VisibilityMode.ListDetailView;
+					displayInfo.VisibilityMode = VisibilityMode.ListDetailView;
 				}
 				else
 				{
-					displayProperty.VisibilityMode = VisibilityMode.DetailCreateUpdateDeleteView;
+					displayInfo.VisibilityMode = VisibilityMode.DetailCreateUpdateDeleteView;
 				}
 			}
-			else if (displayProperty.OriginName.Equals(nameof(ConfigurationModel.Type)))
+			else if (displayInfo.OriginName.Equals(nameof(ConfigurationModel.Type)))
 			{
 				if (SubObjects.Count == 1)
 				{
-					displayProperty.VisibilityMode = VisibilityMode.ListDetailView;
+					displayInfo.VisibilityMode = VisibilityMode.ListDetailView;
 				}
 				else
 				{
-					displayProperty.VisibilityMode = VisibilityMode.DetailCreateUpdateDeleteView;
+					displayInfo.VisibilityMode = VisibilityMode.DetailCreateUpdateDeleteView;
 				}
 			}
-			else if (displayProperty.OriginName.Equals(nameof(ReadonlyMode)))
+			else if (displayInfo.OriginName.Equals(nameof(ReadonlyMode)))
 			{
-				displayProperty.VisibilityMode = VisibilityMode.Hidden;
+				displayInfo.VisibilityMode = VisibilityMode.Hidden;
 			}
-			else if (displayProperty.OriginName.Equals(nameof(VisibilityMode)))
+			else if (displayInfo.OriginName.Equals(nameof(VisibilityMode)))
 			{
-				displayProperty.VisibilityMode = VisibilityMode.Hidden;
+				displayInfo.VisibilityMode = VisibilityMode.Hidden;
 			}
 		}
 	}

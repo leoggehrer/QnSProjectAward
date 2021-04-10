@@ -26,11 +26,11 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         partial void BeforeGetModelType(ref Type modelType, ref bool handled);
         partial void AfterGetModelType(Type modelType);
 
-        public virtual GridModelColumn CreateGridModelColumn(Type modelType, PropertyInfo propertyInfo)
+        public virtual GridModelMember CreateGridModelMember(Type modelType, PropertyInfo propertyInfo)
         {
-            var displayProperty = GetOrCreateDisplayProperty(modelType, propertyInfo);
+            var displayInfo = GetOrCreateDisplayInfo(modelType, propertyInfo);
 
-            return new GridModelColumn(modelType, propertyInfo, displayProperty);
+            return new GridModelMember(modelType, propertyInfo, displayInfo);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace CSharpCodeGenerator.Logic.Generation
 
         public static IEnumerable<string> EnvelopeWithANamespace(IEnumerable<string> source, string nameSpace, params string[] usings)
         {
-            List<string> result = new List<string>();
+            var result = new List<string>();
 
             if (nameSpace.HasContent())
             {

@@ -15,6 +15,11 @@ namespace QnSProjectAward.Logic.DataContext.Db
             get;
             set;
         }
+        protected DbSet<Entities.Persistence.Configuration.IdentitySetting> IdentitySettingSet
+        {
+            get;
+            set;
+        }
         protected DbSet<Entities.Persistence.Configuration.Setting> SettingSet
         {
             get;
@@ -85,6 +90,10 @@ namespace QnSProjectAward.Logic.DataContext.Db
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Data.IBinaryData))
             {
                 result = BinaryDataSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.IIdentitySetting))
+            {
+                result = IdentitySettingSet as DbSet<E>;
             }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Configuration.ISetting))
             {
@@ -157,6 +166,19 @@ namespace QnSProjectAward.Logic.DataContext.Db
             binaryDataBuilder.Property(p => p.Guid).IsRequired();
             binaryDataBuilder.Property(p => p.Data).IsRequired();
             ConfigureEntityType(binaryDataBuilder);
+            var identitySettingBuilder = modelBuilder.Entity<Entities.Persistence.Configuration.IdentitySetting>();
+            identitySettingBuilder.ToTable("IdentitySetting", "Configuration").HasKey("Id");
+            modelBuilder.Entity<Entities.Persistence.Configuration.IdentitySetting>().Property(p => p.RowVersion).IsRowVersion();
+            identitySettingBuilder.Property(p => p.IdentityId).IsRequired();
+            identitySettingBuilder.Property(p => p.AppName).IsRequired().HasMaxLength(128);
+            identitySettingBuilder.Property(p => p.Key).IsRequired().HasMaxLength(512);
+            identitySettingBuilder.Property(p => p.Value).HasMaxLength(4096);
+            identitySettingBuilder.HasIndex(c => new
+            {
+                c.IdentityId, c.AppName, c.Key
+            }
+            ).IsUnique();
+            ConfigureEntityType(identitySettingBuilder);
             var settingBuilder = modelBuilder.Entity<Entities.Persistence.Configuration.Setting>();
             settingBuilder.ToTable("Setting", "Configuration").HasKey("Id");
             modelBuilder.Entity<Entities.Persistence.Configuration.Setting>().Property(p => p.RowVersion).IsRowVersion();
@@ -179,8 +201,8 @@ namespace QnSProjectAward.Logic.DataContext.Db
             jurorBuilder.ToTable("Juror", "App").HasKey("Id");
             modelBuilder.Entity<Entities.Persistence.App.Juror>().Property(p => p.RowVersion).IsRowVersion();
             jurorBuilder.Property(p => p.Name).IsRequired().HasMaxLength(256);
-            jurorBuilder.Property(p => p.Institution).IsRequired().HasMaxLength(256);
             jurorBuilder.Property(p => p.Position).HasMaxLength(128);
+            jurorBuilder.Property(p => p.Institution).HasMaxLength(256);
             jurorBuilder.Property(p => p.Email).IsRequired().HasMaxLength(128);
             ConfigureEntityType(jurorBuilder);
             var memberBuilder = modelBuilder.Entity<Entities.Persistence.App.Member>();
@@ -197,7 +219,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
             modelBuilder.Entity<Entities.Persistence.App.Project>().Property(p => p.RowVersion).IsRowVersion();
             projectBuilder.Property(p => p.School).IsRequired().HasMaxLength(128);
             projectBuilder.Property(p => p.Title).IsRequired().HasMaxLength(256);
-            projectBuilder.Property(p => p.Description).IsRequired().HasMaxLength(1024);
+            projectBuilder.Property(p => p.Description).IsRequired().HasMaxLength(2048);
             ConfigureEntityType(projectBuilder);
             var ratingBuilder = modelBuilder.Entity<Entities.Persistence.App.Rating>();
             ratingBuilder.ToTable("Rating", "App").HasKey("Id");
@@ -250,6 +272,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
         }
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Language.Translation> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Data.BinaryData> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Configuration.IdentitySetting> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Configuration.Setting> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Award> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Juror> entityTypeBuilder);

@@ -6,14 +6,14 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Configuration
 {
     partial class SettingDataGridColumns
     {
-        protected override void InitDisplayProperties(DisplayPropertyContainer displayProperties)
+        protected override void InitDisplayInfoContainer(DisplayInfoContainer displayInfos)
         {
-            base.InitDisplayProperties(displayProperties);
+            base.InitDisplayInfoContainer(displayInfos);
 
-            displayProperties.Add(new DisplayProperty(nameof(Models.Persistence.Configuration.Setting.State))
+            displayInfos.AddOrSet(nameof(Models.Persistence.Configuration.Setting.State), dp =>
             {
-                Order = 1_000,
-                IsModelItem = true,
+                dp.IsModelItem = true;
+                dp.Order = 1_000;
             }); ;
         }
     }

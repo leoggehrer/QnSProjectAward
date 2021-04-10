@@ -447,6 +447,125 @@ namespace QnSProjectAward.Logic.Entities.Modules.Base
         static partial void AfterCreate(Modules.Base.Setting instance, QnSProjectAward.Contracts.Modules.Base.ISetting other);
     }
 }
+namespace QnSProjectAward.Logic.Entities.Modules.Base
+{
+    partial class IdentitySetting : IdentityEntity
+    {
+    }
+}
+namespace QnSProjectAward.Logic.Entities.Modules.Base
+{
+    using System;
+    partial class IdentitySetting : QnSProjectAward.Contracts.Modules.Base.IIdentitySetting
+    {
+        static IdentitySetting()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        static partial void ClassConstructing();
+        static partial void ClassConstructed();
+        public IdentitySetting()
+        {
+            Constructing();
+            Constructed();
+        }
+        partial void Constructing();
+        partial void Constructed();
+        public System.Int32 IdentityId
+        {
+            get;
+            set;
+        }
+        public System.String AppName
+        {
+            get;
+            set;
+        }
+        = nameof(QnSProjectAward);
+        public System.String Key
+        {
+            get;
+            set;
+        }
+        public System.String Value
+        {
+            get;
+            set;
+        }
+        = string.Empty;
+        public void CopyProperties(QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other)
+        {
+            if (other == null)
+            {
+                throw new System.ArgumentNullException(nameof(other));
+            }
+            bool handled = false;
+            BeforeCopyProperties(other, ref handled);
+            if (handled == false)
+            {
+                Id = other.Id;
+                IdentityId = other.IdentityId;
+                AppName = other.AppName;
+                Key = other.Key;
+                Value = other.Value;
+            }
+            AfterCopyProperties(other);
+        }
+        partial void BeforeCopyProperties(QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other, ref bool handled);
+        partial void AfterCopyProperties(QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other);
+        public override bool Equals(object obj)
+        {
+            if (obj is not QnSProjectAward.Contracts.Modules.Base.IIdentitySetting instance)
+            {
+                return false;
+            }
+            return base.Equals(instance) && Equals(instance);
+        }
+        protected bool Equals(QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return IdentityId == other.IdentityId && IsEqualsWith(AppName, other.AppName) && IsEqualsWith(Key, other.Key) && IsEqualsWith(Value, other.Value);
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdentityId, AppName, Key, Value);
+        }
+        public static Modules.Base.IdentitySetting Create()
+        {
+            BeforeCreate();
+            var result = new Modules.Base.IdentitySetting();
+            AfterCreate(result);
+            return result;
+        }
+        public static Modules.Base.IdentitySetting Create(object other)
+        {
+            BeforeCreate(other);
+            CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));
+            var result = new Modules.Base.IdentitySetting();
+            CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);
+            AfterCreate(result, other);
+            return result;
+        }
+        public static Modules.Base.IdentitySetting Create(QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other)
+        {
+            BeforeCreate(other);
+            var result = new Modules.Base.IdentitySetting();
+            result.CopyProperties(other);
+            AfterCreate(result, other);
+            return result;
+        }
+        static partial void BeforeCreate();
+        static partial void AfterCreate(Modules.Base.IdentitySetting instance);
+        static partial void BeforeCreate(object other);
+        static partial void AfterCreate(Modules.Base.IdentitySetting instance, object other);
+        static partial void BeforeCreate(QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other);
+        static partial void AfterCreate(Modules.Base.IdentitySetting instance, QnSProjectAward.Contracts.Modules.Base.IIdentitySetting other);
+    }
+}
 namespace QnSProjectAward.Logic.Entities.Modules.Language
 {
     partial class Translation : IdentityEntity

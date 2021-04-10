@@ -64,7 +64,7 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Configuration
 				entity.Value = item.Value;
 				result.Add(entity);
 			}
-			return result;
+			return result.OrderBy(e => e.Key);
 		}
 	}
 }

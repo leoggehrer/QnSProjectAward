@@ -10,7 +10,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
     public class DataAdapterAccess<TContract> : DataAccess<TContract>
 		where TContract : Contracts.IIdentifiable, Contracts.ICopyable<TContract>
 	{
-		public IAdapterAccess<TContract> AdapterAccess { get; init; }
+		protected IAdapterAccess<TContract> AdapterAccess { get; private set; }
 		public override string SessionToken 
 		{
 			set => AdapterAccess.SessionToken = value; 
@@ -81,6 +81,19 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 				result = result.Replace(tag.InnerText, tag.InnerText.ToLower());
 			}
 			return result;
+		}
+
+        protected override void Dispose(bool disposing)
+        {
+			if (disposing)
+            {
+				if (AdapterAccess != null)
+                {
+					AdapterAccess.Dispose();
+                }
+				AdapterAccess = null;
+            }
+			base.Dispose(disposing);
 		}
 	}
 }

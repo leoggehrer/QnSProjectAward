@@ -6,14 +6,14 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Language
 {
     partial class TranslationDataGridColumns
     {
-        protected override void InitDisplayProperties(DisplayPropertyContainer displayProperties)
+        protected override void InitDisplayInfoContainer(DisplayInfoContainer displayProperties)
         {
-            base.InitDisplayProperties(displayProperties);
+            base.InitDisplayInfoContainer(displayProperties);
 
-            displayProperties.Add(new DisplayProperty(nameof(Models.Persistence.Language.Translation.State))
+            displayProperties.AddOrSet(nameof(Models.Persistence.Language.Translation.State), dp =>
             {
-                Order = 1_000,
-                IsModelItem = true,
+                dp.IsModelItem = true;
+                dp.Order = 1_000;
             }); ;
         }
     }

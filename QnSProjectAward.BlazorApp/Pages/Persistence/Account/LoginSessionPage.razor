@@ -1,30 +1,48 @@
 @*@QnSGeneratedCode*@
-@page "/LoginSession"
-@inherits Pages.DataGridPage
-@using Radzen;
-@using TModel = QnSProjectAward.BlazorApp.Models.Persistence.Account.LoginSession;
+@page "/LoginSessions/{Mode}"
+@page "/LoginSessions/{Mode}/{Detail}/{Index:int}"
+@page "/LoginSessions/{Mode}/{Id:int}"
+@page "/LoginSessions/{Mode}/{Id:int}/{Detail}/{Index:int}"
+@using QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account;
+@using TMasterContract = QnSProjectAward.Contracts.Persistence.Account.ILoginSession;
+@using TMaster = QnSProjectAward.BlazorApp.Models.Persistence.Account.LoginSession;
+@inherits Pages.MasterDetailsPage<TMasterContract, TMaster>
 
-@if (MenuItems.Count > 0)
-{
-    <RadzenMenu Click="@(args => OnMenuItemClick(args))">
-        <RadzenMenuItem Text="@Translate(ComponentName)" Icon="grid_on" Style="z-index: 1000;">
-            @foreach (var item in MenuItems)
+@{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href=@($"{PageRoot}")>@Translate(PageRoot)</a></li>
+            <li class="breadcrumb-item"><a href=@($"{NewRef}")>@Translate(nameof(NewRef))</a></li>
+            @if (Id > 0)
             {
-                <RadzenMenuItem Text="@item.Text" Value="@item.Value" Path="@item.Path" Icon="@item.Icon"></RadzenMenuItem>
+                <li class="breadcrumb-item"><a href=@($"{ViewRef}")>@Translate(nameof(ViewRef))</a></li>
+                <li class="breadcrumb-item"><a href=@($"{EditRef}")>@Translate(nameof(EditRef))</a></li>
+                <li class="breadcrumb-item"><a href=@($"{DeleteRef}")>@Translate(nameof(DeleteRef))</a></li>
             }
-        </RadzenMenuItem>
-    </RadzenMenu>
-}
-else
-{
-    <h2>@Translate(ComponentName)</h2>
+            <li class="breadcrumb-item active" aria-current="page">@Translate(Mode)</li>
+        </ol>
+    </nav>
+    if (MenuItems.Count > 0)
+    {
+        <RadzenMenu Click="@(args => OnMenuItemClick(args))">
+            <RadzenMenuItem Text="@Translate(ComponentName)" Icon="grid_on" Style="z-index: 1000;">
+                @foreach (var item in MenuItems)
+                {
+                    <RadzenMenuItem Text="@item.Text" Value="@item.Value" Path="@item.Path" Icon="@item.Icon"></RadzenMenuItem>
+                }
+            </RadzenMenuItem>
+        </RadzenMenu>
+    }
 }
 
 @if (CanRender)
 {
-	<QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account.LoginSessionDataGrid DataGridHandler="DataGridHandler" />
+    <LoginSessionMasterComponent MasterDetailsPage=@this />
+    <hr />
+    <QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account.LoginSessionDetailsComponent MasterDetailsPage=@this />
 }
 else
 {
-	<QnSProjectAward.BlazorApp.Shared.Components.LoadingIndicator />
+    <QnSProjectAward.BlazorApp.Shared.Components.LoadingIndicator />
 }
+

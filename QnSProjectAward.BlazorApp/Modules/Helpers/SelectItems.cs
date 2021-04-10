@@ -37,6 +37,7 @@ namespace QnSProjectAward.BlazorApp.Modules.Helpers
                                 Text = toText != null ? toText(e) : e.ToString(),
                                 Selected = selector != null && selector.Invoke(e)
                             });
+
             AddRange(items.OrderBy(e => e.Text));
         }
     }

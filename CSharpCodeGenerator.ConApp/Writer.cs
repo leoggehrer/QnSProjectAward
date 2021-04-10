@@ -210,7 +210,7 @@ namespace CSharpCodeGenerator.ConApp
             }));
             tasks.Add(Task.Factory.StartNew(() =>
             {
-                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.BlazorApp && (e.ItemType & ItemType.EditFormAll) > 0);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.BlazorApp && (e.ItemType & ItemType.ComponentAll) > 0);
 
                 Console.WriteLine("Write BlazorApp-EditForm...");
                 WriteGeneratedItem(solutionPath, writeItems);
