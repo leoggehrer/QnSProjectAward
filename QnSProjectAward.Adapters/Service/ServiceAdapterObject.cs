@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace QnSProjectAward.Adapters.Service
 {
-    abstract partial class ServiceAdapterObject : IDisposable
+    public abstract partial class ServiceAdapterObject : IDisposable
     {
         static ServiceAdapterObject()
         {

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.Adapters.Service
 {
-    partial class InvokeServiceAdapter : ServiceAdapterObject
+    public partial class InvokeServiceAdapter : ServiceAdapterObject
     {
         static InvokeServiceAdapter()
         {
