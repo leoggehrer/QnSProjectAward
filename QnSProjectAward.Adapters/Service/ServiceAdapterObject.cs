@@ -35,7 +35,7 @@ namespace QnSProjectAward.Adapters.Service
         partial void Constructing();
         partial void Constructed();
 
-        protected static JsonSerializerOptions DeserializerOptions => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        protected static JsonSerializerOptions DeserializerOptions => new() { PropertyNameCaseInsensitive = true };
         /// <summary>
         /// The base url like https://localhost:5001/api
         /// </summary>
@@ -49,7 +49,7 @@ namespace QnSProjectAward.Adapters.Service
         protected static string MediaType => "application/json";
         protected static HttpClient CreateClient(string baseAddress, string sessionToken)
         {
-            HttpClient client = new HttpClient();
+            HttpClient client = new();
 
             if (baseAddress.HasContent())
             {
