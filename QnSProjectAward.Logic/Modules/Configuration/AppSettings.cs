@@ -53,6 +53,5 @@ namespace QnSProjectAward.Logic.Modules.Configuration
             return result;
         }
     }
-
 }
 //MdEnd

@@ -263,29 +263,9 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             }
         }
 
-        protected void ShowException(string title, System.Exception exception)
-        {
-            ShowError(title, GetExceptionError(exception));
-        }
-        protected void ShowError(string title, string message)
-        {
-            NotificationService.Notify(new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = Translate(title),
-                Detail = message,
-                Duration = 4000
-            });
-        }
         protected void ShowWarning(string title, string message)
         {
-            NotificationService.Notify(new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Warning,
-                Summary = Translate(title),
-                Detail = Translate(message),
-                Duration = 4000
-            });
+            ShowMessage(title, message, NotificationSeverity.Warning);
         }
 
         protected virtual TMaster ToModel(TMasterContract entity)

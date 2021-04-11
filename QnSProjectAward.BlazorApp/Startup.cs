@@ -39,6 +39,10 @@ namespace QnSProjectAward.BlazorApp
             services.AddScoped<IIdentitySettingService, IdentitySettingService>();
             services.AddScoped<ITranslatorService, TranslatorService>();
 
+            //services.AddScoped<AuthenticationStateProviderService>();
+            //services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<AuthenticationStateProviderService>());
+            //services.AddScoped<Modules.App.AppState>();
+
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
         }

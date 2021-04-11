@@ -111,6 +111,25 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             return errMsg;
         }
 
+        protected void ShowError(string title, string message)
+        {
+            ShowMessage(title, message, NotificationSeverity.Error);
+        }
+        protected void ShowException(string title, Exception exception)
+        {
+            ShowError(title, GetExceptionError(exception));
+        }
+        protected void ShowMessage(string title, string message, NotificationSeverity notificationSeverity)
+        {
+            NotificationService.Notify(new NotificationMessage()
+            {
+                Severity = notificationSeverity,
+                Summary = Translate(title),
+                Detail = message,
+                Duration = 4000
+            });
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

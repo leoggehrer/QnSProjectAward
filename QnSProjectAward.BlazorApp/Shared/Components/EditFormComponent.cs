@@ -94,21 +94,6 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 EditModel.CopyProperties(entity);
             }
         }
-
-        protected void ShowException(string title, System.Exception exception)
-        {
-            ShowError(title, GetExceptionError(exception));
-        }
-        protected void ShowError(string title, string message)
-        {
-            NotificationService.Notify(new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = Translate(title),
-                Detail = message,
-                Duration = 4000
-            });
-        }
     }
 }
 //MdEnd

@@ -65,13 +65,13 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             ItemToText = itemToText;
             ModelAssignment = modelAssignment;
 
-            DisplayComponent.InitDisplayPropertiesHandler += InitDisplayPropertiesHandler;
+            DisplayComponent.InitDisplayInfosHandler += InitDisplayInfosHandler;
             DisplayComponent.CreatedDisplayModelMemberHandler += CreatedDisplayModelMemberHandler;
             DisplayComponent.CreateEditModelMemberHandler += CreateEditModelMemberHandler;
             DataGridHandler.LoadModelDataHandler += LoadModelDataHandler;
         }
 
-        protected virtual void InitDisplayPropertiesHandler(object sender, DisplayInfoContainer e)
+        protected virtual void InitDisplayInfosHandler(object sender, DisplayInfoContainer e)
         {
             if (e.ContainsKey($"{typeof(TModel).Name}{ItemRefIdName}") == false)
             {
@@ -163,7 +163,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    DisplayComponent.InitDisplayPropertiesHandler -= InitDisplayPropertiesHandler;
+                    DisplayComponent.InitDisplayInfosHandler -= InitDisplayInfosHandler;
                     DisplayComponent.CreatedDisplayModelMemberHandler -= CreatedDisplayModelMemberHandler;
                     DisplayComponent.CreateEditModelMemberHandler -= CreateEditModelMemberHandler;
                     DisplayComponent = null;

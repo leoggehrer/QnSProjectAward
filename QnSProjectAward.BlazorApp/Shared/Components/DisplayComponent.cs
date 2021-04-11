@@ -5,6 +5,7 @@ using CommonBase.Extensions;
 using Microsoft.AspNetCore.Components;
 using QnSProjectAward.BlazorApp.Models;
 using QnSProjectAward.BlazorApp.Models.Modules.Form;
+using Radzen;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         protected DisplayInfoContainer DisplayInfos { get; } = new DisplayInfoContainer();
 
         #region EventHandler
-        public event EventHandler<DisplayInfoContainer> InitDisplayPropertiesHandler;
+        public event EventHandler<DisplayInfoContainer> InitDisplayInfosHandler;
 
         public event EventHandler<DisplayModelMemberInfo> CreateDisplayModelMemberHandler;
         public event EventHandler<DisplayModelMember> CreatedDisplayModelMemberHandler;
@@ -39,9 +40,9 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         partial void Constructing();
         partial void Constructed();
 
-        protected virtual void InitDisplayInfoContainer(DisplayInfoContainer displayProperties)
+        protected virtual void InitDisplayInfoContainer(DisplayInfoContainer displayInfos)
         {
-            displayProperties.AddOrSet(nameof(IdentityModel.Id), dp =>
+            displayInfos.AddOrSet(nameof(IdentityModel.Id), dp =>
             {
                 dp.ReadonlyMode = Models.Modules.Common.ReadonlyMode.Readonly;
                 dp.VisibilityMode = Models.Modules.Common.VisibilityMode.Hidden;
@@ -49,14 +50,14 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 dp.ListWidth = "100px";
                 dp.Order = 100;
             });
-            displayProperties.AddOrSet(nameof(IdentityModel.Cloneable), dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet(nameof(IdentityModel.CloneData), dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet(nameof(VersionModel.RowVersion), dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet(nameof(IdentityModel.Cloneable), dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet(nameof(IdentityModel.CloneData), dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet(nameof(VersionModel.RowVersion), dp => { dp.ScaffoldItem = false; });
 
-            displayProperties.AddOrSet("OneItem", dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet("OneModel", dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet("ManyItems", dp => { dp.ScaffoldItem = false; });
-            displayProperties.AddOrSet("ManyModels", dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet("OneItem", dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet("OneModel", dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet("ManyItems", dp => { dp.ScaffoldItem = false; });
+            displayInfos.AddOrSet("ManyModels", dp => { dp.ScaffoldItem = false; });
         }
 
         protected override void OnInitialized()
@@ -65,7 +66,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
 
             BeforeInitialized();
             InitDisplayInfoContainer(DisplayInfos);
-            InitDisplayPropertiesHandler?.Invoke(this, DisplayInfos);
+            InitDisplayInfosHandler?.Invoke(this, DisplayInfos);
             AfterInitialized();
         }
         protected virtual void BeforeInitialized()
@@ -75,12 +76,12 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         {
         }
 
-        public virtual IEnumerable<DisplayInfo> GetAllDisplayProperties()
+        public virtual IEnumerable<DisplayInfo> GetAllDisplayInfos()
         {
             var handled = false;
             var result = new List<DisplayInfo>();
 
-            BeforeGetAllDisplayProperties(result, ref handled);
+            BeforeGetAllDisplayInfos(result, ref handled);
             if (handled == false)
             {
                 foreach (var item in DisplayInfos)
@@ -89,16 +90,16 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 }
                 if (ParentComponent != null)
                 {
-                    result.AddRange(ParentComponent.GetAllDisplayProperties());
+                    result.AddRange(ParentComponent.GetAllDisplayInfos());
                 }
             }
-            AfterGetAllDisplayProperties(result);
+            AfterGetAllDisplayInfos(result);
             return result;
         }
-        partial void BeforeGetAllDisplayProperties(List<DisplayInfo> result, ref bool handled);
-        partial void AfterGetAllDisplayProperties(List<DisplayInfo> result);
+        partial void BeforeGetAllDisplayInfos(List<DisplayInfo> result, ref bool handled);
+        partial void AfterGetAllDisplayInfos(List<DisplayInfo> result);
 
-        public virtual DisplayInfo GetDisplayProperty(PropertyInfo propertyInfo)
+        public virtual DisplayInfo GetDisplayInfo(PropertyInfo propertyInfo)
         {
             propertyInfo.CheckArgument(nameof(propertyInfo));
 
@@ -109,7 +110,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             BeforeGetDisplayInfo(originName, ref result, ref handled);
             if (handled == false)
             {
-                result = ParentComponent?.GetDisplayProperty(propertyInfo);
+                result = ParentComponent?.GetDisplayInfo(propertyInfo);
                 if (result == default)
                 {
                     DisplayInfos.TryGetValue(originName, out result);
@@ -168,7 +169,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
                 }
                 else
                 {
-                    result = GetDisplayProperty(propertyInfo);
+                    result = GetDisplayInfo(propertyInfo);
                     if (result == null)
                     {
                         jsonValue = Settings.GetValue($"{propertyInfo.Name}", string.Empty);

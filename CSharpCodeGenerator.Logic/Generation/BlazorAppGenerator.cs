@@ -679,7 +679,7 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.Add("protected override Task OnFirstRenderAsync()");
             result.Add("{");
-            result.Add("DataGridHandler.ModelItems = DataGridHandler.ModelItems.Union(GetAllDisplayProperties().Where(e => e.ScaffoldItem && (e.VisibilityMode & Models.Modules.Common.VisibilityMode.ListView) > 0 && e.IsModelItem).Select(e => e.PropertyName)).Distinct().ToArray();");
+            result.Add("DataGridHandler.ModelItems = DataGridHandler.ModelItems.Union(GetAllDisplayInfos().Where(e => e.ScaffoldItem && (e.VisibilityMode & Models.Modules.Common.VisibilityMode.ListView) > 0 && e.IsModelItem).Select(e => e.PropertyName)).Distinct().ToArray();");
             result.Add("return base.OnFirstRenderAsync();");
             result.Add("}");
 

@@ -49,12 +49,12 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
             ItemToText = itemToText;
             ModelAssignment = modelAssignment;
 
-            DisplayComponent.InitDisplayPropertiesHandler += InitDisplayPropertiesHandler;
+            DisplayComponent.InitDisplayInfosHandler += InitDisplayInfosHandler;
             DisplayComponent.CreatedDisplayModelMemberHandler += CreatedDisplayModelMemberHandler;
             DisplayComponent.CreateEditModelMemberHandler += CreateEditModelMemberHandler;
         }
 
-        protected virtual void InitDisplayPropertiesHandler(object sender, DisplayInfoContainer e)
+        protected virtual void InitDisplayInfosHandler(object sender, DisplayInfoContainer e)
         {
         }
 
@@ -98,7 +98,7 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    DisplayComponent.InitDisplayPropertiesHandler -= InitDisplayPropertiesHandler;
+                    DisplayComponent.InitDisplayInfosHandler -= InitDisplayInfosHandler;
                     DisplayComponent.CreatedDisplayModelMemberHandler -= CreatedDisplayModelMemberHandler;
                     DisplayComponent.CreateEditModelMemberHandler -= CreateEditModelMemberHandler;
                     DisplayComponent = null;

@@ -296,8 +296,8 @@ namespace QnSProjectAward.Adapters.Service
             entity.CheckArgument(nameof(entity));
 
             using var client = GetClient(BaseUri);
-            string jsonData = JsonSerializer.Serialize(ToModel(entity));
-            StringContent contentData = new(jsonData, Encoding.UTF8, MediaType);
+            var jsonData = JsonSerializer.Serialize(ToModel(entity));
+            var contentData = new StringContent(jsonData, Encoding.UTF8, MediaType);
             HttpResponseMessage response = await client.PutAsync($"{ExtUri}", contentData).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
@@ -319,8 +319,8 @@ namespace QnSProjectAward.Adapters.Service
             entities.CheckArgument(nameof(entities));
 
             using var client = GetClient(BaseUri);
-            string jsonData = JsonSerializer.Serialize(ToModel(entities));
-            StringContent contentData = new StringContent(jsonData, Encoding.UTF8, MediaType);
+            var jsonData = JsonSerializer.Serialize(ToModel(entities));
+            var contentData = new StringContent(jsonData, Encoding.UTF8, MediaType);
             HttpResponseMessage response = await client.PutAsync($"{ExtUri}/Array", contentData).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
