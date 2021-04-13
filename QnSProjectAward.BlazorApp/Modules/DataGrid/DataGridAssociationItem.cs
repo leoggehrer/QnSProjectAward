@@ -98,7 +98,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 
                     if (refItem != null)
                     {
-                        ModelAssignment(model, refItem);
+                        ModelAssignment?.Invoke(model, refItem);
                     }
                 }
             }

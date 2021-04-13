@@ -262,11 +262,11 @@ namespace CSharpCodeGenerator.Logic.Helpers
                              .Select(e => e.Property);
         }
 
-        public IEnumerable<Type> GetMasterTypes(IEnumerable<Type> types)
+        public IEnumerable<Models.Relation> GetMasterTypes(IEnumerable<Type> types)
         {
             types.CheckArgument(nameof(types));
 
-            var result = new List<Type>();
+            var result = new List<Models.Relation>();
 
             foreach (var pi in GetAllProperties())
             {
@@ -279,7 +279,7 @@ namespace CSharpCodeGenerator.Logic.Helpers
 
                     if (masterReference != null)
                     {
-                        result.Add(masterReference);
+                        result.Add(new Models.Relation(masterReference, Type, pi));
                     }
                 }
                 else if ((idx = pi.Name.IndexOf("Id_")) > -1)
@@ -289,7 +289,7 @@ namespace CSharpCodeGenerator.Logic.Helpers
 
                     if (masterReference != null)
                     {
-                        result.Add(masterReference);
+                        result.Add(new Models.Relation(masterReference, Type, pi));
                     }
                 }
             }

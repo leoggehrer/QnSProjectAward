@@ -2,6 +2,7 @@
 //MdStart
 using CommonBase.Extensions;
 using QnSProjectAward.BlazorApp.Pages;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,13 +16,23 @@ namespace QnSProjectAward.BlazorApp.Modules.Helpers
         {
             get
             {
+                var result = items;
+
                 if (items == null)
                 {
                     using var access = ModelPage.CreateService<T>();
                     
-                    items = Task.Run(async () => await access.GetAllAsync().ConfigureAwait(false)).Result;
+                    if (ModelPage.AuthorizationSession != null)
+					{
+                        access.SessionToken = ModelPage.AuthorizationSession.Token;
+                        result = items = Task.Run(async () => await access.GetAllAsync().ConfigureAwait(false)).Result;
+                    }
+                    else
+					{
+                        result = Array.Empty<T>();
+					}
                 }
-                return items;
+                return result;
             }
         }
         private ModelPage ModelPage { get; init; }

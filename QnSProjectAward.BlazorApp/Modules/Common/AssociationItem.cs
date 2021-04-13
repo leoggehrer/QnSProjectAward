@@ -20,9 +20,7 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
         public ModelPage ModelPage { get; init; }
         public DisplayComponent DisplayComponent { get; private set; }
         public string ItemRefIdName { get; init; }
-        public Func<int, TModel, bool> Compare { get; init; }
-        public Func<TItem, string> ItemToText { get; init; }
-        public Action<TModel, TItem> ModelAssignment { get; init; }
+        public Func<TItem, string> ItemToText { get; set; }
         private ItemContainer<TItem> items = null;
 
         public IEnumerable<TItem> Items
@@ -36,18 +34,16 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
                 return items.Items;
             }
         }
-        public AssociationItem(ModelPage modelPage, DisplayComponent displayComponent, string itemRefIdName, Func<TItem, string> itemToText, Action<TModel, TItem> modelAssignment)
+        public AssociationItem(ModelPage modelPage, DisplayComponent displayComponent, string itemRefIdName, Func<TItem, string> itemToText)
         {
             modelPage.CheckArgument(nameof(modelPage));
             displayComponent.CheckArgument(nameof(displayComponent));
             itemToText.CheckArgument(nameof(itemToText));
-            modelAssignment.CheckArgument(nameof(modelAssignment));
 
             ModelPage = modelPage;
             DisplayComponent = displayComponent;
             ItemRefIdName = itemRefIdName;
             ItemToText = itemToText;
-            ModelAssignment = modelAssignment;
 
             DisplayComponent.InitDisplayInfosHandler += InitDisplayInfosHandler;
             DisplayComponent.CreatedDisplayModelMemberHandler += CreatedDisplayModelMemberHandler;
@@ -57,7 +53,6 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
         protected virtual void InitDisplayInfosHandler(object sender, DisplayInfoContainer e)
         {
         }
-
         protected void CreatedDisplayModelMemberHandler(object sender, DisplayModelMember modelMember)
         {
             if (modelMember.Name.Equals(ItemRefIdName))
@@ -70,7 +65,7 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
 
                     if (refItem != null)
                     {
-                        result = ItemToText(refItem);
+                        result = ItemToText?.Invoke(refItem);
                     }
                     return result;
                 };
@@ -84,7 +79,7 @@ namespace QnSProjectAward.BlazorApp.Modules.Common
                 var displayInfo = DisplayComponent.GetOrCreateDisplayInfo(memberInfo.Model.GetType(), memberInfo.Property);
 
                 memberInfo.Created = true;
-                memberInfo.ModelMember = new SelectEditMember<TItem>(ModelPage, memberInfo.Model, memberInfo.Property, displayInfo, Items, a => ItemToText(a), a => a.Id == refId.GetValueOrDefault());
+                memberInfo.ModelMember = new SelectEditMember<TItem>(ModelPage, memberInfo.Model, memberInfo.Property, displayInfo, Items, a => ItemToText?.Invoke(a), a => a.Id == refId.GetValueOrDefault());
             }
         }
 

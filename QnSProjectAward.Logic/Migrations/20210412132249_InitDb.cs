@@ -355,6 +355,7 @@ namespace QnSProjectAward.Logic.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     JurorId = table.Column<int>(type: "int", nullable: false),
+                    Category = table.Column<int>(type: "int", nullable: false),
                     Rate = table.Column<int>(type: "int", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },

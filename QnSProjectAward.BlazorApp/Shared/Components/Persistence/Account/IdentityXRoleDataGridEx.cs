@@ -9,18 +9,18 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
 {
     partial class IdentityXRoleDataGrid
     {
-        [DisposeField]
-        protected DataGridAssociationItem<TModel, IRole> associationRole;
-        [DisposeField]
-        protected DataGridAssociationItem<TModel, IIdentity> associationIdentity;
+        //[DisposeField]
+        //protected DataGridAssociationItem<TModel, IRole> associationRole;
+        //[DisposeField]
+        //protected DataGridAssociationItem<TModel, IIdentity> associationIdentity;
 
-        protected override void BeforeInitialized()
-        {
-            base.BeforeInitialized();
+        //protected override void BeforeInitialized()
+        //{
+        //    base.BeforeInitialized();
 
-            associationRole = new DataGridAssociationItem<TModel, IRole>(this, DataGridHandler, nameof(TModel.RoleId), i => i.Designation);
-            associationIdentity = new DataGridAssociationItem<TModel, IIdentity>(this, DataGridHandler, nameof(TModel.IdentityId), i => i.Name);
-        }
+        //    associationRole = new DataGridAssociationItem<TModel, IRole>(this, DataGridHandler, nameof(TModel.RoleId), i => i.Designation);
+        //    associationIdentity = new DataGridAssociationItem<TModel, IIdentity>(this, DataGridHandler, nameof(TModel.IdentityId), i => i.Name);
+        //}
     }
 }
 //MdEnd

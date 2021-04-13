@@ -14,7 +14,7 @@ namespace QnSProjectAward.BlazorApp.Pages
         public virtual Contracts.Client.IAdapterAccess<T> CreateService<T>()
             where T : Contracts.IIdentifiable
         {
-            return ServiceAdapter.Create<T>(AuthorizationSession.Token);
+            return ServiceAdapter.Create<T>();
         }
 
         public virtual void OnMenuItemClick(MenuItemEventArgs args)

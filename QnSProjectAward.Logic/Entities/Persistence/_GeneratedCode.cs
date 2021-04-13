@@ -1039,14 +1039,14 @@ namespace QnSProjectAward.Logic.Entities.Persistence.App
 {
     partial class Rating
     {
-        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("ProjectId")]
-        public QnSProjectAward.Logic.Entities.Persistence.App.Project Project
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("JurorId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Juror Juror
         {
             get;
             set;
         }
-        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("JurorId")]
-        public QnSProjectAward.Logic.Entities.Persistence.App.Juror Juror
+        [System.ComponentModel.DataAnnotations.Schema.ForeignKey("ProjectId")]
+        public QnSProjectAward.Logic.Entities.Persistence.App.Project Project
         {
             get;
             set;
@@ -1078,12 +1078,17 @@ namespace QnSProjectAward.Logic.Entities.Persistence.App
         }
         partial void Constructing();
         partial void Constructed();
+        public System.Int32 JurorId
+        {
+            get;
+            set;
+        }
         public System.Int32 ProjectId
         {
             get;
             set;
         }
-        public System.Int32 JurorId
+        public QnSProjectAward.Contracts.Modules.Common.RateCategory Category
         {
             get;
             set;
@@ -1105,8 +1110,9 @@ namespace QnSProjectAward.Logic.Entities.Persistence.App
             {
                 Id = other.Id;
                 RowVersion = other.RowVersion;
-                ProjectId = other.ProjectId;
                 JurorId = other.JurorId;
+                ProjectId = other.ProjectId;
+                Category = other.Category;
                 Rate = other.Rate;
             }
             AfterCopyProperties(other);
@@ -1127,11 +1133,11 @@ namespace QnSProjectAward.Logic.Entities.Persistence.App
             {
                 return false;
             }
-            return ProjectId == other.ProjectId && JurorId == other.JurorId && Rate == other.Rate;
+            return JurorId == other.JurorId && ProjectId == other.ProjectId && Category == other.Category && Rate == other.Rate;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(ProjectId, JurorId, Rate);
+            return HashCode.Combine(JurorId, ProjectId, Category, Rate);
         }
         public static Persistence.App.Rating Create()
         {

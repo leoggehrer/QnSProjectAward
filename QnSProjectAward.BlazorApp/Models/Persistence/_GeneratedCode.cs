@@ -865,12 +865,17 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
         }
         partial void Constructing();
         partial void Constructed();
+        public System.Int32 JurorId
+        {
+            get;
+            set;
+        }
         public System.Int32 ProjectId
         {
             get;
             set;
         }
-        public System.Int32 JurorId
+        public QnSProjectAward.Contracts.Modules.Common.RateCategory Category
         {
             get;
             set;
@@ -892,8 +897,9 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.App
             {
                 Id = other.Id;
                 RowVersion = other.RowVersion;
-                ProjectId = other.ProjectId;
                 JurorId = other.JurorId;
+                ProjectId = other.ProjectId;
+                Category = other.Category;
                 Rate = other.Rate;
             }
             AfterCopyProperties(other);

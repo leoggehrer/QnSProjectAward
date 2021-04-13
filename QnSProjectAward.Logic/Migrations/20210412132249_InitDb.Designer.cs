@@ -10,7 +10,7 @@ using QnSProjectAward.Logic.DataContext.Db;
 namespace QnSProjectAward.Logic.Migrations
 {
     [DbContext(typeof(QnSProjectAwardDbContext))]
-    [Migration("20210409213026_InitDb")]
+    [Migration("20210412132249_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -419,6 +419,9 @@ namespace QnSProjectAward.Logic.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
 
                     b.Property<int>("JurorId")
                         .HasColumnType("int");

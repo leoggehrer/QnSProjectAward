@@ -141,10 +141,10 @@ namespace CSharpCodeGenerator.Logic.Generation
                     var contractHelper = new ContractHelper(type);
                     var persistenceAndBusinessTypes = contractsProject.PersistenceTypes
                                                                       .Union(contractsProject.BusinessTypes);
-                    var relations = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
+                    var details = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
 
-                    result.Add(CreateMasterDetailsPageRazor(type, relations));
-                    result.Add(CreateMasterDetailsPageCode(type, relations));
+                    result.Add(CreateMasterDetailsPageRazor(type, details));
+                    result.Add(CreateMasterDetailsPageCode(type, details));
                 }
             }
             return result;
@@ -346,13 +346,17 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             var result = new List<Contracts.IGeneratedItem>();
             var contractsProject = ContractsProject.Create(SolutionProperties);
+            var contractHelper = new ContractHelper(type);
+            var persistenceAndBusinessTypes = contractsProject.PersistenceTypes
+                                                              .Union(contractsProject.BusinessTypes);
+            var masters = contractHelper.GetMasterTypes(persistenceAndBusinessTypes);
+            var details = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
 
             StartCreateDisplayComponent(type, typeLabel);
 
             result.Add(CreateDataGridHandlerCode(type));
-            result.Add(CreateDataGridComponentRazor(type));
-            result.Add(CreateDataGridComponentCode(type));
-            //result.Add(CreateDataGridComponentCommonCode(type));
+            result.Add(CreateDataGridComponentRazor(type, masters));
+            result.Add(CreateDataGridComponentCode(type, masters));
 
             result.Add(CreateDataGridColumnsComponentRazor(type));
             result.Add(CreateDataGridColumnsComponentCode(type));
@@ -367,16 +371,12 @@ namespace CSharpCodeGenerator.Logic.Generation
             //result.Add(CreateEditFieldSetDetailComponentRazor(type));
             //result.Add(CreateEditFieldSetDetailComponentCode(type));
 
-            result.Add(CreateMasterComponentRazor(type));
-            result.Add(CreateMasterComponentCode(type));
+            result.Add(CreateMasterComponentRazor(type, masters));
+            result.Add(CreateMasterComponentCode(type, masters));
 
-            var contractHelper = new ContractHelper(type);
-            var persistenceAndBusinessTypes = contractsProject.PersistenceTypes
-                                                              .Union(contractsProject.BusinessTypes);
-            var relations = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
 
-            result.Add(CreateDetailsComponentRazor(type, relations));
-            result.Add(CreateDetailsComponentCode(type, relations));
+            result.Add(CreateDetailsComponentRazor(type, details));
+            result.Add(CreateDetailsComponentCode(type, details));
 
             FinishCreateDisplayComponent(type, typeLabel);
             return result;
@@ -432,9 +432,10 @@ namespace CSharpCodeGenerator.Logic.Generation
         partial void StartCreateDataGridHandlerCode(Type type, List<string> lines);
         partial void FinishCreateDataGridHandlerCode(Type type, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateDataGridComponentRazor(Type type)
+        private Contracts.IGeneratedItem CreateDataGridComponentRazor(Type type, IEnumerable<Models.Relation> masters)
         {
             type.CheckArgument(nameof(type));
+            masters.CheckArgument(nameof(masters));
 
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
@@ -472,10 +473,12 @@ namespace CSharpCodeGenerator.Logic.Generation
         partial void StartCreateDataGridComponentRazor(Type type, List<string> lines);
         partial void FinishCreateDataGridComponentRazor(Type type, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateDataGridComponentCode(Type type)
+        private Contracts.IGeneratedItem CreateDataGridComponentCode(Type type, IEnumerable<Models.Relation> masters)
         {
             type.CheckArgument(nameof(type));
+            masters.CheckArgument(nameof(type));
 
+            var listMasters = new List<Models.Relation>(masters);
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
@@ -489,7 +492,8 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazorCode);
 
-            StartCreateDataGridComponentCode(type, result.Source);
+            StartCreateDataGridComponentCode(type, listMasters, result.Source);
+            result.Add("using CommonBase.Attributes;");
             result.Add("using Microsoft.AspNetCore.Components;");
             result.Add("using Radzen;");
             result.Add("using System.Linq;");
@@ -498,23 +502,57 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add($"using TModel = {entityFullName};");
 
             result.Add($"namespace {CreateComponentsNameSpace(type)}");
-            result.Add("{");
+            result.Add("{");    // open namespace
             result.Add($"partial class {entityName}DataGrid");
-            result.Add("{");
+            result.Add("{");    // open class
 
             result.Add("[Parameter]");
             result.Add($"public {entityName}DataGridHandler DataGridHandler" + " { get; set; }");
-
+            result.Add(string.Empty);
             result.Add($"public override string ForPrefix => \"{entityName}\";");
-            result.Add("}");
-            result.Add("}");
+            result.Add(string.Empty);
 
-            FinishCreateDataGridComponentCode(type, result.Source);
+            if (listMasters.Any())
+            {
+                foreach (var item in listMasters)
+                {
+                    var referenceEntityName = CreateEntityNameFromInterface(item.From);
+
+                    result.Add("[DisposeField]");
+                    result.Add($"protected Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}> association{referenceEntityName};");
+                }
+
+				result.Add(string.Empty);
+				result.Add("protected override void BeforeInitialized()");
+				result.Add("{");
+				result.Add("base.BeforeInitialized();");
+				result.Add("bool handled = false;");
+				result.Add("BeforeInitAssociations(ref handled);");
+				result.Add("if (handled == false)");
+				result.Add("{");
+				foreach (var item in listMasters)
+				{
+					var detailEntityName = CreateEntityNameFromInterface(item.From);
+
+					result.Add($"association{detailEntityName} = new Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}>(this, DataGridHandler, \"{item.Name}\", i =>i.ToString());");
+				}
+				result.Add("}");
+				result.Add("AfterInitAssosiations();");
+				result.Add("}");
+				result.Add(string.Empty);
+				result.Add("partial void BeforeInitAssociations(ref bool handled);");
+                result.Add("partial void AfterInitAssosiations();");
+            }
+
+            result.Add("}");    // close class
+            result.Add("}");    // close namespace
+
+            FinishCreateDataGridComponentCode(type, listMasters, result.Source);
             result.FormatCSharpCode();
             return result;
         }
-        partial void StartCreateDataGridComponentCode(Type type, List<string> lines);
-        partial void FinishCreateDataGridComponentCode(Type type, List<string> lines);
+        partial void StartCreateDataGridComponentCode(Type type, IEnumerable<Models.Relation> masterTypes, List<string> lines);
+        partial void FinishCreateDataGridComponentCode(Type type, IEnumerable<Models.Relation> masterTypes, List<string> lines);
 
         private Contracts.IGeneratedItem CreateDataGridDetailComponentRazor(Type type)
         {
@@ -936,10 +974,10 @@ namespace CSharpCodeGenerator.Logic.Generation
             }
             return result;
         }
-        private Contracts.IGeneratedItem CreateMasterDetailsPageRazor(Type type, IEnumerable<Models.Relation> relations)
+        private Contracts.IGeneratedItem CreateMasterDetailsPageRazor(Type type, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
-            relations.CheckArgument(nameof(relations));
+            details.CheckArgument(nameof(details));
 
             var subPath = CreateSubPathFromType(type);
             var subNamespace = CreateSubNamespaceFromType(type);
@@ -955,7 +993,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 FileExtension = PageExtension,
             };
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazor);
-            StartCreateMasterPageRazor(type, relations, result.Source);
+            StartCreateMasterPageRazor(type, details, result.Source);
 
             result.Add($"@page \"/{pluralPageName}" + "/{Mode}\"");
             result.Add($"@page \"/{pluralPageName}" + "/{Mode}/{Detail}/{Index:int}\"");
@@ -975,16 +1013,16 @@ namespace CSharpCodeGenerator.Logic.Generation
                                             .Select(l => l.Replace("TDetailsComponent", $"{componentNamespace}.{entityName}DetailsComponent")));
             result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
 
-            FinishCreateMasterPageRazor(type, relations, result.Source);
+            FinishCreateMasterPageRazor(type, details, result.Source);
             return result;
         }
         partial void StartCreateMasterPageRazor(Type type, IEnumerable<Models.Relation> detailTypes, List<string> lines);
         partial void FinishCreateMasterPageRazor(Type type, IEnumerable<Models.Relation> detailTypes, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateMasterDetailsPageCode(Type type, IEnumerable<Models.Relation> relations)
+        private Contracts.IGeneratedItem CreateMasterDetailsPageCode(Type type, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
-            relations.CheckArgument(nameof(relations));
+            details.CheckArgument(nameof(details));
 
             var customUsings = new List<string>();
             var customNamespaceCode = new List<string>();
@@ -1004,7 +1042,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazorCode);
 
-            StartCreateMasterPageCode(type, relations, result.Source);
+            StartCreateMasterPageCode(type, details, result.Source);
             if (File.Exists(filePathRazorCode))
             {
                 var fileCode = File.ReadAllText(filePathRazorCode, Encoding.Default);
@@ -1053,17 +1091,19 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("}");
             result.Add("}");
 
-            FinishCreateMasterPageCode(type, relations, result.Source);
+            FinishCreateMasterPageCode(type, details, result.Source);
             result.FormatCSharpCode();
             return result;
         }
         partial void StartCreateMasterPageCode(Type type, IEnumerable<Models.Relation> relations, List<string> lines);
         partial void FinishCreateMasterPageCode(Type type, IEnumerable<Models.Relation> relations, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateMasterComponentRazor(Type type)
+        private Contracts.IGeneratedItem CreateMasterComponentRazor(Type type, IEnumerable<Models.Relation> masters)
         {
             type.CheckArgument(nameof(type));
+            masters.CheckArgument(nameof(masters));
 
+            var listMasters = new List<Models.Relation>(masters);
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
@@ -1077,7 +1117,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazor);
 
-            StartCreateMasterComponentRazor(type, result.Source);
+            StartCreateMasterComponentRazor(type, listMasters, result.Source);
             result.Add($"@using TMasterContract = {type.FullName};");
             result.Add($"@using TMaster = {entityFullName};");
             result.Add("@using CommonBase.Extensions;");
@@ -1088,16 +1128,19 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
 
             result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
-            FinishCreateMasterComponentRazor(type, result.Source);
+            FinishCreateMasterComponentRazor(type, listMasters, result.Source);
             return result;
         }
-        partial void StartCreateMasterComponentRazor(Type type, List<string> lines);
-        partial void FinishCreateMasterComponentRazor(Type type, List<string> lines);
+        partial void StartCreateMasterComponentRazor(Type type, List<Models.Relation> masters, List<string> lines);
+        partial void FinishCreateMasterComponentRazor(Type type, List<Models.Relation> masters, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateMasterComponentCode(Type type)
+        private Contracts.IGeneratedItem CreateMasterComponentCode(Type type, IEnumerable<Models.Relation> masters)
         {
             type.CheckArgument(nameof(type));
+            masters.CheckArgument(nameof(masters));
 
+            var contractHelper = new ContractHelper(type);
+            var listMasters = new List<Models.Relation>(masters);
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
@@ -1111,7 +1154,8 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazorCode);
 
-            StartCreateMasterComponentCode(type, result.Source);
+            StartCreateMasterComponentCode(type, listMasters, result.Source);
+            result.Add("using CommonBase.Attributes;");
             result.Add("using Microsoft.AspNetCore.Components;");
             result.Add("using Radzen;");
             result.Add("using System.Linq;");
@@ -1129,22 +1173,52 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
 
+            if (listMasters.Any())
+            {
+                foreach (var item in listMasters)
+                {
+                    var referenceEntityName = CreateEntityNameFromInterface(item.From);
+
+                    result.Add("[DisposeField]");
+                    result.Add($"protected Modules.Common.AssociationItem<TMaster, {item.From.FullName}> association{referenceEntityName};");
+                }
+
+                result.Add("protected override void BeforeInitialized()");
+                result.Add("{");
+                result.Add("base.BeforeInitialized();");
+                result.Add("bool handled = false;");
+                result.Add("BeforeInitAssociations(ref handled);");
+                result.Add("if (handled == false)");
+                result.Add("{");
+                foreach (var item in listMasters)
+                {
+                    var referenceEntityName = CreateEntityNameFromInterface(item.From);
+
+                    result.Add($"association{referenceEntityName} = new Modules.Common.AssociationItem<TMaster, {item.From.FullName}>(MasterDetailsPage, this, \"{item.Name}\", i =>i.ToString());");
+                }
+                result.Add("}");
+                result.Add("AfterInitAssosiations();");
+                result.Add("}");
+                result.Add("partial void BeforeInitAssociations(ref bool handled);");
+                result.Add("partial void AfterInitAssosiations();");
+            }
+
             result.Add("}");
             result.Add("}");
 
-            FinishCreateMasterComponentCode(type, result.Source);
+            FinishCreateMasterComponentCode(type, listMasters, result.Source);
             result.FormatCSharpCode();
             return result;
         }
-        partial void StartCreateMasterComponentCode(Type type, List<string> lines);
-        partial void FinishCreateMasterComponentCode(Type type, List<string> lines);
+        partial void StartCreateMasterComponentCode(Type type, List<Models.Relation> masters, List<string> lines);
+        partial void FinishCreateMasterComponentCode(Type type, List<Models.Relation> masters, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateDetailsComponentRazor(Type type, IEnumerable<Models.Relation> relations)
+        private Contracts.IGeneratedItem CreateDetailsComponentRazor(Type type, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
-            relations.CheckArgument(nameof(relations));
+            details.CheckArgument(nameof(details));
 
-            var listRelations = new List<Models.Relation>(relations);
+            var listDetails = new List<Models.Relation>(details);
             var subPath = CreateSubPathFromType(type);
             var subNamespace = CreateSubNamespaceFromType(type);
             var projectPagePath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
@@ -1157,7 +1231,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 FileExtension = PageExtension,
             };
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazor);
-            StartCreateDetailsComponentRazor(type, listRelations, result.Source);
+            StartCreateDetailsComponentRazor(type, listDetails, result.Source);
 
             result.Add($"@using {SolutionProperties.BlazorAppProjectName}.Shared.Components;");
             result.Add($"@using TMasterContract = {type.FullName};");
@@ -1172,37 +1246,37 @@ namespace CSharpCodeGenerator.Logic.Generation
                                             .Select(l => l.Replace("TDetailsComponent", $"{entityName}Component")));
             result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
 
-            if (listRelations.Any())
+            if (listDetails.Any())
             {
                 var namespaceComponents = $"{SolutionProperties.BlazorAppProjectName}.Shared.Components";
 
                 result.Add("<RadzenTabs SelectedIndex=@SelectedIndex @ref=@RadzenTabs >");
                 result.Add("  <Tabs>");
-                foreach (var item in listRelations)
+                foreach (var item in listDetails)
                 {
                     var namespaceSub = CreateSubNamespaceFromType(item.To);
-                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+                    var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
-                    result.Add($"    <RadzenTabsItem Text=\"@TranslateFor(\"{detailEntityName}_{item.Name}\")\">");
-                    result.Add($"      <{namespaceComponents}.{namespaceSub}.{detailEntityName}DataGrid DataGridHandler={detailEntityName}DataGridHandler{item.Name} ParentComponent=@this />");
+                    result.Add($"    <RadzenTabsItem Text=\"@TranslateFor(\"{referenceEntityName}_{item.Name}\")\">");
+                    result.Add($"      <{namespaceComponents}.{namespaceSub}.{referenceEntityName}DataGrid DataGridHandler={referenceEntityName}DataGridHandler{item.Name} ParentComponent=@this />");
                     result.Add("    </RadzenTabsItem>");
                 }
                 result.Add("  </Tabs>");
                 result.Add("</RadzenTabs>");
             }
 
-            FinishCreateDetailsComponentRazor(type, listRelations, result.Source);
+            FinishCreateDetailsComponentRazor(type, listDetails, result.Source);
             return result;
         }
-        partial void StartCreateDetailsComponentRazor(Type type, List<Models.Relation> relations, List<string> lines);
-        partial void FinishCreateDetailsComponentRazor(Type type, List<Models.Relation> relations, List<string> lines);
+        partial void StartCreateDetailsComponentRazor(Type type, List<Models.Relation> details, List<string> lines);
+        partial void FinishCreateDetailsComponentRazor(Type type, List<Models.Relation> details, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateDetailsComponentCode(Type type, IEnumerable<Models.Relation> relations)
+        private Contracts.IGeneratedItem CreateDetailsComponentCode(Type type, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
-            relations.CheckArgument(nameof(relations));
+            details.CheckArgument(nameof(details));
 
-            var listRelations = new List<Models.Relation>(relations);
+            var listDetails = new List<Models.Relation>(details);
             var customUsings = new List<string>();
             var customNamespaceCode = new List<string>();
             var customClassCode = new List<string>();
@@ -1220,7 +1294,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazorCode);
 
-            StartCreateDetailsComponentCode(type, listRelations, result.Source);
+            StartCreateDetailsComponentCode(type, listDetails, result.Source);
             if (File.Exists(filePathRazorCode))
             {
                 var fileCode = File.ReadAllText(filePathRazorCode, Encoding.Default);
@@ -1264,18 +1338,18 @@ namespace CSharpCodeGenerator.Logic.Generation
 
             result.Add(string.Empty);
 
-            if (listRelations.Any())
+            if (listDetails.Any())
             {
-                foreach (var item in listRelations)
+                foreach (var item in listDetails)
                 {
-                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+                    var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
-                    result.Add($"protected {CreateComponentsNameSpace(item.To)}.{detailEntityName}DataGridHandler {detailEntityName}DataGridHandler{item.Name}" + "{ get; private set; }");
+                    result.Add($"protected {CreateComponentsNameSpace(item.To)}.{referenceEntityName}DataGridHandler {referenceEntityName}DataGridHandler{item.Name}" + "{ get; private set; }");
                 }
 
                 result.Add("protected override Task InitializeParametersAsync()");
                 result.Add("{");
-                foreach (var item in listRelations)
+                foreach (var item in listDetails)
                 {
                     var detailEntityName = CreateEntityNameFromInterface(item.To);
                     var dataGridHandler = $"{detailEntityName}DataGridHandler{item.Name}";
@@ -1290,25 +1364,24 @@ namespace CSharpCodeGenerator.Logic.Generation
                 result.Add("{");
                 result.Add("base.BeforeInitialized();");
 
-                foreach (var item in listRelations)
+                foreach (var item in listDetails)
                 {
-                    var detailEntityName = CreateEntityNameFromInterface(item.To);
+                    var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
-                    result.Add($"{detailEntityName}DataGridHandler{item.Name} = new {CreateComponentsNameSpace(item.To)}.{detailEntityName}DataGridHandler(MasterDetailsPage);");
-                    result.Add($"InitDataGridHandler({detailEntityName}DataGridHandler{item.Name}, \"{detailEntityName}\");");
+                    result.Add($"{referenceEntityName}DataGridHandler{item.Name} = new {CreateComponentsNameSpace(item.To)}.{referenceEntityName}DataGridHandler(MasterDetailsPage);");
+                    result.Add($"InitDataGridHandler({referenceEntityName}DataGridHandler{item.Name}, \"{referenceEntityName}\");");
                     result.Add(string.Empty);
-                    result.Add($"{detailEntityName}DataGridHandler{item.Name}.BeforeLoadDataHandler += {detailEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler;");
-                    result.Add($"{detailEntityName}DataGridHandler{item.Name}.AfterCreateModelHandler += {detailEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler;");
+                    result.Add($"{referenceEntityName}DataGridHandler{item.Name}.BeforeLoadDataHandler += {referenceEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler;");
+                    result.Add($"{referenceEntityName}DataGridHandler{item.Name}.AfterCreateModelHandler += {referenceEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler;");
                 }
                 result.Add("}");
                 result.Add(string.Empty);
 
-                foreach (var item in listRelations)
+                foreach (var item in listDetails)
                 {
-                    var detailEntityName = CreateEntityNameFromInterface(item.To);
-                    var namespaceModel = CreateModelsNamespace(item.To);
+                    var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
-                    result.Add($"private void {detailEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler(object sender, LoadDataArgs e)");
+                    result.Add($"private void {referenceEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler(object sender, LoadDataArgs e)");
                     result.Add("{");
                     result.Add("if (sender is Modules.DataGrid.IDataGridBase dataGridHandler)");
                     result.Add("{");
@@ -1317,12 +1390,12 @@ namespace CSharpCodeGenerator.Logic.Generation
                     result.Add("}");
                 }
 
-                foreach (var item in listRelations)
+                foreach (var item in listDetails)
                 {
-                    var detailEntityName = CreateEntityNameFromInterface(item.To);
                     var namespaceModel = CreateModelsNamespace(item.To);
+                    var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
-                    result.Add($"private void {detailEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler(object sender, {namespaceModel}.{detailEntityName} model)");
+                    result.Add($"private void {referenceEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler(object sender, {namespaceModel}.{referenceEntityName} model)");
                     result.Add("{");
                     result.Add("if (sender is Modules.DataGrid.IDataGridBase)");
                     result.Add("{");
@@ -1347,12 +1420,12 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("}");
             result.Add("}");
 
-            FinishCreateDetailsComponentCode(type, listRelations, result.Source);
+            FinishCreateDetailsComponentCode(type, listDetails, result.Source);
             result.FormatCSharpCode();
             return result;
         }
-        partial void StartCreateDetailsComponentCode(Type type, List<Models.Relation> relations, List<string> lines);
-        partial void FinishCreateDetailsComponentCode(Type type, List<Models.Relation> relations, List<string> lines);
+        partial void StartCreateDetailsComponentCode(Type type, List<Models.Relation> details, List<string> lines);
+        partial void FinishCreateDetailsComponentCode(Type type, List<Models.Relation> details, List<string> lines);
         #endregion Master details generation
     }
 }

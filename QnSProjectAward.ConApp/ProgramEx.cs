@@ -16,11 +16,20 @@ namespace QnSProjectAward.ConApp
 
         static async partial void EndExecuteMain()
         {
+            var jury = new List<IJuror>();
+            var projects = new List<IProject>();
+            var members = new List<IMember>();
+            var ratings = new List<IRating>();
             var award = await ImportAwardAsync();
 
-            await ImportJuryAsync(award);
-            await ImportProgramAsync(award);
+            jury.AddRange(await ImportJuryAsync(award));
+            projects.AddRange(await ImportProgramAsync(award, members));
+            ratings.AddRange(await ImportEvaluationAsync(jury, projects));
+
             WriteProgramToCsv("Programm.csv");
+            WriteEmailJury("EmailJury.txt", jury);
+            WriteEmailMembers("EmailMembers.txt", members);
+            WriteEvaluationTableToCsv("EvaluationTable.csv", jury, projects);
         }
 
         static void WriteProgramToCsv(string fileName)
@@ -36,7 +45,54 @@ namespace QnSProjectAward.ConApp
             }
             File.WriteAllLines(Path.Combine(PAPath, fileName), lines.ToArray(), System.Text.Encoding.UTF8);
         }
+        static void WriteEvaluationTableToCsv(string fileName, IEnumerable<IJuror> jury, IEnumerable<IProject> projects)
+        {
+            var lines = new List<string>();
 
+            foreach (var juror in jury)
+            {
+                foreach (var project in projects)
+                {
+                    lines.Add($"{juror.Name};{project.Title};Best Of Project;");
+                    lines.Add($"{juror.Name};{project.Title};Best Of Business;");
+                    lines.Add($"{juror.Name};{project.Title};Best Of Innovation;");
+                    lines.Add(";;;");
+                }
+            }
+            File.WriteAllLines(Path.Combine(PAPath, fileName), lines.ToArray(), System.Text.Encoding.UTF8);
+        }
+        static void WriteEmailJury(string fileName, IEnumerable<IJuror> jury)
+        {
+            var line = string.Empty;
+
+            foreach (var item in jury)
+            {
+                if (item.Email != null && item.Email.Equals("---") == false)
+                {
+                    if (line.Length > 0)
+                        line += ";";
+
+                    line += item.Email;
+                }
+            }
+            File.WriteAllText(Path.Combine(PAPath, fileName), line, System.Text.Encoding.UTF8);
+        }
+        static void WriteEmailMembers(string fileName, IEnumerable<IMember> members)
+        {
+            var line = string.Empty;
+
+            foreach (var item in members)
+            {
+                if (item.Email != null && item.Email.Equals("---") == false)
+                {
+                    if (line.Length > 0)
+                        line += ";";
+
+                    line += item.Email;
+                }
+            }
+            File.WriteAllText(Path.Combine(PAPath, fileName), line, System.Text.Encoding.UTF8);
+        }
         static async Task<IAward> ImportAwardAsync()
         {
             var accMngr = new AccountManager();
@@ -57,8 +113,9 @@ namespace QnSProjectAward.ConApp
             return entity;
         }
 
-        static async Task ImportJuryAsync(IAward award)
+        static async Task<IEnumerable<IJuror>> ImportJuryAsync(IAward award)
         {
+            var result = new List<IJuror>();
             var accMngr = new AccountManager();
             var login = await accMngr.LogonAsync(SaEmail, SaPwd, string.Empty).ConfigureAwait(false);
             string filePath = Path.Combine(PAPath, JuryFolder, "Jurylist.txt");
@@ -75,15 +132,20 @@ namespace QnSProjectAward.ConApp
                 entity.Institution = lines[i++];
                 entity.Email = lines[i++];
                 entity = await adapter.InsertAsync(entity);
+                result.Add(entity);
             }
             await accMngr.LogoutAsync(login.SessionToken).ConfigureAwait(false);
+            return result;
         }
-        static async Task ImportProgramAsync(IAward award)
+        static async Task<IEnumerable<IProject>> ImportProgramAsync(IAward award, List<IMember> members)
         {
+            var result = new List<IProject>();
             var accMngr = new AccountManager();
             var login = await accMngr.LogonAsync(SaEmail, SaPwd, string.Empty).ConfigureAwait(false);
             string filePath = Path.Combine(PAPath, ProgramFolder);
             using var adapter = Adapters.Factory.Create<IProject>(login.SessionToken);
+
+            members ??= new List<IMember>();
 
             foreach (var item in new DirectoryInfo(filePath).GetDirectories())
             {
@@ -104,19 +166,21 @@ namespace QnSProjectAward.ConApp
                     entity.Description = File.Exists(fileDescription) ? File.ReadAllText(fileDescription) : "No description";
                     entity.Logo = File.Exists(fileLogo) ? File.ReadAllBytes(fileLogo) : null;
                     entity = await adapter.InsertAsync(entity);
+                    result.Add(entity);
 
                     if (File.Exists(fileMembers))
                     {
-                        await ImportMembersAsync(login.SessionToken, entity, fileMembers);
+                        members.AddRange(await ImportMembersAsync(login.SessionToken, entity, fileMembers));
                     }
                 }
             }
             await accMngr.LogoutAsync(login.SessionToken).ConfigureAwait(false);
+            return result;
         }
-        static async Task ImportMembersAsync(string token, IProject project, string filePath)
+        static async Task<IEnumerable<IMember>> ImportMembersAsync(string token, IProject project, string filePath)
         {
+            var result = new List<IMember>();
             var accMngr = new AccountManager();
-            var login = await accMngr.LogonAsync(SaEmail, SaPwd, string.Empty).ConfigureAwait(false);
             using var adapter = Adapters.Factory.Create<IMember>(token);
             var lines = File.ReadAllLines(filePath).Where(l => string.IsNullOrEmpty(l) == false).ToArray();
 
@@ -125,13 +189,57 @@ namespace QnSProjectAward.ConApp
                 var entity = await adapter.CreateAsync();
 
                 entity.ProjectId = project.Id;
-                entity.Course = lines[i++];
-                entity.Role = lines[i++];
-                entity.Name = lines[i++];
-                entity.Email = lines[i++];
-                entity.Phone = lines[i++];
+                entity.Course = lines[i++].Trim();
+                entity.Role = lines[i++].Trim();
+                entity.Name = lines[i++].Trim();
+                entity.Email = lines[i++].Trim();
+                entity.Phone = lines[i++].Trim();
                 entity = await adapter.InsertAsync(entity);
+                result.Add(entity);
             }
+            return result;
+        }
+        static async Task<IEnumerable<IRating>> ImportEvaluationAsync(IEnumerable<IJuror> jury, IEnumerable<IProject> projects)
+        {
+            var result = new List<IRating>();
+            var accMngr = new AccountManager();
+            var login = await accMngr.LogonAsync(SaEmail, SaPwd, string.Empty).ConfigureAwait(false);
+            using var adapter = Adapters.Factory.Create<IRating>(login.SessionToken);
+
+            foreach (var juror in jury)
+            {
+                foreach (var project in projects)
+                {
+                    var entity = await adapter.CreateAsync();
+
+                    entity.JurorId = juror.Id;
+                    entity.ProjectId = project.Id;
+                    entity.Category = Contracts.Modules.Common.RateCategory.BestOfProject;
+                    entity.Rate = Contracts.Modules.Common.Rate.Undefined;
+                    entity = await adapter.InsertAsync(entity);
+                    result.Add(entity);
+
+                    entity = await adapter.CreateAsync();
+
+                    entity.JurorId = juror.Id;
+                    entity.ProjectId = project.Id;
+                    entity.Category = Contracts.Modules.Common.RateCategory.BestOfBusiness;
+                    entity.Rate = Contracts.Modules.Common.Rate.Undefined;
+                    entity = await adapter.InsertAsync(entity);
+                    result.Add(entity);
+
+                    entity = await adapter.CreateAsync();
+
+                    entity.JurorId = juror.Id;
+                    entity.ProjectId = project.Id;
+                    entity.Category = Contracts.Modules.Common.RateCategory.BestOfInnovation;
+                    entity.Rate = Contracts.Modules.Common.Rate.Undefined;
+                    entity = await adapter.InsertAsync(entity);
+                    result.Add(entity);
+                }
+            }
+            await accMngr.LogoutAsync(login.SessionToken).ConfigureAwait(false);
+            return result;
         }
     }
 }

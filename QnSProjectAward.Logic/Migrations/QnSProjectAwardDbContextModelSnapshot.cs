@@ -418,6 +418,9 @@ namespace QnSProjectAward.Logic.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
                     b.Property<int>("JurorId")
                         .HasColumnType("int");
 
