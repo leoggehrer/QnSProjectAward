@@ -15,6 +15,10 @@ namespace QnSProjectAward.Logic.Entities.Persistence.Account
             PasswordHash = identity.PasswordHash;
             PasswordSalt = identity.PasswordSalt;
         }
+        public override string ToString()
+        {
+            return $"{Name}";
+        }
     }
 }
 //MdEnd

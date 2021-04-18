@@ -18,7 +18,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
         }
         public override string ForPrefix => "LoginSession";
         [DisposeField]
-        protected Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity> associationIdentity;
+        protected Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity> dgaiIdentitiesByIdentityId;
         protected override void BeforeInitialized()
         {
             base.BeforeInitialized();
@@ -26,7 +26,7 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
             BeforeInitAssociations(ref handled);
             if (handled == false)
             {
-                associationIdentity = new Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity>(this, DataGridHandler, "IdentityId", i =>i.ToString());
+                dgaiIdentitiesByIdentityId = new Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity>(this, DataGridHandler, "IdentityId", i =>i.ToString());
             }
             AfterInitAssosiations();
         }

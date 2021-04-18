@@ -121,6 +121,16 @@ namespace CSharpCodeGenerator.Logic.Generation
                     result.AddRange(CreateDataGridPage(type, StaticLiterals.BusinessLabel));
                     result.AddRange(CreateDisplayComponents(type, StaticLiterals.BusinessLabel));
                 }
+                if (CanCreateMasterPage(type))
+                {
+                    var contractHelper = new ContractHelper(type);
+                    var persistenceAndBusinessTypes = contractsProject.PersistenceTypes
+                                                                      .Union(contractsProject.BusinessTypes);
+                    var details = contractHelper.GetDetailTypes(persistenceAndBusinessTypes);
+
+                    result.Add(CreateMasterDetailsPageRazor(type, details));
+                    result.Add(CreateMasterDetailsPageCode(type, details));
+                }
             }
             return result;
         }
@@ -190,7 +200,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
             var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
-            var pluralPageName = CreatePluralWord(entityName);
+            var pluralPageName = entityName.CreatePluralWord();
             var fileNameRazor = $"{entityName}{DataGridPagePostfix}{PageExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridRazorPage)
             {
@@ -242,7 +252,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
             var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
-            var pluralPageName = CreatePluralWord(entityName);
+            var pluralPageName = entityName.CreatePluralWord();
             var fileNameRazor = $"{entityName}{DataGridPagePostfix}{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
@@ -519,7 +529,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                     var referenceEntityName = CreateEntityNameFromInterface(item.From);
 
                     result.Add("[DisposeField]");
-                    result.Add($"protected Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}> association{referenceEntityName};");
+                    result.Add($"protected Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}> dgai{referenceEntityName.CreatePluralWord()}By{item.Name};");
                 }
 
 				result.Add(string.Empty);
@@ -534,7 +544,7 @@ namespace CSharpCodeGenerator.Logic.Generation
 				{
 					var detailEntityName = CreateEntityNameFromInterface(item.From);
 
-					result.Add($"association{detailEntityName} = new Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}>(this, DataGridHandler, \"{item.Name}\", i =>i.ToString());");
+					result.Add($"dgai{detailEntityName.CreatePluralWord()}By{item.Name} = new Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}>(this, DataGridHandler, \"{item.Name}\", i =>i.ToString());");
 				}
 				result.Add("}");
 				result.Add("AfterInitAssosiations();");
@@ -956,24 +966,6 @@ namespace CSharpCodeGenerator.Logic.Generation
         #endregion FieldSet component generation
 
         #region Master details generation
-        private static string CreatePluralWord(string wordInSingular)
-        {
-            string result;
-
-            if (wordInSingular.EndsWith("y"))
-            {
-                result = $"{wordInSingular[0..^1]}ies";
-            }
-            else if (wordInSingular.EndsWith("s"))
-            {
-                result = $"{wordInSingular}es";
-            }
-            else
-            {
-                result = $"{wordInSingular}s";
-            }
-            return result;
-        }
         private Contracts.IGeneratedItem CreateMasterDetailsPageRazor(Type type, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
@@ -985,7 +977,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
             var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
-            var pluralPageName = CreatePluralWord(entityName);
+            var pluralPageName = entityName.CreatePluralWord();
             var fileNameRazor = $"{entityName}{PagePostfix}{PageExtension}";
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.MasterDetailsRazorPage)
             {
@@ -1031,7 +1023,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var projectPagePath = Path.Combine(ProjectName, PagesFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
             var entityFullName = $"{CreateModelsNamespace(type)}.{entityName}";
-            var pluralPageName = CreatePluralWord(entityName);
+            var pluralPageName = entityName.CreatePluralWord();
             var fileNameRazor = $"{entityName}{PagePostfix}{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
@@ -1180,7 +1172,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                     var referenceEntityName = CreateEntityNameFromInterface(item.From);
 
                     result.Add("[DisposeField]");
-                    result.Add($"protected Modules.Common.AssociationItem<TMaster, {item.From.FullName}> association{referenceEntityName};");
+                    result.Add($"protected Modules.Common.AssociationItem<TMaster, {item.From.FullName}> ai{referenceEntityName.CreatePluralWord()}By{item.Name};");
                 }
 
                 result.Add("protected override void BeforeInitialized()");
@@ -1194,7 +1186,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 {
                     var referenceEntityName = CreateEntityNameFromInterface(item.From);
 
-                    result.Add($"association{referenceEntityName} = new Modules.Common.AssociationItem<TMaster, {item.From.FullName}>(MasterDetailsPage, this, \"{item.Name}\", i =>i.ToString());");
+                    result.Add($"ai{referenceEntityName.CreatePluralWord()}By{item.Name} = new Modules.Common.AssociationItem<TMaster, {item.From.FullName}>(MasterDetailsPage, this, \"{item.Name}\", i =>i.ToString());");
                 }
                 result.Add("}");
                 result.Add("AfterInitAssosiations();");
@@ -1257,7 +1249,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                     var namespaceSub = CreateSubNamespaceFromType(item.To);
                     var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
-                    result.Add($"    <RadzenTabsItem Text=\"@TranslateFor(\"{referenceEntityName}_{item.Name}\")\">");
+                    result.Add($"    <RadzenTabsItem Text=\"@Translate(\"{referenceEntityName.CreatePluralWord()}By{item.Name}\")\">");
                     result.Add($"      <{namespaceComponents}.{namespaceSub}.{referenceEntityName}DataGrid DataGridHandler={referenceEntityName}DataGridHandler{item.Name} ParentComponent=@this />");
                     result.Add("    </RadzenTabsItem>");
                 }

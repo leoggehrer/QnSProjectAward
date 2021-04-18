@@ -267,8 +267,20 @@ namespace CSharpCodeGenerator.Logic.Helpers
             types.CheckArgument(nameof(types));
 
             var result = new List<Models.Relation>();
+            IEnumerable<PropertyInfo> properties;
 
-            foreach (var pi in GetAllProperties())
+            if (IsOneToMany)
+            {
+                var (one, _) = GetOneToManyTypes(Type);
+
+                properties = GetAllProperties(one);
+            }
+            else
+            {
+                properties = GetAllProperties();
+            }
+
+            foreach (var pi in properties)
             {
                 int idx;
 
@@ -300,6 +312,14 @@ namespace CSharpCodeGenerator.Logic.Helpers
             types.CheckArgument(nameof(types));
 
             var result = new List<Models.Relation>();
+            var entityName = EntityName;
+
+            if (IsOneToMany)
+            {
+                var (one, _) = GetOneToManyTypes(Type);
+
+                entityName = GeneratorObject.CreateEntityNameFromInterface(one);
+            }
 
             foreach (var other in types)
             {
@@ -307,11 +327,11 @@ namespace CSharpCodeGenerator.Logic.Helpers
 
                 foreach (var pi in otherHelper.GetAllProperties())
                 {
-                    if (pi.Name.Equals($"{EntityName}Id"))
+                    if (pi.Name.Equals($"{entityName}Id"))
                     {
                         result.Add(new Models.Relation(Type, other, pi));
                     }
-                    else if (pi.Name.StartsWith($"{EntityName}Id_"))
+                    else if (pi.Name.StartsWith($"{entityName}Id_"))
                     {
                         result.Add(new Models.Relation(Type, other, pi));
                     }

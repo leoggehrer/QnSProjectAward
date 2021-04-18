@@ -18,9 +18,9 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
         }
         public override string ForPrefix => "IdentityXRole";
         [DisposeField]
-        protected Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity> associationIdentity;
+        protected Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity> dgaiIdentitiesByIdentityId;
         [DisposeField]
-        protected Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IRole> associationRole;
+        protected Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IRole> dgaiRolesByRoleId;
         protected override void BeforeInitialized()
         {
             base.BeforeInitialized();
@@ -28,8 +28,8 @@ namespace QnSProjectAward.BlazorApp.Shared.Components.Persistence.Account
             BeforeInitAssociations(ref handled);
             if (handled == false)
             {
-                associationIdentity = new Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity>(this, DataGridHandler, "IdentityId", i =>i.ToString());
-                associationRole = new Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IRole>(this, DataGridHandler, "RoleId", i =>i.ToString());
+                dgaiIdentitiesByIdentityId = new Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IIdentity>(this, DataGridHandler, "IdentityId", i =>i.ToString());
+                dgaiRolesByRoleId = new Modules.DataGrid.DataGridAssociationItem<TModel, QnSProjectAward.Contracts.Persistence.Account.IRole>(this, DataGridHandler, "RoleId", i =>i.ToString());
             }
             AfterInitAssosiations();
         }

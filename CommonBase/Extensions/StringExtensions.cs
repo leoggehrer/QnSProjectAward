@@ -795,7 +795,7 @@ namespace CommonBase.Extensions
             return result;
         }
 
-        public static byte[] ConvertToByteArray(this string source)
+        public static byte[] ToByteArray(this string source)
         {
             byte[] result = null;
 
@@ -851,6 +851,28 @@ namespace CommonBase.Extensions
                 result = srDecrypt.ReadToEnd();
             }
 
+            return result;
+        }
+
+        public static string CreatePluralWord(this string wordInSingular)
+        {
+            string result = null;
+
+            if (wordInSingular != null)
+            {
+                if (wordInSingular.EndsWith("y"))
+                {
+                    result = $"{wordInSingular[0..^1]}ies";
+                }
+                else if (wordInSingular.EndsWith("s"))
+                {
+                    result = $"{wordInSingular}es";
+                }
+                else
+                {
+                    result = $"{wordInSingular}s";
+                }
+            }
             return result;
         }
     }

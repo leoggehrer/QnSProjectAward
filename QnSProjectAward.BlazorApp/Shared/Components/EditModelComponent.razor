@@ -3,7 +3,7 @@
 @inherits DisplayComponent
 
 @{
-    if (Model.Cloneable && Cloneable)
+    if (Model != null && Model.Cloneable && Cloneable)
     {
         <div class="row justify-content-end">
             <RadzenLabel Text="@TranslateFor(nameof(Model.CloneData))" />

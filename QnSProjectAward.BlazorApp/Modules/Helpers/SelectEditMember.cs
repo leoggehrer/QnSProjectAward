@@ -36,9 +36,13 @@ namespace QnSProjectAward.BlazorApp.Modules.Helpers
                     {
                         EditValue = null;
                     }
-                    else
+                    else if (selectItems.Any())
                     {
                         EditValue = selectItems.ElementAt(0).Value;
+                    }
+                    else
+                    {
+                        EditValue = null;
                     }
                 }
             }
@@ -71,9 +75,13 @@ namespace QnSProjectAward.BlazorApp.Modules.Helpers
                     {
                         EditValue = null;
                     }
-                    else
+                    else if (selectItems.Any())
                     {
                         EditValue = selectItems.ElementAt(0).Value;
+                    }
+                    else
+                    {
+                        EditValue = null;
                     }
                 }
             }

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 {
-	public partial class DataGridHandler<TContract, TModel> : ComponentHandler, IDisposable, IDataGridHandler<TModel>
+    public partial class DataGridHandler<TContract, TModel> : ComponentHandler, IDisposable, IDataGridHandler<TModel>
         where TContract : Contracts.IIdentifiable, Contracts.ICopyable<TContract>
         where TModel : IdentityModel, TContract, new()
     {
@@ -54,11 +54,16 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         private bool allowEdit = true;
         private bool allowDelete = true;
         private bool allowInlineEdit = true;
+        private string[] modelItems = null;
+        private DataAccess<TContract> dataAccess;
+        private volatile bool loadDataActive = false;
+        private bool hasFieldChanged;
+        private bool disposedValue;
         #endregion Fields
+
         public RadzenGrid<TModel> RadzenGrid { get; set; }
         public EditContext EditContext { get; protected set; }
         public ModelPage ModelPage { get; init; }
-        private DataAccess<TContract> dataAccess;
         public DataAccess<TContract> DataAccess
         {
             get
@@ -145,7 +150,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public int From { get; protected set; }
         public int To { get; protected set; }
 
-        private string[] modelItems = null;
         public string[] ModelItems
         {
             get => modelItems ?? Array.Empty<string>();
@@ -282,7 +286,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             }
         }
 
-        private volatile bool loadDataActive = false;
         public bool IsLoadDataActive => loadDataActive;
         public virtual async Task LoadDataAsync(LoadDataArgs args)
         {
@@ -675,9 +678,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         partial void AfterRowDoubleClick(TModel item);
 
         #region Dialog operations
-        private bool hasFieldChanged;
-        private bool disposedValue;
-
         public bool IsEditModal { get; private set; }
         public bool HasFieldChanged
         {
@@ -785,28 +785,10 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
             }
         }
 
-        private static string CreatePluralWord(string wordInSingular)
-        {
-            string result;
-
-            if (wordInSingular.EndsWith("y"))
-            {
-                result = $"{wordInSingular[0..^1]}ies";
-            }
-            else if (wordInSingular.EndsWith("s"))
-            {
-                result = $"{wordInSingular}es";
-            }
-            else
-            {
-                result = $"{wordInSingular}s";
-            }
-            return result;
-        }
         public virtual void NavigateTo(int id)
 		{
             var modelName = typeof(TModel).Name;
-            var pageRoot = $"{CreatePluralWord(modelName)}";
+            var pageRoot = $"{modelName.CreatePluralWord()}";
             var navigateUri = $"{pageRoot}/View/{id}/Tabs/0";
 
             ModelPage.NavigationManager.NavigateTo(navigateUri);

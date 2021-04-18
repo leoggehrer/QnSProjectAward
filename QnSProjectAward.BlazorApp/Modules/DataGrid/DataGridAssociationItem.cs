@@ -21,9 +21,8 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public DisplayComponent DisplayComponent { get; private set; }
         public IDataGridHandler<TModel> DataGridHandler { get; private set; }
         public string ItemRefIdName { get; init; }
-        public Func<int, TModel, bool> Compare { get; init; }
-        public Func<TItem, string> ItemToText { get; init; }
-        public Action<TModel, TItem> ModelAssignment { get; init; }
+        public Func<TItem, string> ItemToText { get; set; }
+        public Action<TModel, TItem> ModelAssignment { get; set; }
         private ItemContainer<TItem> items = null;
 
         public IEnumerable<TItem> Items
@@ -82,7 +81,6 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 });
             }
         }
-
         protected void LoadModelDataHandler(object sender, TModel[] models)
         {
             models.CheckArgument(nameof(models));
@@ -153,6 +151,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
                 };
             }
         }
+
         #region Dispose-pattern
         private bool disposedValue;
 
