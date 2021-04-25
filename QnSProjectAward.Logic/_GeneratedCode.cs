@@ -42,6 +42,10 @@ namespace QnSProjectAward.Logic
             {
                 result = new Controllers.Persistence.App.RatingController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
             }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+            {
+                result = new Controllers.Persistence.Account.AccessController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
+            }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
             {
                 result = new Controllers.Persistence.Account.ActionLogController(CreateContext()) as Contracts.Client.IControllerAccess<I>;
@@ -118,6 +122,10 @@ namespace QnSProjectAward.Logic
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
             {
                 result = new Controllers.Persistence.App.RatingController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+            {
+                result = new Controllers.Persistence.Account.AccessController(sharedController as Controllers.ControllerObject) as Contracts.Client.IControllerAccess<I>;
             }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
             {
@@ -227,6 +235,14 @@ namespace QnSProjectAward.Logic
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
             {
                 result = new Controllers.Persistence.App.RatingController(CreateContext())
+                {
+                    SessionToken = sessionToken
+                }
+                as Contracts.Client.IControllerAccess<I>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+            {
+                result = new Controllers.Persistence.Account.AccessController(CreateContext())
                 {
                     SessionToken = sessionToken
                 }

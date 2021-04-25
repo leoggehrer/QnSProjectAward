@@ -52,7 +52,7 @@ namespace QnSProjectAward.Logic.Modules.Security
             if (sessionToken.IsNullOrEmpty())
             {
                 var authorization = originalMethodBase.GetCustomAttribute<AuthorizeAttribute>();
-                var isRequired = authorization?.IsRequired ?? false;
+                var isRequired = authorization?.Required ?? false;
 
                 if (isRequired)
                     throw new AuthorizationException(ErrorType.NotLogedIn);
@@ -60,7 +60,7 @@ namespace QnSProjectAward.Logic.Modules.Security
             else if (sessionToken.Equals(SystemAuthorizationToken) == false)
             {
                 var authorization = originalMethodBase.GetCustomAttribute<AuthorizeAttribute>();
-                bool isRequired = authorization?.IsRequired ?? false;
+                bool isRequired = authorization?.Required ?? false;
 
                 if (isRequired)
                 {
@@ -131,7 +131,7 @@ namespace QnSProjectAward.Logic.Modules.Security
             {
                 var authorization = originalMethodBase.GetCustomAttribute<AuthorizeAttribute>()
                                   ?? GetClassAuthorization(instanceType);
-                var isRequired = authorization?.IsRequired ?? false;
+                var isRequired = authorization?.Required ?? false;
 
                 if (isRequired)
                 {
@@ -142,7 +142,7 @@ namespace QnSProjectAward.Logic.Modules.Security
             {
                 var authorization = originalMethodBase.GetCustomAttribute<AuthorizeAttribute>()
                                     ?? GetClassAuthorization(instanceType);
-                var isRequired = authorization?.IsRequired ?? false;
+                var isRequired = authorization?.Required ?? false;
 
                 if (isRequired)
                 {

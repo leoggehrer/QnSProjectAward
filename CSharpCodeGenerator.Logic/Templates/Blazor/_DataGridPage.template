@@ -1,12 +1,12 @@
 @*@QnSCodeCopy*@
 
 @*DefaultPage*@
-@{
+@if (CanRender)
+{
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href=@($"{PageRoot}")>@Translate(PageRoot)</a></li>
-            <li class="breadcrumb-item"><a href=@($"{NewRef}")>@Translate(nameof(NewRef))</a></li>
             <li class="breadcrumb-item active" aria-current="page">@Translate(PageRoot)</li>
+            <li class="ml-auto"><RadzenButton Visible=@DataGridHandler.AllowAdd Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" Click="@(args => AddItem())"/></li>
         </ol>
     </nav>
     if (MenuItems.Count > 0)

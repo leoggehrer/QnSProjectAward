@@ -144,6 +144,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                 {
                     result.Add(CreateModelFromContract(type, UnitType, Common.ItemType.PersistenceModel));
                     result.Add(CreatePersistenceModel(type, UnitType));
+                    //result.Add(CreateOverrideToString(type, UnitType));
                 }
             }
             return result;
@@ -230,6 +231,40 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.AddRange(CreateFactoryMethods(type, false));
             result.Add("}");
             result.EnvelopeWithANamespace(CreateModelsNamespace(type), "using System;");
+            result.FormatCSharpCode();
+            return result;
+        }
+
+#pragma warning disable IDE0051 // Remove unused private members
+        private Contracts.IGeneratedItem CreateOverrideToString(Type type, Common.UnitType unitType)
+#pragma warning restore IDE0051 // Remove unused private members
+        {
+            type.CheckArgument(nameof(type));
+
+            var result = new Models.GeneratedItem(unitType, Common.ItemType.Model)
+            {
+                FullName = CreateModelFullNameFromInterface(type),
+                FileExtension = StaticLiterals.CSharpFileExtension,
+            };
+            result.SubFilePath = $"{result.FullName}PartA{result.FileExtension}";
+            result.Source.Add($"partial class {CreateModelNameFromInterface(type)}");
+            result.Source.Add("{");
+            result.Source.Add("public override string ToString()");
+            result.Source.Add("{");
+            result.Source.Add("var result = string.Empty;");
+            result.Source.Add("var handled = false;");
+            result.Source.Add("BeforeToString(ref result, ref handled);");
+            result.Source.Add("if (handled == false)");
+            result.Source.Add("{");
+            result.Source.Add("result = base.ToString();");
+            result.Source.Add("}");
+            result.Source.Add("AfterToString(ref result);");
+            result.Source.Add("return result;");
+            result.Source.Add("}");
+            result.Source.Add("partial void BeforeToString(ref string result, ref bool handled);");
+            result.Source.Add("partial void AfterToString(ref string result);");
+            result.Source.Add("}");
+            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -357,7 +392,6 @@ namespace CSharpCodeGenerator.Logic.Generation
             {
                 result = ModuleModel;
             }
-
             return result;
         }
         private string CreateModelFullNameFromInterface(Type type)

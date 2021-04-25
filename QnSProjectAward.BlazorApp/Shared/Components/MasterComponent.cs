@@ -16,18 +16,27 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
         where TMasterContract : Contracts.IIdentifiable, Contracts.ICopyable<TMasterContract>
         where TMaster : Models.ModelObject, TMasterContract, new()
     {
-        private TMaster model;
+        protected TMaster model;
+        protected string[] detailNames;
         private bool hasFieldChanged;
 
         [Parameter]
         public MasterDetailsPage<TMasterContract, TMaster> MasterDetailsPage { get; set; }
-        protected int Id => MasterDetailsPage.Id;
-        protected string Mode => MasterDetailsPage.Mode;
+
         protected TMaster Model
         {
             get => model ??= new TMaster();
-            set => model = value;
+            set
+            {
+                model = value;
+                if (MasterDetailsPage != null)
+                {
+                    MasterDetailsPage.Master = value;
+                }
+            }
         }
+        protected int Id => MasterDetailsPage.Id;
+        protected string Mode => MasterDetailsPage.Mode;
         public bool HasFieldChanged
         {
             get => hasFieldChanged;
@@ -65,13 +74,13 @@ namespace QnSProjectAward.BlazorApp.Shared.Components
             {
                 adapter.SessionToken = AuthorizationSession.Token;
 
-                if (Mode.AreEquals("new", StringComparison.CurrentCultureIgnoreCase))
+                if (Mode.AreEquals("new", StringComparison.CurrentCultureIgnoreCase) || (string.IsNullOrEmpty(Mode) && Id == 0))
                 {
                     var entity = await adapter.CreateAsync().ConfigureAwait(false);
 
                     Model = ToModel(entity);
                 }
-                else if (Mode.AreEquals("view", StringComparison.CurrentCultureIgnoreCase))
+                else if (Mode.AreEquals("view", StringComparison.CurrentCultureIgnoreCase) || (string.IsNullOrEmpty(Mode) && Id > 0))
                 {
                     var entity = await adapter.GetByIdAsync(Id).ConfigureAwait(false);
 

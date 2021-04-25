@@ -3,7 +3,6 @@
 using CommonBase.Extensions;
 using QnSProjectAward.Contracts.Client;
 using QnSProjectAward.Logic.DataContext;
-using QnSProjectAward.Logic.Modules.Security;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ namespace QnSProjectAward.Logic.Controllers
     /// </summary>
     /// <typeparam name="E">The entity type of element in the controller.</typeparam>
     /// <typeparam name="I">The interface type which implements the entity.</typeparam>
-    [Authorize]
     internal abstract partial class GenericController<I, E> : ControllerObject, IControllerAccess<I>
         where I : Contracts.IIdentifiable
         where E : Entities.IdentityEntity, I, Contracts.ICopyable<I>, new()
@@ -51,7 +49,7 @@ namespace QnSProjectAward.Logic.Controllers
         {
             contract.CheckArgument(nameof(contract));
 
-            E result = new E();
+            var result = new E();
 
             result.CopyProperties(contract);
             return result;
@@ -60,7 +58,7 @@ namespace QnSProjectAward.Logic.Controllers
         {
             contracts.CheckArgument(nameof(contracts));
 
-            List<E> result = new List<E>();
+            var result = new List<E>();
 
             foreach (var item in contracts)
             {
@@ -102,7 +100,7 @@ namespace QnSProjectAward.Logic.Controllers
         {
             entities.CheckArgument(nameof(entities));
 
-            List<I> result = new List<I>();
+            var result = new List<I>();
 
             foreach (var entity in entities)
             {
@@ -117,7 +115,7 @@ namespace QnSProjectAward.Logic.Controllers
         {
             entities.CheckArgument(nameof(entities));
 
-            List<I> result = new List<I>();
+            var result = new List<I>();
 
             foreach (var entity in entities)
             {

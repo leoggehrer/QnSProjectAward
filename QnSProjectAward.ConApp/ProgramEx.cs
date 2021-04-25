@@ -10,12 +10,14 @@ namespace QnSProjectAward.ConApp
 {
     partial class Program
     {
-        static readonly string PAPath = @"C:\Users\Gerhard\OneDrive - HTBLA Leonding\PA2021";
+        static readonly string PAPath = @"C:\Users\Gerhard\OneDrive - HTBLA Leonding\Schule\PA2021";
         static readonly string JuryFolder = "Jury";
         static readonly string ProgramFolder = "Programm";
 
         static async partial void EndExecuteMain()
         {
+            ExportProgram("Programm.txt");
+            return;
             var jury = new List<IJuror>();
             var projects = new List<IProject>();
             var members = new List<IMember>();
@@ -161,8 +163,8 @@ namespace QnSProjectAward.ConApp
                     entity.AwardId = award.Id;
                     entity.From = TimeSpan.ParseExact(data[0], "hhmm", null);
                     entity.To = TimeSpan.ParseExact(data[1], "hhmm", null);
-                    entity.School = $"{data[2]} - {data[3]}";
-                    entity.Title = data[4];
+                    entity.Title = data[2];
+                    entity.School = $"{data[3]} - {data[4]}";
                     entity.Description = File.Exists(fileDescription) ? File.ReadAllText(fileDescription) : "No description";
                     entity.Logo = File.Exists(fileLogo) ? File.ReadAllBytes(fileLogo) : null;
                     entity = await adapter.InsertAsync(entity);
@@ -240,6 +242,70 @@ namespace QnSProjectAward.ConApp
             }
             await accMngr.LogoutAsync(login.SessionToken).ConfigureAwait(false);
             return result;
+        }
+
+        static void ExportProgram(string fileName)
+        {
+            var lines = new List<string>();
+            var programPath = Path.Combine(PAPath, ProgramFolder);
+
+            foreach (var item in new DirectoryInfo(programPath).GetDirectories())
+            {
+                var data = item.Name.Split(' ');
+                var from = string.Empty;
+                var to = string.Empty;
+                var title = string.Empty;
+
+                if (data.Length > 0)
+                    from = data[0];
+
+                if (data.Length > 1)
+                    to = data[1];
+
+                if (data.Length > 2)
+                    title = data[2];
+
+                if (lines.Count > 0)
+                    lines.Add(string.Empty);
+
+                lines.Add($"{from} {to} {title}");
+                lines.Add(string.Empty);
+                lines.Add("Video");
+                lines.Add(string.Empty);
+                lines.Add("Logo");
+
+                var fileMembers = Path.Combine(programPath, item.Name, "Members.txt");
+                var fileDescription = Path.Combine(programPath, item.Name, "Description.txt");
+                var fileLogo = Path.Combine(programPath, item.Name, "Logo.png");
+
+                if (File.Exists(fileMembers))
+                {
+                    var members = File.ReadAllLines(fileMembers).Where(l => string.IsNullOrEmpty(l) == false).ToArray();
+
+                lines.Add(string.Empty);
+                    lines.Add("Mitglieder");
+                    for (int i = 0; i < members.Length;)
+                    {
+                        _ = members[i++].Trim();  // Course
+                        _ = members[i++].Trim();  // Position/Role
+                        lines.Add($"\t{members[i++].Trim()}");  // Name
+                        _ = members[i++].Trim();  // Email
+                        _ = members[i++].Trim();  // Phonenumber
+                    }
+                }
+
+                if (File.Exists(fileDescription))
+                {
+                    var description = File.ReadAllText(fileDescription);
+
+                    lines.Add(string.Empty);
+                    lines.Add("Beschreibung");
+                    lines.Add(description);
+                }
+            }
+            var filePath = Path.Combine(PAPath, fileName);
+         
+            File.WriteAllLines(filePath, lines.ToArray(), System.Text.Encoding.UTF8);
         }
     }
 }

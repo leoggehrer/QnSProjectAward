@@ -17,13 +17,13 @@ using System.Threading.Tasks;
 
 namespace QnSProjectAward.Logic.Controllers.Persistence
 {
-	/// <inheritdoc cref="IControllerAccess{T}"/>
-	/// <summary>
-	/// This generic class implements the base properties and operations defined in the interface. 
-	/// </summary>
-	/// <typeparam name="E">The entity type of element in the controller.</typeparam>
-	/// <typeparam name="I">The interface type which implements the entity.</typeparam>
-	[Authorize]
+    /// <inheritdoc cref="IControllerAccess{T}"/>
+    /// <summary>
+    /// This generic class implements the base properties and operations defined in the interface. 
+    /// </summary>
+    /// <typeparam name="E">The entity type of element in the controller.</typeparam>
+    /// <typeparam name="I">The interface type which implements the entity.</typeparam>
+    [Authorize(AllowModify = true)]
     internal abstract partial class GenericPersistenceController<I, E> : GenericController<I, E>
         where I : Contracts.IIdentifiable
         where E : Entities.IdentityEntity, I, Contracts.ICopyable<I>, new()

@@ -157,9 +157,11 @@ namespace CSharpCodeGenerator.Logic.Generation
                         Width = "800px",
                         Height = string.Empty,
                     };
+                    var modelSetting = new ModelSetting();
                     var dataGridSetting = new DataGridSetting();
                     var dataGridHandlerSetting = new DataGridHandlerSetting();
 
+                    result.Add($"{categoryKey}{separator}Setting{separator}{separator}{JsonSerializer.Serialize<ModelSetting>(modelSetting)}");
                     result.Add($"{categoryKey}DataGrid{separator}Setting{separator}{separator}{JsonSerializer.Serialize<DataGridSetting>(dataGridSetting)}");
                     result.Add($"{categoryKey}DataGrid{separator}HandlerSetting{separator}{separator}{JsonSerializer.Serialize<DataGridHandlerSetting>(dataGridHandlerSetting)}");
                     result.Add($"{categoryKey}DataGrid{separator}EditOptions{separator}{separator}{JsonSerializer.Serialize<DialogOptions>(dialogOptions)}");
@@ -184,7 +186,7 @@ namespace CSharpCodeGenerator.Logic.Generation
 
                     if (result.Any(e => e.StartsWith(fullKey)) == false)
                     {
-                        var propertyHelper = new Helpers.ContractPropertyHelper(pi);
+                        var propertyHelper = new ContractPropertyHelper(pi);
                         var displaySetting = new DisplaySetting()
                         {
                             ScaffoldItem = true,

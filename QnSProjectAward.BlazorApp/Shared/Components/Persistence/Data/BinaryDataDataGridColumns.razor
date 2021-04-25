@@ -92,7 +92,7 @@
 {
     <RadzenGridColumn TItem="TModel" Bubble="false" Filterable="true" Sortable="false" TextAlign="TextAlign.Center" Width="45px">
         <Template Context="item">
-            <RadzenButton Visible="AllowAdd" Icon="list" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="@(args => DataGridHandler.NavigateTo(item.Id))" />
+            <RadzenButton Icon="list" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="@(args => DataGridHandler.NavigateTo(item.Id))" />
         </Template>
     </RadzenGridColumn>
 }
@@ -100,15 +100,15 @@
 {
     <RadzenGridColumn TItem="TModel" Bubble="false" Filterable="true" Sortable="false" TextAlign="TextAlign.Center" Width="45px">
         <HeaderTemplate>
-            <RadzenButton Visible="AllowAdd" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small" Click="@(args => DataGridHandler.AddItemAsync())" />
+            <RadzenButton Visible="AllowAdd" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" Click="@(args => DataGridHandler.AddItemAsync())" />
         </HeaderTemplate>
 
         <Template Context="item">
-            <RadzenButton Visible="AllowEdit" Icon="edit_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click="@(args => DataGridHandler.EditRowAsync(item))" />
+            <RadzenButton Visible="AllowEdit" Icon="edit" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click="@(args => DataGridHandler.EditRowAsync(item))" />
         </Template>
 
         <EditTemplate Context="item">
-            <RadzenButton Visible="AllowEdit" Icon="save_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click="@(args => DataGridHandler.CommitEditRow(item))" />
+            <RadzenButton Visible="AllowEdit" Icon="save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click="@(args => DataGridHandler.CommitEditRow(item))" />
         </EditTemplate>
     </RadzenGridColumn>
 }
@@ -116,10 +116,10 @@
 {
     <RadzenGridColumn TItem="TModel" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="45px">
         <Template Context="item">
-            <RadzenButton Visible="AllowDelete" Icon="delete_circle_outline" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(args => DataGridHandler.DeleteRowAsync(item))" />
+            <RadzenButton Visible="AllowDelete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(args => DataGridHandler.DeleteRowAsync(item))" />
         </Template>
         <EditTemplate Context="item">
-            <RadzenButton Visible="AllowEdit" Icon="cancel_circle_outline" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="@(args => DataGridHandler.CancelEditRow(item))" />
+            <RadzenButton Visible="AllowEdit" Icon="cancel" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="@(args => DataGridHandler.CancelEditRow(item))" />
         </EditTemplate>
     </RadzenGridColumn>
 }

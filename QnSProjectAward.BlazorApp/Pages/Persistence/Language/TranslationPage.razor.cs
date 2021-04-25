@@ -16,5 +16,16 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Language
             private set;
         }
         protected override string PageRoot => "Translations";
+        private string[] detailNames;
+        protected override string[] DetailNames
+        {
+            get
+            {
+                return detailNames ??= new string[]
+                {
+                }
+                ;
+            }
+        }
     }
 }

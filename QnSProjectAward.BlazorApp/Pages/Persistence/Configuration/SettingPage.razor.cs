@@ -16,5 +16,16 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Configuration
             private set;
         }
         protected override string PageRoot => "Settings";
+        private string[] detailNames;
+        protected override string[] DetailNames
+        {
+            get
+            {
+                return detailNames ??= new string[]
+                {
+                }
+                ;
+            }
+        }
     }
 }

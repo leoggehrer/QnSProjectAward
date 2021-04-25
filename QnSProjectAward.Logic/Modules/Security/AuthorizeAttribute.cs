@@ -8,22 +8,23 @@ namespace QnSProjectAward.Logic.Modules.Security
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     internal partial class AuthorizeAttribute : Attribute
     {
-        public bool IsRequired { get; }
+        public bool Required { get; }
+        public bool AllowModify { get; set; } = false;
         public IEnumerable<string> Roles { get; }
         public AuthorizeAttribute()
         {
-            IsRequired = true;
-            Roles = new string[0];
+            Required = true;
+            Roles = Array.Empty<string>();
         }
         public AuthorizeAttribute(params string[] roles)
         {
-            IsRequired = true;
-            Roles = roles ?? new string[0];
+            Required = true;
+            Roles = roles ?? Array.Empty<string>();
         }
-        protected AuthorizeAttribute(bool isRequired, params string[] roles)
+        protected AuthorizeAttribute(bool required, params string[] roles)
         {
-            IsRequired = isRequired;
-            Roles = roles ?? new string[0];
+            Required = required;
+            Roles = roles ?? Array.Empty<string>();
         }
     }
 }

@@ -60,6 +60,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var result = new List<string>();
 
             if (type.FullName.EndsWith(".Business.Account.IAppAccess")
+                || type.FullName.EndsWith(".Persistence.Account.IAccess")
                 || type.FullName.EndsWith(".Persistence.Account.IIdentity")
                 || type.FullName.EndsWith(".Persistence.Account.IRole")
                 || type.FullName.EndsWith(".Persistence.Account.IIdentityXRole")

@@ -856,9 +856,9 @@ namespace CommonBase.Extensions
 
         public static string CreatePluralWord(this string wordInSingular)
         {
-            string result = null;
+            string result = wordInSingular;
 
-            if (wordInSingular != null)
+            if (wordInSingular.IsWord())
             {
                 if (wordInSingular.EndsWith("y"))
                 {
@@ -872,6 +872,16 @@ namespace CommonBase.Extensions
                 {
                     result = $"{wordInSingular}s";
                 }
+            }
+            return result;
+        }
+        private static bool IsWord(this string text)
+        {
+            var result = text.IsNullOrEmpty() == false;
+
+            for (int i = 0; result && i < text.Length; i++)
+            {
+                result = char.IsLetter(text[i]);
             }
             return result;
         }

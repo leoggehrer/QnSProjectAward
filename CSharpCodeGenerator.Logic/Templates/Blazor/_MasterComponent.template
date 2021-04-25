@@ -1,7 +1,7 @@
 @*@QnSCodeCopy*@
 
 @*DefaultPage*@
-@if (Mode.AreEquals("new", System.StringComparison.CurrentCultureIgnoreCase))
+@if (Mode.AreEquals("new", System.StringComparison.CurrentCultureIgnoreCase) || (string.IsNullOrEmpty(Mode) && Id == 0))
 {
     <div class="card">
         <EditForm EditContext="@EditModelContext">
@@ -23,7 +23,7 @@
         </EditForm>
     </div>
 }
-else if (Mode.AreEquals("view", System.StringComparison.CurrentCultureIgnoreCase))
+else if (Mode.AreEquals("view", System.StringComparison.CurrentCultureIgnoreCase) || (string.IsNullOrEmpty(Mode) && Id > 0))
 {
     <div class="card">
         <div class="card-body">

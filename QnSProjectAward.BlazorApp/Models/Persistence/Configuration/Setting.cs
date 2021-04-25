@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 {
-	partial class Setting
+    partial class Setting
 	{
 		public string State => Id > 0 ? "Stored" : "Unstored";
 
@@ -21,13 +21,13 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 				{
 					SubObjects.Add(JsonSerializer.Deserialize<MenuItem>(Value));
 				}
+				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(ModelSetting)}\""))
+				{
+					SubObjects.Add(JsonSerializer.Deserialize<ModelSetting>(Value));
+				}
 				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DisplaySetting)}\""))
 				{
 					SubObjects.Add(JsonSerializer.Deserialize<DisplaySetting>(Value));
-				}
-				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DialogOptions)}\""))
-				{
-					SubObjects.Add(JsonSerializer.Deserialize<DialogOptions>(Value));
 				}
 				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DataGridSetting)}\""))
 				{
@@ -36,6 +36,10 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DataGridHandlerSetting)}\""))
 				{
 					SubObjects.Add(JsonSerializer.Deserialize<DataGridHandlerSetting>(Value));
+				}
+				else if (Value != null && Value.Contains($"\"Type\":\"{nameof(DialogOptions)}\""))
+				{
+					SubObjects.Add(JsonSerializer.Deserialize<DialogOptions>(Value));
 				}
 			}
 			catch (System.Exception ex)
@@ -57,13 +61,13 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 				{
 					Value = JsonSerializer.Serialize(mim, serializerOptions);
 				}
+				else if (SubObjects[0] is ModelSetting ms)
+				{
+					Value = JsonSerializer.Serialize(ms, serializerOptions);
+				}
 				else if (SubObjects[0] is DisplaySetting dsm)
 				{
 					Value = JsonSerializer.Serialize(dsm, serializerOptions);
-				}
-				else if (SubObjects[0] is DialogOptions dom)
-				{
-					Value = JsonSerializer.Serialize(dom, serializerOptions);
 				}
 				else if (SubObjects[0] is DataGridSetting dgsm)
 				{
@@ -72,6 +76,10 @@ namespace QnSProjectAward.BlazorApp.Models.Persistence.Configuration
 				else if (SubObjects[0] is DataGridHandlerSetting dghsm)
 				{
 					Value = JsonSerializer.Serialize(dghsm, serializerOptions);
+				}
+				else if (SubObjects[0] is DialogOptions dom)
+				{
+					Value = JsonSerializer.Serialize(dom, serializerOptions);
 				}
 			}
 		}

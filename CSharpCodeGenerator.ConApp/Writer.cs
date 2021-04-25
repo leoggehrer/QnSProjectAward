@@ -175,7 +175,7 @@ namespace CSharpCodeGenerator.ConApp
             }));
             tasks.Add(Task.Factory.StartNew(() =>
             {
-                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.BlazorApp && e.ItemType == ItemType.PersistenceModel);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.BlazorApp && (e.ItemType == ItemType.PersistenceModel || e.ItemType == ItemType.Model));
 
                 Console.WriteLine("Write BlazorApp-Persistence-Models...");
                 WriteGeneratedCodeFile(solutionPath, solutionProperties.BlazorAppPersistenceFileSubPath, writeItems);

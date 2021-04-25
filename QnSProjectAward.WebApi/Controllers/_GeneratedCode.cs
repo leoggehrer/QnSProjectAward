@@ -87,6 +87,17 @@ namespace QnSProjectAward.WebApi.Controllers.Persistence.Account
     {
     }
 }
+namespace QnSProjectAward.WebApi.Controllers.Persistence.Account
+{
+    using Microsoft.AspNetCore.Mvc;
+    using TContract = Contracts.Persistence.Account.IAccess;
+    using TModel = Transfer.Persistence.Account.Access;
+    [ApiController]
+    [Route("Controller")]
+    public partial class AccessController : GenericController<TContract, TModel>
+    {
+    }
+}
 namespace QnSProjectAward.WebApi.Controllers.Persistence.App
 {
     using Microsoft.AspNetCore.Mvc;

@@ -16,5 +16,16 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Data
             private set;
         }
         protected override string PageRoot => "BinaryDatas";
+        private string[] detailNames;
+        protected override string[] DetailNames
+        {
+            get
+            {
+                return detailNames ??= new string[]
+                {
+                }
+                ;
+            }
+        }
     }
 }

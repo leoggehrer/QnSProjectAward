@@ -16,5 +16,17 @@ namespace QnSProjectAward.BlazorApp.Pages.Persistence.Account
             private set;
         }
         protected override string PageRoot => "Identities";
+        private string[] detailNames;
+        protected override string[] DetailNames
+        {
+            get
+            {
+                return detailNames ??= new string[]
+                {
+                    "IdentitySettingsByIdentityId","AccessesByIdentityId","ActionLogsByIdentityId","IdentityXRolesByIdentityId","LoginSessionsByIdentityId","UsersByIdentityId",
+                }
+                ;
+            }
+        }
     }
 }

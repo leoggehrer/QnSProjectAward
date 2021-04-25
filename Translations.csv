@@ -352,3 +352,8 @@ QnSProjectAward;En;JsonWebLogonDetailsComponent.;De;
 QnSProjectAward;En;LogonMasterComponent.;De;
 QnSProjectAward;En;LogonDetailsComponent.;De;
 QnSProjectAward;En;Category;De;Category
+QnSProjectAward;En;AccessMasterComponent.;De;
+QnSProjectAward;En;AccessDetailsComponent.;De;
+QnSProjectAward;En;Access.TitelDetails;De;TitelDetails
+QnSProjectAward;En;Access.TitleEditModel;De;TitleEditModel
+QnSProjectAward;En;Access.TitleConfirmDelete;De;TitleConfirmDelete

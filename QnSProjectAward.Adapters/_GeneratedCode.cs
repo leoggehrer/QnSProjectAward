@@ -44,6 +44,10 @@ namespace QnSProjectAward.Adapters
                 {
                     result = new Controller.GenericControllerAdapter<QnSProjectAward.Contracts.Persistence.App.IRating>() as Contracts.Client.IAdapterAccess<I>;
                 }
+                else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+                {
+                    result = new Controller.GenericControllerAdapter<QnSProjectAward.Contracts.Persistence.Account.IAccess>() as Contracts.Client.IAdapterAccess<I>;
+                }
                 else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
                 {
                     result = new Controller.GenericControllerAdapter<QnSProjectAward.Contracts.Persistence.Account.IActionLog>() as Contracts.Client.IAdapterAccess<I>;
@@ -114,6 +118,10 @@ namespace QnSProjectAward.Adapters
                 else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
                 {
                     result = new Service.GenericServiceAdapter<QnSProjectAward.Contracts.Persistence.App.IRating, Transfer.Persistence.App.Rating>(BaseUri, "Ratings") as Contracts.Client.IAdapterAccess<I>;
+                }
+                else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+                {
+                    result = new Service.GenericServiceAdapter<QnSProjectAward.Contracts.Persistence.Account.IAccess, Transfer.Persistence.Account.Access>(BaseUri, "Access") as Contracts.Client.IAdapterAccess<I>;
                 }
                 else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
                 {
@@ -191,6 +199,10 @@ namespace QnSProjectAward.Adapters
                 {
                     result = new Controller.GenericControllerAdapter<QnSProjectAward.Contracts.Persistence.App.IRating>(sessionToken) as Contracts.Client.IAdapterAccess<I>;
                 }
+                else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+                {
+                    result = new Controller.GenericControllerAdapter<QnSProjectAward.Contracts.Persistence.Account.IAccess>(sessionToken) as Contracts.Client.IAdapterAccess<I>;
+                }
                 else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
                 {
                     result = new Controller.GenericControllerAdapter<QnSProjectAward.Contracts.Persistence.Account.IActionLog>(sessionToken) as Contracts.Client.IAdapterAccess<I>;
@@ -261,6 +273,10 @@ namespace QnSProjectAward.Adapters
                 else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
                 {
                     result = new Service.GenericServiceAdapter<QnSProjectAward.Contracts.Persistence.App.IRating, Transfer.Persistence.App.Rating>(sessionToken, BaseUri, "Ratings") as Contracts.Client.IAdapterAccess<I>;
+                }
+                else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+                {
+                    result = new Service.GenericServiceAdapter<QnSProjectAward.Contracts.Persistence.Account.IAccess, Transfer.Persistence.Account.Access>(sessionToken, BaseUri, "Access") as Contracts.Client.IAdapterAccess<I>;
                 }
                 else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
                 {

@@ -256,6 +256,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var fileNameRazor = $"{entityName}{DataGridPagePostfix}{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
+            var contractHelper = new ContractHelper(type);
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.DataGridRazorPageCode)
             {
                 FullName = CreateEntityFullNameFromInterface(type),
@@ -321,6 +322,10 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("var adapterAccess = ServiceAdapter.Create<TContract>();");
             result.Add($"DataGridHandler = new {entityName}DataGridHandler(this, new DataAdapterAccess<TContract>(adapterAccess));");
             result.Add("InitDataGridHandler(DataGridHandler);");
+            if (contractHelper.ContextType == CommonBase.Attributes.ContextType.View)
+            {
+                result.Add("DataGridHandler.Editable = false;");
+            }
             result.Add("}");
             result.Add("AfterFirstRender();");
             result.Add("return base.OnFirstRenderAsync();");
@@ -381,9 +386,8 @@ namespace CSharpCodeGenerator.Logic.Generation
             //result.Add(CreateEditFieldSetDetailComponentRazor(type));
             //result.Add(CreateEditFieldSetDetailComponentCode(type));
 
-            result.Add(CreateMasterComponentRazor(type, masters));
-            result.Add(CreateMasterComponentCode(type, masters));
-
+            result.Add(CreateMasterComponentRazor(type, masters, details));
+            result.Add(CreateMasterComponentCode(type, masters, details));
 
             result.Add(CreateDetailsComponentRazor(type, details));
             result.Add(CreateDetailsComponentCode(type, details));
@@ -532,25 +536,25 @@ namespace CSharpCodeGenerator.Logic.Generation
                     result.Add($"protected Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}> dgai{referenceEntityName.CreatePluralWord()}By{item.Name};");
                 }
 
-				result.Add(string.Empty);
-				result.Add("protected override void BeforeInitialized()");
-				result.Add("{");
-				result.Add("base.BeforeInitialized();");
-				result.Add("bool handled = false;");
-				result.Add("BeforeInitAssociations(ref handled);");
-				result.Add("if (handled == false)");
-				result.Add("{");
-				foreach (var item in listMasters)
-				{
-					var detailEntityName = CreateEntityNameFromInterface(item.From);
+                result.Add(string.Empty);
+                result.Add("protected override void BeforeInitialized()");
+                result.Add("{");
+                result.Add("base.BeforeInitialized();");
+                result.Add("bool handled = false;");
+                result.Add("BeforeInitAssociations(ref handled);");
+                result.Add("if (handled == false)");
+                result.Add("{");
+                foreach (var item in listMasters)
+                {
+                    var detailEntityName = CreateEntityNameFromInterface(item.From);
 
-					result.Add($"dgai{detailEntityName.CreatePluralWord()}By{item.Name} = new Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}>(this, DataGridHandler, \"{item.Name}\", i =>i.ToString());");
-				}
-				result.Add("}");
-				result.Add("AfterInitAssosiations();");
-				result.Add("}");
-				result.Add(string.Empty);
-				result.Add("partial void BeforeInitAssociations(ref bool handled);");
+                    result.Add($"dgai{detailEntityName.CreatePluralWord()}By{item.Name} = new Modules.DataGrid.DataGridAssociationItem<TModel, {item.From.FullName}>(this, DataGridHandler, \"{item.Name}\", i =>i.ToString());");
+                }
+                result.Add("}");
+                result.Add("AfterInitAssosiations();");
+                result.Add("}");
+                result.Add(string.Empty);
+                result.Add("partial void BeforeInitAssociations(ref bool handled);");
                 result.Add("partial void AfterInitAssosiations();");
             }
 
@@ -987,10 +991,12 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazor);
             StartCreateMasterPageRazor(type, details, result.Source);
 
+            result.Add($"@page \"/{pluralPageName}" + "/{Id:int}\"");
             result.Add($"@page \"/{pluralPageName}" + "/{Mode}\"");
-            result.Add($"@page \"/{pluralPageName}" + "/{Mode}/{Detail}/{Index:int}\"");
             result.Add($"@page \"/{pluralPageName}" + "/{Mode}" + "/{Id:int}\"");
+            result.Add($"@page \"/{pluralPageName}" + "/{Mode}/{Detail}/{Index:int}\"");
             result.Add($"@page \"/{pluralPageName}" + "/{Mode}" + "/{Id:int}" + "/{Detail}/{Index:int}\"");
+            result.Add("@using Radzen;");
             result.Add($"@using {componentNamespace};");
             result.Add($"@using TMasterContract = {type.FullName};");
             result.Add($"@using TMaster = {entityFullName};");
@@ -1016,6 +1022,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             type.CheckArgument(nameof(type));
             details.CheckArgument(nameof(details));
 
+            var listDetails = new List<Models.Relation>(details);
             var customUsings = new List<string>();
             var customNamespaceCode = new List<string>();
             var customClassCode = new List<string>();
@@ -1027,6 +1034,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             var fileNameRazor = $"{entityName}{PagePostfix}{PageExtension}";
             var fileNameRazorCode = $"{fileNameRazor}{CodeExtension}";
             var filePathRazorCode = Path.Combine(ProjectName, subPath, fileNameRazorCode);
+            var contractHelper = new ContractHelper(type);
             var result = new Models.GeneratedItem(Common.UnitType.BlazorApp, Common.ItemType.MasterDetailsRazorPageCode)
             {
                 FullName = CreateEntityFullNameFromInterface(type),
@@ -1034,7 +1042,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectPagePath, fileNameRazorCode);
 
-            StartCreateMasterPageCode(type, details, result.Source);
+            StartCreateMasterPageCode(type, listDetails, result.Source);
             if (File.Exists(filePathRazorCode))
             {
                 var fileCode = File.ReadAllText(filePathRazorCode, Encoding.Default);
@@ -1080,22 +1088,56 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add(string.Empty);
             result.Add($"protected override string PageRoot => \"{pluralPageName}\";");
 
+            result.Add("private string[] detailNames;");
+            result.Add("protected override string[] DetailNames");
+            result.Add("{");
+            result.Add("get");
+            result.Add("{");
+            result.Add("return detailNames ??= new string[]");
+            result.Add("{");
+            foreach (var item in listDetails)
+            {
+                var referenceEntityName = CreateEntityNameFromInterface(item.To);
+
+                result.Add($"\"{referenceEntityName.CreatePluralWord()}By{item.Name}\",");
+            }
+            result.Add("};");
+            result.Add("}");
+            result.Add("}");
+            if (contractHelper.ContextType == CommonBase.Attributes.ContextType.View)
+            {
+                result.Add("protected override void InitPageData()");
+                result.Add("{");
+                result.Add("base.InitPageData();");
+                result.Add("bool handled = false;");
+                result.Add("BeforeInitPageData(ref handled);");
+                result.Add("if (handled == false)");
+                result.Add("{");
+                result.Add("ModelSetting.Editable = false;");
+                result.Add("}");
+                result.Add("AfterInitPageData();");
+                result.Add("}");
+                result.Add("partial void BeforeInitPageData(ref bool handled);");
+                result.Add("partial void AfterInitPageData();");
+            }
             result.Add("}");
             result.Add("}");
 
-            FinishCreateMasterPageCode(type, details, result.Source);
+            FinishCreateMasterPageCode(type, listDetails, result.Source);
             result.FormatCSharpCode();
             return result;
         }
-        partial void StartCreateMasterPageCode(Type type, IEnumerable<Models.Relation> relations, List<string> lines);
-        partial void FinishCreateMasterPageCode(Type type, IEnumerable<Models.Relation> relations, List<string> lines);
+        partial void StartCreateMasterPageCode(Type type, List<Models.Relation> details, List<string> lines);
+        partial void FinishCreateMasterPageCode(Type type, List<Models.Relation> details, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateMasterComponentRazor(Type type, IEnumerable<Models.Relation> masters)
+        private Contracts.IGeneratedItem CreateMasterComponentRazor(Type type, IEnumerable<Models.Relation> masters, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
             masters.CheckArgument(nameof(masters));
+            details.CheckArgument(nameof(details));
 
             var listMasters = new List<Models.Relation>(masters);
+            var listDetails = new List<Models.Relation>(details);
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
@@ -1109,7 +1151,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazor);
 
-            StartCreateMasterComponentRazor(type, listMasters, result.Source);
+            StartCreateMasterComponentRazor(type, listMasters, listDetails, result.Source);
             result.Add($"@using TMasterContract = {type.FullName};");
             result.Add($"@using TMaster = {entityFullName};");
             result.Add("@using CommonBase.Extensions;");
@@ -1120,19 +1162,21 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("@*EmbeddedEnd:Label=DefaultPage*@");
 
             result.AddRange(EmbeddedTagReplacer.ReplaceEmbeddedTags(result.Source.Eject(), TemplatesSubPath, "@*", "*@", (st, et, rt, p) => EmbeddedTagManager.Handle(type, st, et, rt, p)));
-            FinishCreateMasterComponentRazor(type, listMasters, result.Source);
+            FinishCreateMasterComponentRazor(type, listMasters, listDetails, result.Source);
             return result;
         }
-        partial void StartCreateMasterComponentRazor(Type type, List<Models.Relation> masters, List<string> lines);
-        partial void FinishCreateMasterComponentRazor(Type type, List<Models.Relation> masters, List<string> lines);
+        partial void StartCreateMasterComponentRazor(Type type, List<Models.Relation> masters, List<Models.Relation> details, List<string> lines);
+        partial void FinishCreateMasterComponentRazor(Type type, List<Models.Relation> masters, List<Models.Relation> detaiols, List<string> lines);
 
-        private Contracts.IGeneratedItem CreateMasterComponentCode(Type type, IEnumerable<Models.Relation> masters)
+        private Contracts.IGeneratedItem CreateMasterComponentCode(Type type, IEnumerable<Models.Relation> masters, IEnumerable<Models.Relation> details)
         {
             type.CheckArgument(nameof(type));
             masters.CheckArgument(nameof(masters));
+            details.CheckArgument(nameof(details));
 
-            var contractHelper = new ContractHelper(type);
             var listMasters = new List<Models.Relation>(masters);
+            var listDetails = new List<Models.Relation>(details);
+            var contractHelper = new ContractHelper(type);
             var subPath = CreateSubPathFromType(type);
             var projectSharedComponentsPath = Path.Combine(ProjectName, SharedFolder, ComponentsFolder, subPath);
             var entityName = CreateEntityNameFromInterface(type);
@@ -1146,7 +1190,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             };
             result.SubFilePath = Path.Combine(projectSharedComponentsPath, fileNameRazorCode);
 
-            StartCreateMasterComponentCode(type, listMasters, result.Source);
+            StartCreateMasterComponentCode(type, listMasters, listDetails, result.Source);
             result.Add("using CommonBase.Attributes;");
             result.Add("using Microsoft.AspNetCore.Components;");
             result.Add("using Radzen;");
@@ -1198,12 +1242,12 @@ namespace CSharpCodeGenerator.Logic.Generation
             result.Add("}");
             result.Add("}");
 
-            FinishCreateMasterComponentCode(type, listMasters, result.Source);
+            FinishCreateMasterComponentCode(type, listMasters, listDetails, result.Source);
             result.FormatCSharpCode();
             return result;
         }
-        partial void StartCreateMasterComponentCode(Type type, List<Models.Relation> masters, List<string> lines);
-        partial void FinishCreateMasterComponentCode(Type type, List<Models.Relation> masters, List<string> lines);
+        partial void StartCreateMasterComponentCode(Type type, List<Models.Relation> masters, List<Models.Relation> details, List<string> lines);
+        partial void FinishCreateMasterComponentCode(Type type, List<Models.Relation> masters, List<Models.Relation> details, List<string> lines);
 
         private Contracts.IGeneratedItem CreateDetailsComponentRazor(Type type, IEnumerable<Models.Relation> details)
         {
@@ -1242,7 +1286,7 @@ namespace CSharpCodeGenerator.Logic.Generation
             {
                 var namespaceComponents = $"{SolutionProperties.BlazorAppProjectName}.Shared.Components";
 
-                result.Add("<RadzenTabs SelectedIndex=@SelectedIndex @ref=@RadzenTabs >");
+                result.Add("<RadzenTabs SelectedIndex=@SelectedIndex Change=@OnTabChange @ref=@RadzenTabs >");
                 result.Add("  <Tabs>");
                 foreach (var item in listDetails)
                 {
@@ -1346,7 +1390,7 @@ namespace CSharpCodeGenerator.Logic.Generation
                     var detailEntityName = CreateEntityNameFromInterface(item.To);
                     var dataGridHandler = $"{detailEntityName}DataGridHandler{item.Name}";
 
-                    result.Add($"{dataGridHandler}.Editable = MasterDetailsPage.Id != 0;");
+                    result.Add($"{dataGridHandler}.AllowAdd = MasterDetailsPage.Id != 0;");
                     result.Add($"{dataGridHandler}.AccessFilter = $\"{item.Name}=" + "{MasterDetailsPage.Id}\";");
                 }
                 result.Add("return base.InitializeParametersAsync();");
@@ -1358,10 +1402,15 @@ namespace CSharpCodeGenerator.Logic.Generation
 
                 foreach (var item in listDetails)
                 {
+                    var contractHelper = new ContractHelper(item.To);
                     var referenceEntityName = CreateEntityNameFromInterface(item.To);
 
                     result.Add($"{referenceEntityName}DataGridHandler{item.Name} = new {CreateComponentsNameSpace(item.To)}.{referenceEntityName}DataGridHandler(MasterDetailsPage);");
                     result.Add($"InitDataGridHandler({referenceEntityName}DataGridHandler{item.Name}, \"{referenceEntityName}\");");
+                    if (contractHelper.ContextType == CommonBase.Attributes.ContextType.View)
+                    {
+                        result.Add($"{referenceEntityName}DataGridHandler{item.Name}.Editable = false;");
+                    }
                     result.Add(string.Empty);
                     result.Add($"{referenceEntityName}DataGridHandler{item.Name}.BeforeLoadDataHandler += {referenceEntityName}DataGridHandler{item.Name}_BeforeLoadDataHandler;");
                     result.Add($"{referenceEntityName}DataGridHandler{item.Name}.AfterCreateModelHandler += {referenceEntityName}DataGridHandler{item.Name}_AfterCreateModelHandler;");

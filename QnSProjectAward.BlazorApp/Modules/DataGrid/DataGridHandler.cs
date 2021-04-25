@@ -119,7 +119,11 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
         public string AccessFilter { get; set; }
 
         public int PageSize { get; set; } = 50;
-        public bool Editable { get; set; } = true;
+        public bool Editable 
+        {
+            get; 
+            set; 
+        } = true;
         public bool AllowAdd 
         {
             get => Editable && allowAdd;
@@ -789,7 +793,7 @@ namespace QnSProjectAward.BlazorApp.Modules.DataGrid
 		{
             var modelName = typeof(TModel).Name;
             var pageRoot = $"{modelName.CreatePluralWord()}";
-            var navigateUri = $"{pageRoot}/View/{id}/Tabs/0";
+            var navigateUri = $"{pageRoot}/{id}";
 
             ModelPage.NavigationManager.NavigateTo(navigateUri);
 		}

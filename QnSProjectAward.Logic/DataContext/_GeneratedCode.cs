@@ -50,6 +50,11 @@ namespace QnSProjectAward.Logic.DataContext.Db
             get;
             set;
         }
+        protected DbSet<Entities.Persistence.Account.Access> AccessSet
+        {
+            get;
+            set;
+        }
         protected DbSet<Entities.Persistence.Account.ActionLog> ActionLogSet
         {
             get;
@@ -118,6 +123,10 @@ namespace QnSProjectAward.Logic.DataContext.Db
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.App.IRating))
             {
                 result = RatingSet as DbSet<E>;
+            }
+            else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IAccess))
+            {
+                result = AccessSet as DbSet<E>;
             }
             else if (typeof(I) == typeof(QnSProjectAward.Contracts.Persistence.Account.IActionLog))
             {
@@ -225,6 +234,12 @@ namespace QnSProjectAward.Logic.DataContext.Db
             ratingBuilder.ToTable("Rating", "App").HasKey("Id");
             modelBuilder.Entity<Entities.Persistence.App.Rating>().Property(p => p.RowVersion).IsRowVersion();
             ConfigureEntityType(ratingBuilder);
+            var accessBuilder = modelBuilder.Entity<Entities.Persistence.Account.Access>();
+            accessBuilder.ToTable("Access", "Account").HasKey("Id");
+            accessBuilder.HasIndex(c => c.Key).IsUnique();
+            accessBuilder.Property(p => p.Key).IsRequired().HasMaxLength(512);
+            accessBuilder.Property(p => p.Value).HasMaxLength(4096);
+            ConfigureEntityType(accessBuilder);
             var actionLogBuilder = modelBuilder.Entity<Entities.Persistence.Account.ActionLog>();
             actionLogBuilder.ToTable("ActionLog", "Account").HasKey("Id");
             modelBuilder.Entity<Entities.Persistence.Account.ActionLog>().Property(p => p.RowVersion).IsRowVersion();
@@ -279,6 +294,7 @@ namespace QnSProjectAward.Logic.DataContext.Db
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Member> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Project> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.App.Rating> entityTypeBuilder);
+        static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.Access> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.ActionLog> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.Identity> entityTypeBuilder);
         static partial void ConfigureEntityType(EntityTypeBuilder<Entities.Persistence.Account.IdentityXRole> entityTypeBuilder);

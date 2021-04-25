@@ -1,8 +1,10 @@
 @*@QnSGeneratedCode*@
+@page "/Translations/{Id:int}"
 @page "/Translations/{Mode}"
-@page "/Translations/{Mode}/{Detail}/{Index:int}"
 @page "/Translations/{Mode}/{Id:int}"
+@page "/Translations/{Mode}/{Detail}/{Index:int}"
 @page "/Translations/{Mode}/{Id:int}/{Detail}/{Index:int}"
+@using Radzen;
 @using QnSProjectAward.BlazorApp.Shared.Components.Persistence.Language;
 @using TMasterContract = QnSProjectAward.Contracts.Persistence.Language.ITranslation;
 @using TMaster = QnSProjectAward.BlazorApp.Models.Persistence.Language.Translation;
@@ -12,14 +14,18 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href=@($"{PageRoot}")>@Translate(PageRoot)</a></li>
-            <li class="breadcrumb-item"><a href=@($"{NewRef}")>@Translate(nameof(NewRef))</a></li>
             @if (Id > 0)
             {
-                <li class="breadcrumb-item"><a href=@($"{ViewRef}")>@Translate(nameof(ViewRef))</a></li>
-                <li class="breadcrumb-item"><a href=@($"{EditRef}")>@Translate(nameof(EditRef))</a></li>
-                <li class="breadcrumb-item"><a href=@($"{DeleteRef}")>@Translate(nameof(DeleteRef))</a></li>
+                <li class="breadcrumb-item"><a href=@($"{ViewRef}")>@MasterName</a></li>
             }
-            <li class="breadcrumb-item active" aria-current="page">@Translate(Mode)</li>
+            else
+            {
+                <li class="breadcrumb-item"><a href=@($"{NewRef}")>@TranslateFor(nameof(NewRef))</a></li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Translate(DetailName)</li>
+            <li class="ml-auto px-2"><RadzenButton Visible=@ModelSetting.AllowAdd Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" Click="@(args => NavigationManager.NavigateTo(NewRef, true))" /></li>
+            <li class="px-2"><RadzenButton Visible=@ModelSetting.AllowEdit Disabled="@(Id < 1)" Icon="edit" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click="@(args => NavigationManager.NavigateTo(EditRef))" /></li>
+            <li class="px-2"><RadzenButton Visible=@ModelSetting.AllowDelete Disabled="@(Id < 1)" Icon="delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(args => NavigationManager.NavigateTo(DeleteRef))" /></li>
         </ol>
     </nav>
     if (MenuItems.Count > 0)
